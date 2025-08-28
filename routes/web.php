@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\EmployeeLoginController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LeaveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::post('/employees/{employee}/inline-update', [EmployeeController::class, 'inlineUpdate'])->name('employees.inline-update');
 	Route::resource('reviews', ReviewController::class);
+	Route::resource('leaves', LeaveController::class);
 });
 
 // Admin Auth (Breeze)

@@ -25,9 +25,11 @@
                                 @csrf
                                 <input type="text" name="name" placeholder="Name" class="border p-2 w-full mb-2" required>
                                 <input type="email" name="email" placeholder="Email" class="border p-2 w-full mb-2" required>
+								<input type="text" name="employee_id" placeholder="Employee ID" class="border p-2 w-full mb-2" required>
                                 <input type="text" name="phone" placeholder="Phone" class="border p-2 w-full mb-2">
                                 <input type="text" name="position" placeholder="Position" class="border p-2 w-full mb-2">
                                 <input type="text" name="pan_number" placeholder="PAN Number" class="border p-2 w-full mb-2">
+								<input type="date" name="joining_date" placeholder="Joining Date" class="border p-2 w-full mb-2">
                                 <textarea name="address" placeholder="Address" class="border p-2 w-full mb-2"></textarea>
                                 <div class="flex justify-end">
                                     <button type="button" id="closeModal" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">Cancel</button>
@@ -41,25 +43,29 @@
                     <table id="employeesTable" class="display w-full mt-4">
                         <thead>
                             <tr>
-                                <th>ID</th> <!-- Added ID Column -->
+                                <th style="display:none;">ID</th> <!-- Added ID Column -->
                                 <th>Name</th>
                                 <th>Email</th>
+								<th>Employee ID</th>
                                 <th>Phone</th>
                                 <th>Position</th>
                                 <th>PAN Number</th>
-                                <th>Address</th>
+                                <th>Joining Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($employees as $emp)
                             <tr data-id="{{ $emp->id }}">
-                                <td>{{ $emp->id }}</td> <!-- ID Cell -->
+                                <td style="display:none;">{{ $emp->id }}</td> <!-- ID Cell -->
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'name', this.innerText)">
                                     {{ $emp->name }}
                                 </td>
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'email', this.innerText)">
                                     {{ $emp->email }}
+                                </td>
+								<td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'employee_id', this.innerText)">
+                                    {{ $emp->employee_id }}
                                 </td>
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'phone', this.innerText)">
                                     {{ $emp->phone }}
@@ -70,8 +76,8 @@
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'pan_number', this.innerText)">
                                     {{ $emp->pan_number }}
                                 </td>
-                                <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'address', this.innerText)">
-                                    {{ $emp->address }}
+                                <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'joining_date', this.innerText)">
+                                    {{ $emp->joining_date }}
                                 </td>
                                 <td class="space-x-2">
                                     <!-- View Icon -->
@@ -108,6 +114,10 @@
     $(document).ready(function() {
         // Initialize DataTable with ID DESC
         $('#employeesTable').DataTable({
+			columnDefs: [
+				{ targets: 0, visible: false, searchable: false }, // Hide ID column
+				{ targets: -1, orderable: false } // Disable sorting for last column (Actions)
+			],
             "order": [[0, "desc"]], // ID column, descending
             "pageLength": 10,
             "responsive": true
@@ -136,26 +146,25 @@
 
                 // Add new row to DataTable dynamically (insert at top)
                 var table = $('#employeesTable').DataTable();
-                table.row.add([
-                    response.id,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'name', this.innerText)">${response.name}</td>`,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'email', this.innerText)">${response.email}</td>`,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'phone', this.innerText)">${response.phone ?? ''}</td>`,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'position', this.innerText)">${response.position ?? ''}</td>`,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'pan_number', this.innerText)">${response.pan_number ?? ''}</td>`,
-                    `<td contenteditable="true" onBlur="updateField(${response.id}, 'address', this.innerText)">${response.address ?? ''}</td>`,
-                    `<td>
-                        <a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <form method="POST" action="/employees/${response.id}" style="display:inline">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Delete?')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </td>`
-                ]).order([0, 'desc']).draw(false); // Force reorder by ID DESC
+				table.row.add([
+					`${response.id}`, // ID is hidden by DataTables configuration
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'name', this.innerText)">${response.name}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'email', this.innerText)">${response.email}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'employee_id', this.innerText)">${response.employee_id}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'phone', this.innerText)">${response.phone ?? ''}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'position', this.innerText)">${response.position ?? ''}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'pan_number', this.innerText)">${response.pan_number ?? ''}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'joining_date', this.innerText)">${response.joining_date ?? ''}</td>`,
+					`<td>
+						<a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
+						<form method="POST" action="/employees/${response.id}" style="display:inline">
+							@csrf @method('DELETE')
+							<button type="submit" class="text-red-500 hover:text-red-700" onclick="return confirm('Delete?')">
+								<i class="fas fa-trash-alt"></i>
+							</button>
+						</form>
+					</td>`
+				]).order([0, 'desc']).draw(false); // Force reorder by ID DESC
 
                 $('#addEmployeeForm')[0].reset();
             }

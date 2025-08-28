@@ -12,30 +12,16 @@
                 <h3 class="text-lg font-bold mb-4">Employee Information</h3>
 
                 <table class="w-full border-collapse border border-gray-300 mb-4">
-                    <tr>
-                        <th class="border p-2 text-left">Name</th>
-                        <td class="border p-2">{{ $employee->name }}</td>
-                    </tr>
-                    <tr>
-                        <th class="border p-2 text-left">Email</th>
-                        <td class="border p-2">{{ $employee->email }}</td>
-                    </tr>
-                    <tr>
-                        <th class="border p-2 text-left">Phone</th>
-                        <td class="border p-2">{{ $employee->phone }}</td>
-                    </tr>
-                    <tr>
-                        <th class="border p-2 text-left">Position</th>
-                        <td class="border p-2">{{ $employee->position }}</td>
-                    </tr>
-                    <tr>
-                        <th class="border p-2 text-left">PAN Number</th>
-                        <td class="border p-2">{{ $employee->pan_number }}</td>
-                    </tr>
-                    <tr>
-                        <th class="border p-2 text-left">Address</th>
-                        <td class="border p-2">{{ $employee->address }}</td>
-                    </tr>
+                    @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date'] as $field)
+                        <tr>
+                            <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
+                            <td class="border p-2">
+                                <span class="editable" data-field="{{ $field }}" data-id="{{ $employee->id }}">
+                                    {{ $employee->$field }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
                 </table>
 
                 <a href="{{ route('employees.index') }}" 
@@ -46,4 +32,49 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.editable').forEach(element => {
+                element.addEventListener('click', () => {
+                    const currentValue = element.textContent.trim();
+                    const field = element.dataset.field;
+                    const id = element.dataset.id;
+                    const input = document.createElement('input');
+
+                    input.type = 'text';
+                    input.value = currentValue;
+                    input.className = 'border p-1 w-full';
+                    element.replaceWith(input);
+                    input.focus();
+
+                    input.addEventListener('blur', () => {
+                        const newValue = input.value.trim();
+                        if (newValue !== currentValue) {
+                            fetch(`/employees/${id}/inline-update`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ [field]: newValue })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    input.replaceWith(element);
+                                    element.textContent = newValue;
+                                } else {
+                                    alert('Update failed!');
+                                    input.replaceWith(element);
+                                }
+                            });
+                        } else {
+                            input.replaceWith(element);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </x-app-layout>

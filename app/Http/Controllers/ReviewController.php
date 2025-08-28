@@ -22,6 +22,7 @@ class ReviewController extends Controller
 			'project_name' => 'required',
 			'date_from' => 'required|date',
 			'date_to' => 'required|date|after_or_equal:date_from',
+			'review_given_by' => 'required|string|max:255',
 			'review' => 'required',
 		]);
 
@@ -48,7 +49,7 @@ class ReviewController extends Controller
 	public function update(Request $request, $id)
 	{
 		$review = Review::findOrFail($id);
-		$review->update($request->only(['project_name', 'date_from', 'date_to', 'review']));
+		$review->update($request->only(['project_name', 'date_from', 'date_to', 'review_given_by', 'review']));
 		return response()->json(['success' => true]);
 	}
 }

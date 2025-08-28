@@ -21,6 +21,8 @@ class EmployeeController extends Controller
 		$request->validate([
 			'name' => 'required',
 			'email' => 'required|email|unique:employees,email',
+			'employee_id' => 'nullable|string|unique:employees,employee_id',
+			'joining_date' => 'nullable|date'
 		]);
 
 		$password = 'emp@123'; // Or use: Str::random(8);
@@ -28,9 +30,11 @@ class EmployeeController extends Controller
 		$employee = Employee::create([
 			'name' => $request->name,
 			'email' => $request->email,
+			'employee_id' => $request->employee_id,
 			'phone' => $request->phone,
 			'position' => $request->position,
 			'pan_number' => $request->pan_number,
+			'joining_date' => $request->joining_date,
 			'address' => $request->address,
 			'password' => bcrypt($password),
 		]);
@@ -46,10 +50,11 @@ class EmployeeController extends Controller
 				'id' => $employee->id,
 				'name' => $employee->name,
 				'email' => $employee->email,
+				'employee_id' => $employee->employee_id,
 				'phone' => $employee->phone,
 				'position' => $employee->position,
 				'pan_number' => $employee->pan_number,
-				'address' => $employee->address
+				'joining_date' => $employee->joining_date
 			]);
 		}
 

@@ -28,9 +28,17 @@
                         <th class="border p-2 text-left">To</th>
                         <td class="border p-2">{{ $review->date_to }}</td>
                     </tr>
+					<tr>
+                        <th class="border p-2 text-left">Review Given By</th>
+                        <td class="border p-2">{{ $review->review_given_by }}</td>
+                    </tr>
                     <tr>
                         <th class="border p-2 text-left">Review</th>
                         <td class="border p-2">{{ $review->review }}</td>
+                    </tr>
+					<tr>
+                        <th class="border p-2 text-left">Added At</th>
+                        <td class="border p-2">{{ $review->created_at }}</td>
                     </tr>
                 </table>
 
