@@ -77,7 +77,14 @@
                                     {{ $emp->pan_number }}
                                 </td>
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'joining_date', this.innerText)">
-                                    {{ $emp->joining_date }}
+                                    <input
+										type="date"
+										maxlength="10"
+										placeholder="YYYY-MM-DD"
+										value="{{ $emp->joining_date }}"
+										oninput="formatDateInput(event)"
+										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
+									/>
                                 </td>
                                 <td class="space-x-2">
                                     <!-- View Icon -->
@@ -179,4 +186,18 @@
         });
     }
     </script>
+	
+	<style>
+		input[type="date"] {
+			border: none;
+			background: transparent;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		input[type="date"]:focus {
+			outline: none;
+			background: #f3f3f3;
+		}
+	</style>
 </x-app-layout>
