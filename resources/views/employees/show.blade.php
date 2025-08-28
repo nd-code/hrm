@@ -16,9 +16,20 @@
                         <tr>
                             <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
                             <td class="border p-2">
-                                <span class="editable" data-field="{{ $field }}" data-id="{{ $employee->id }}">
-                                    {{ $employee->$field }}
-                                </span>
+                                @if ($field === 'joining_date')
+									<input
+										type="date"
+										class="joining-date-input"
+										value="{{ $employee->$field }}"
+										onchange="updateField({{ $employee->id }}, '{{ $field }}', this.value)"
+									/>
+								@else
+									<span class="editable"
+										data-field="{{ $field }}"
+										data-id="{{ $employee->id }}">
+										{{ $employee->$field }}
+									</span>
+								@endif
                             </td>
                         </tr>
                     @endforeach
@@ -33,6 +44,7 @@
         </div>
     </div>
 
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.editable').forEach(element => {
@@ -76,5 +88,26 @@
                 });
             });
         });
+		
+		// Inline update
+		function updateField(id, field, value) {
+			$.post(`/employees/${id}/inline-update`, {
+				_token: '{{ csrf_token() }}',
+				[field]: value
+			});
+		}
     </script>
+	
+	<style>
+		.joining-date-input {
+			border: none;
+			background: transparent;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.joining-date-input {
+			outline: none;
+		}
+	</style>
 </x-app-layout>

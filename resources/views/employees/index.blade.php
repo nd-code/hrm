@@ -79,10 +79,8 @@
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'joining_date', this.innerText)">
                                     <input
 										type="date"
-										maxlength="10"
-										placeholder="YYYY-MM-DD"
+										class="joining-date-input"
 										value="{{ $emp->joining_date }}"
-										oninput="formatDateInput(event)"
 										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
 									/>
                                 </td>
@@ -188,16 +186,15 @@
     </script>
 	
 	<style>
-		input[type="date"] {
+		.joining-date-input {
 			border: none;
 			background: transparent;
 			font: inherit;
 			cursor: pointer;
 		}
 
-		input[type="date"]:focus {
+		.joining-date-input {
 			outline: none;
-			background: #f3f3f3;
 		}
 	</style>
 </x-app-layout>
