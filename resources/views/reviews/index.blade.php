@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Reviews') }}
+            {{ __('Feedback') }}
         </h2>
     </x-slot>
 
@@ -27,7 +27,7 @@
 
                 <!-- Add Review Button -->
                 <div class="flex justify-end mb-4">
-                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Review</button>
+                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Feedback</button>
                 </div>
 
                 <!-- Reviews Table -->
@@ -39,8 +39,8 @@
                             <th>Project</th>
                             <th>From</th>
                             <th>To</th>
-                            <th>Review Given By</th>
-                            <th>Review</th>
+                            <th>Feedback Given By</th>
+                            <th>Feedback</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -75,8 +75,27 @@
         </div>
     </div>
 
-    <!-- Modal (unchanged) -->
-    <!-- ... Existing modal code here ... -->
+    <!-- Modal --> 
+	<div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+	   <div class="bg-white p-6 rounded shadow-lg w-1/3">
+		  <h2 class="text-lg font-semibold mb-4">Add Feedback</h2>
+		  <form id="reviewForm">
+			 @csrf 
+			 <select name="employee_id" required class="w-full mb-2 border p-2">
+				<option value="">Select Employee</option>
+				@foreach($employees as $employee) 
+				<option value="{{ $employee->id }}">{{ $employee->name }}</option>
+				@endforeach 
+			 </select>
+			 <input type="text" name="project_name" placeholder="Project Name" class="w-full mb-2 border p-2" required>
+			 <input type="date" name="date_from" class="w-full mb-2 border p-2" required>
+			 <input type="date" name="date_to" class="w-full mb-2 border p-2" required>
+			 <input type="text" name="review_given_by" placeholder="Feedback Given By" class="w-full mb-2 border p-2" required> 
+			 <textarea name="review" placeholder="Write Feedback..." class="w-full mb-2 border p-2" required></textarea>
+			 <div class="flex justify-end gap-2"> <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button> <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button> </div>
+		  </form>
+	   </div>
+	</div>
 
     <!-- Styles -->
     <style>

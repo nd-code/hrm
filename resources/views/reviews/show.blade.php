@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Review Details') }}
+            {{ __('Feedback Details') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
 
-                <h3 class="text-lg font-bold mb-4">Review Information</h3>
+                <h3 class="text-lg font-bold mb-4">Feedback Information</h3>
 
                 <table class="w-full border-collapse border border-gray-300">
                     <tr>
@@ -29,11 +29,11 @@
                         <td class="border p-2">{{ $review->date_to }}</td>
                     </tr>
 					<tr>
-                        <th class="border p-2 text-left">Review Given By</th>
+                        <th class="border p-2 text-left">Feedback Given By</th>
                         <td class="border p-2">{{ $review->review_given_by }}</td>
                     </tr>
                     <tr>
-                        <th class="border p-2 text-left">Review</th>
+                        <th class="border p-2 text-left">Feedback</th>
                         <td class="border p-2">{{ $review->review }}</td>
                     </tr>
 					<tr>

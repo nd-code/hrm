@@ -55,7 +55,7 @@
 								<li>
 									<a href="{{ route('reviews.index') }}"
 									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reviews.*') ? 'bg-gray-700' : '' }}">
-										Reviews
+										Feedback
 									</a>
 								</li>
 							@else
