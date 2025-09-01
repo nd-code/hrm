@@ -2,64 +2,81 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
 use App\Models\Leave;
-use App\Models\User;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
     public function index()
-	{
-		$leaves = Leave::with('employee')->latest()->get();
-		$employees = Employee::all();
-
-		return view('leaves.index', compact('leaves', 'employees'));
-	}
-
-    public function create()
     {
-        $employees = User::where('role', 'Employee')->get();
-        return view('leaves.create', compact('employees'));
+        $leaves = Leave::with('employee')->orderBy('id', 'desc')->get();
+        $employees = Employee::orderBy('id', 'desc')->get();
+        return view('leaves.index', compact('leaves', 'employees'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:users,id',
-            'leave_type' => 'required|string',
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'leave_type' => 'required|string|max:255',
             'from_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:from_date',
             'reason' => 'nullable|string',
         ]);
 
-        Leave::create($validated);
-        return redirect()->route('leaves.index')->with('success', 'Leave request submitted.');
+        $leave = Leave::create($request->all());
+
+        // Load employee relation for AJAX response
+        $leave->load('employee');
+
+        return response()->json($leave);
     }
 
-    public function edit(Leave $leave)
+    public function show($id)
     {
-        $employees = User::where('role', 'Employee')->get();
-        return view('leaves.edit', compact('leave', 'employees'));
+        $leave = Leave::with('employee')->findOrFail($id);
+        return view('leaves.show', compact('leave'));
     }
 
-    public function update(Request $request, Leave $leave)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'leave_type' => 'required|string',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date|after_or_equal:from_date',
-            'reason' => 'nullable|string',
-            'status' => 'required|in:Pending,Approved,Rejected'
-        ]);
-
-        $leave->update($validated);
-        return redirect()->route('leaves.index')->with('success', 'Leave updated.');
+        $leave = Leave::findOrFail($id);
+        $leave->update($request->only(['leave_type', 'from_date', 'to_date', 'reason', 'status']));
+        return response()->json(['success' => true]);
     }
 
     public function destroy(Leave $leave)
     {
         $leave->delete();
-        return redirect()->route('leaves.index')->with('success', 'Leave deleted.');
+        return back()->with('success', 'Leave deleted.');
     }
+	
+	public function updateStatus(Request $request, Leave $leave)
+	{
+		// Accept either lowercase or capitalized statuses from the UI
+		$request->validate([
+			'status' => 'required|string'
+		]);
+
+		$normalized = ucfirst(strtolower($request->status)); // approved -> Approved
+
+		// Only allow the 3 valid values
+		if (!in_array($normalized, ['Pending', 'Approved', 'Rejected'], true)) {
+			return response()->json(['message' => 'Invalid status value.'], 422);
+		}
+
+		// (Optional) prevent changing once approved/rejected
+		// if ($leave->status !== 'Pending') {
+		//     return response()->json(['message' => 'Only pending leaves can be updated.'], 422);
+		// }
+
+		$leave->update(['status' => $normalized]);
+
+		return response()->json([
+			'success' => true,
+			'status'  => $normalized,
+			'id'      => $leave->id,
+		]);
+	}
 }

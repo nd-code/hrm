@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/employees/{employee}/inline-update', [EmployeeController::class, 'inlineUpdate'])->name('employees.inline-update');
 	Route::resource('reviews', ReviewController::class);
 	Route::resource('leaves', LeaveController::class);
+	Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
 });
 
 // Admin Auth (Breeze)

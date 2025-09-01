@@ -94,7 +94,7 @@
                                     <form method="POST" action="{{ route('employees.destroy', $emp->id) }}" style="display:inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Delete?')">
+                                        <button type="submit" class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Delete this employee?')">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
@@ -164,7 +164,7 @@
 						<a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
 						<form method="POST" action="/employees/${response.id}" style="display:inline">
 							@csrf @method('DELETE')
-							<button type="submit" class="text-red-500 hover:text-red-700" onclick="return confirm('Delete?')">
+							<button type="submit" class="text-red-500 hover:text-red-700" onclick="return confirm('Delete this employee?')">
 								<i class="fas fa-trash-alt"></i>
 							</button>
 						</form>

@@ -61,7 +61,7 @@
                                 <form method="POST" action="{{ route('reviews.destroy', $review->id) }}" style="display:inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button onclick="return confirm('Delete?')">
+                                    <button onclick="return confirm('Delete this feedback?')">
                                         <i class="fas fa-trash-alt text-red-500"></i>
                                     </button>
                                 </form>
@@ -189,7 +189,7 @@
                             <form method="POST" action="/reviews/${data.id}" style="display:inline">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button onclick="return confirm('Delete?')">
+                                <button onclick="return confirm('Delete this feedback?')">
                                     <i class="fas fa-trash-alt text-red-500"></i>
                                 </button>
                             </form>
