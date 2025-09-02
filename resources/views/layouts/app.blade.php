@@ -39,7 +39,7 @@
 				<nav class="flex-1 p-4">
 					<ul class="space-y-2">
 						@auth
-							@if(Auth::user()->id === 1)
+							@if(Auth::user()->id === 101)
 								<li>
 									<a href="{{ route('dashboard') }}"
 									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
