@@ -71,6 +71,12 @@
 										My Dashboard
 									</a>
 								</li>
+								<li>
+									<a href="{{ route('employee.leaves.index') }}"
+									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.leaves.index') ? 'bg-gray-700' : '' }}">
+										Leaves
+									</a>
+								</li>
 							@endif
 						@endauth
 					</ul>

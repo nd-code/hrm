@@ -159,7 +159,12 @@
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'phone', this.innerText)">${response.phone ?? ''}</td>`,
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'position', this.innerText)">${response.position ?? ''}</td>`,
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'pan_number', this.innerText)">${response.pan_number ?? ''}</td>`,
-					`<td contenteditable="true" onBlur="updateField(${response.id}, 'joining_date', this.innerText)">${response.joining_date ?? ''}</td>`,
+					`<td contenteditable="true" onBlur="updateField(${response.id}, 'joining_date', this.innerText)"><input
+										type="date"
+										class="joining-date-input"
+										value="${response.joining_date ?? ''}"
+										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
+									/></td>`,
 					`<td>
 						<a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
 						<form method="POST" action="/employees/${response.id}" style="display:inline">

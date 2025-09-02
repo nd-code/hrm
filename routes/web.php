@@ -38,7 +38,13 @@ Route::post('/employee/logout', [EmployeeLoginController::class, 'logout'])->nam
 
 // Employee Dashboard
 Route::middleware(['auth:employee'])->group(function () {
-    Route::get('/employee/dashboard', fn() => view('employees.dashboard'))->name('employee.dashboard');
+    Route::get('/employee/dashboard', fn() => view('employee.dashboard'))->name('employee.dashboard');
+
+    // Employee Leave Routes
+    Route::get('/employee/leaves', [LeaveController::class, 'employeeIndex'])->name('employee.leaves.index');
+    Route::get('/employee/leaves/create', [LeaveController::class, 'employeeCreate'])->name('employee.leaves.create');
+    Route::post('/employee/leaves', [LeaveController::class, 'employeeStore'])->name('employee.leaves.store');
+    Route::get('/employee/leaves/{leave}', [LeaveController::class, 'employeeShow'])->name('employee.leaves.show');
 });
 
 Route::middleware('auth')->group(function () {

@@ -46,9 +46,10 @@ class LeaveController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function destroy(Leave $leave)
+    public function destroy($id)
     {
-        $leave->delete();
+        $leave = Leave::findOrFail($id);
+		$leave->delete();
         return back()->with('success', 'Leave deleted.');
     }
 	
@@ -78,5 +79,44 @@ class LeaveController extends Controller
 			'status'  => $normalized,
 			'id'      => $leave->id,
 		]);
+	}
+	
+	public function employeeIndex()
+	{
+		$leaves = Leave::where('employee_id', auth('employee')->id())->latest()->get();
+		return view('employee.leaves.index', compact('leaves'));
+	}
+
+	public function employeeCreate()
+	{
+		return view('employee.leaves.create');
+	}
+
+	public function employeeStore(Request $request)
+	{
+		$validated = $request->validate([
+			'leave_type' => 'required|string',
+			'from_date' => 'required|date',
+			'to_date' => 'required|date|after_or_equal:from_date',
+			'reason' => 'nullable|string',
+		]);
+
+		$validated['employee_id'] = auth('employee')->id();
+		$validated['status'] = 'Pending';
+
+		$leave = Leave::create($validated);
+
+		// Load employee relation for AJAX response
+        $leave->load('employee');
+
+        return response()->json($leave);
+	}
+
+	public function employeeShow(Leave $leave)
+	{
+		if ($leave->employee_id !== auth('employee')->id()) {
+			abort(403, 'Unauthorized access.');
+		}
+		return view('employee.leaves.show', compact('leave'));
 	}
 }

@@ -23,8 +23,8 @@
 
 				<!-- Add more boxes as needed -->
 				<div class="bg-purple-500 text-white p-6 rounded-lg shadow-md">
-					<h3 class="text-lg font-semibold">Projects</h3>
-					<p class="text-3xl font-bold">0</p>
+					<h3 class="text-lg font-semibold">Leaves</h3>
+					<p class="text-3xl font-bold">{{ $leaveCount }}</p>
 				</div>
 
 				<div class="bg-red-500 text-white p-6 rounded-lg shadow-md">

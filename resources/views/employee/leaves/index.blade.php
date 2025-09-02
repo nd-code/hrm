@@ -19,7 +19,6 @@
                     <thead>
                         <tr>
                             <th style="display:none;">Id</th>
-                            <th>Employee</th>
 							<th>Leave Type</th>
                             <th>From</th>
                             <th>To</th>
@@ -32,23 +31,15 @@
                         @foreach($leaves as $leave)
                         <tr data-id="{{ $leave->id }}">
                             <td style="display:none;">{{ $leave->id }}</td>
-                            <td>{{ $leave->employee->name }}</td>
-							<td contenteditable="true" class="editable" data-field="leave_type">{{ $leave->leave_type }}</td>
-                            <td contenteditable="true" class="editable" data-field="from_date">{{ $leave->from_date }}</td>
-                            <td contenteditable="true" class="editable" data-field="to_date">{{ $leave->to_date }}</td>
-                            <td contenteditable="true" class="editable" data-field="reason">{{ $leave->reason }}</td>
-                            <td>{{ ucfirst($leave->status) }}@if($leave->status == 'Pending')  (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="{{ $leave->id }}"><i class="fas fa-check-circle"></i></button><button class="reject-btn text-red-500 mr-2" title="Reject" data-id="{{ $leave->id }}"><i class="fas fa-times-circle"></i></button>)@endif</td>
+                            <td>{{ $leave->leave_type }}</td>
+                            <td>{{ $leave->from_date }}</td>
+                            <td>{{ $leave->to_date }}</td>
+                            <td>{{ $leave->reason }}</td>
+                            <td>{{ ucfirst($leave->status) }}</td>
                             <td>
-								<a href="{{ route('leaves.show', $leave->id) }}" title="View">
+								<a href="{{ route('employee.leaves.show', $leave->id) }}" title="View">
 									<i class="fas fa-eye text-blue-500 mr-2"></i>
 								</a>
-								<form method="POST" action="{{ route('leaves.destroy', $leave->id) }}" style="display:inline">
-									@csrf
-									@method('DELETE')
-									<button type="submit" class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Delete this leave?')">
-										<i class="fas fa-trash-alt"></i>
-									</button>
-								</form>
 							</td>
                         </tr>
                         @endforeach
@@ -65,13 +56,7 @@
             <h2 class="text-lg font-semibold mb-4">Add Leave</h2>
             <form id="leaveForm">
                 @csrf
-                <select name="employee_id" required class="w-full mb-2 border p-2">
-                    <option value="">Select Employee</option>
-                    @foreach($employees as $employee)
-                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                    @endforeach
-                </select>
-				<select name="leave_type" id="leave_type" class="w-full mb-2 border p-2" required>
+                <select name="leave_type" id="leave_type" class="w-full mb-2 border p-2" required>
                     <option value="">Select Leave Type</option>
                     <option value="Sick Leave">Sick Leave</option>
                     <option value="Casual Leave">Casual Leave</option>
@@ -124,7 +109,7 @@
             $('#leaveForm').submit(function (e) {
 				e.preventDefault();
 				$.ajax({
-					url: '{{ route("leaves.store") }}',
+					url: '{{ route("employee.leaves.store") }}',
 					method: 'POST',
 					data: $(this).serialize(),
 					success: function (data) {
@@ -132,28 +117,15 @@
 
 						let newRow = table.row.add([
 							data.id,
-							data.employee.name,
 							data.leave_type,
 							data.from_date,
 							data.to_date,
 							data.reason,
-							`Pending (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${data.id}">
-								<i class="fas fa-check-circle"></i>
-							 </button>
-							 <button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${data.id}">
-								<i class="fas fa-times-circle"></i>
-							 </button>)`,
+							`Pending`,
 							`
 							<a href="/leaves/${data.id}" title="View">
 								<i class="fas fa-eye text-blue-500 mr-2"></i>
 							</a>
-							<form method="POST" action="/leaves/${data.id}" style="display:inline">
-								<input type="hidden" name="_token" value="{{ csrf_token() }}">
-								<input type="hidden" name="_method" value="DELETE">
-								<button onclick="return confirm('Delete this leave?')" title="Delete">
-									<i class="fas fa-trash-alt text-red-500"></i>
-								</button>
-							</form>
 							`
 						]).draw().node();
 
@@ -162,49 +134,6 @@
 					},
 					error: function (xhr) {
 						alert(xhr.responseJSON?.message || 'Failed to create leave.');
-					}
-				});
-			});
-
-            // Inline Edit
-            $(document).on('blur', '.editable', function() {
-                let id = $(this).closest('tr').data('id');
-                let field = $(this).data('field');
-                let value = $(this).text();
-
-                $.ajax({
-                    url: `/leaves/${id}`,
-                    method: 'PUT',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        [field]: value
-                    }
-                });
-            });
-
-            // Approve/Reject Leave
-			$(document).on('click', '.approve-btn, .reject-btn', function() {
-				let id = $(this).data('id');
-				let status = $(this).hasClass('approve-btn') ? 'approved' : 'rejected';
-
-				$.ajax({
-					url: `/leaves/${id}/status`,
-					method: 'PUT',
-					data: {
-						_token: '{{ csrf_token() }}',
-						status: status
-					},
-					success: function(resp) {
-						// Update the status cell in the same row
-						const row = $(`#leavesTable tr[data-id="${id}"]`);
-						// Status is in the 7th column (index 6) based on your markup
-						row.find('td').eq(5).text(resp.status);
-
-						// Remove the approve/reject buttons after update
-						row.find('.approve-btn, .reject-btn').remove();
-					},
-					error: function(xhr){
-						alert(xhr.responseJSON?.message || 'Failed to update status.');
 					}
 				});
 			});
