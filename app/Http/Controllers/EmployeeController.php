@@ -6,6 +6,8 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\Models\EmployeeDocument;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -80,4 +82,45 @@ class EmployeeController extends Controller
 
         return response()->json(['success' => true]);
     }
+	
+	public function uploadDocuments(Request $request, $id)
+	{
+		$request->validate([
+			'documents.*' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120', // 5MB max
+		]);
+
+		$uploadedFiles = [];
+		foreach ($request->file('documents', []) as $file) {
+			$path = $file->store('employee_documents', 'public');
+			$document = EmployeeDocument::create([
+				'employee_id' => $id,
+				'file_name' => $file->getClientOriginalName(),
+				'file_path' => $path,
+			]);
+			$uploadedFiles[] = $document;
+		}
+
+		return response()->json(['success' => true, 'documents' => $uploadedFiles]);
+	}
+
+	public function getDocuments($id)
+	{
+		$documents = EmployeeDocument::where('employee_id', $id)->get();
+		return response()->json(['success' => true, 'documents' => $documents]);
+	}
+	
+	public function deleteDocument($employeeId, $documentId)
+	{
+		$document = EmployeeDocument::where('employee_id', $employeeId)->findOrFail($documentId);
+
+		// Delete file from storage
+		if (Storage::disk('public')->exists($document->file_path)) {
+			Storage::disk('public')->delete($document->file_path);
+		}
+
+		// Delete record
+		$document->delete();
+
+		return response()->json(['success' => true]);
+	}
 }

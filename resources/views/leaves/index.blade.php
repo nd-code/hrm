@@ -1,3 +1,6 @@
+@php
+	use Carbon\Carbon;
+@endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -20,10 +23,13 @@
                         <tr>
                             <th style="display:none;">Id</th>
                             <th>Employee</th>
+							<th>Apply To</th>
 							<th>Leave Type</th>
                             <th>From</th>
                             <th>To</th>
+							<th>Number of Days</th>
                             <th>Reason</th>
+							<th>Managed By</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -33,10 +39,26 @@
                         <tr data-id="{{ $leave->id }}">
                             <td style="display:none;">{{ $leave->id }}</td>
                             <td>{{ $leave->employee->name }}</td>
+							<td>
+								@php
+									$ids = explode(',', $leave->apply_to ?? '');
+									$names = \App\Models\Employee::whereIn('id', $ids)->pluck('name')->toArray();
+								@endphp
+								{{ implode(', ', $names) }}
+							</td>
 							<td contenteditable="true" class="editable" data-field="leave_type">{{ $leave->leave_type }}</td>
                             <td contenteditable="true" class="editable" data-field="from_date">{{ $leave->from_date }}</td>
                             <td contenteditable="true" class="editable" data-field="to_date">{{ $leave->to_date }}</td>
+							<td>
+								@php
+									$fromDate = Carbon::parse($leave->from_date);
+									$toDate = Carbon::parse($leave->to_date);
+									$days = $fromDate->diffInDays($toDate) + 1; // +1 if both dates are inclusive
+								@endphp
+								{{ $days }} Days
+							</td>
                             <td contenteditable="true" class="editable" data-field="reason">{{ $leave->reason }}</td>
+							<td>{{ $leave->manager?->name ?? '-' }}</td>
                             <td>{{ ucfirst($leave->status) }}@if($leave->status == 'Pending')  (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="{{ $leave->id }}"><i class="fas fa-check-circle"></i></button><button class="reject-btn text-red-500 mr-2" title="Reject" data-id="{{ $leave->id }}"><i class="fas fa-times-circle"></i></button>)@endif</td>
                             <td>
 								<a href="{{ route('leaves.show', $leave->id) }}" title="View">
@@ -65,8 +87,7 @@
             <h2 class="text-lg font-semibold mb-4">Add Leave</h2>
             <form id="leaveForm">
                 @csrf
-                <select name="employee_id" required class="w-full mb-2 border p-2">
-                    <option value="">Select Employee</option>
+                <select name="employee_ids[]" multiple required class="w-full mb-2 border p-2">
                     @foreach($employees as $employee)
                     <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                     @endforeach
@@ -88,6 +109,24 @@
             </form>
         </div>
     </div>
+	
+	<!-- Manage By Modal -->
+	<div id="manageByModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+		<div class="bg-white p-6 rounded shadow-lg w-96">
+			<h2 class="text-lg font-bold mb-4">Select Manager</h2>
+			<form id="manageByForm">
+				<select name="manage_by" id="manage_by" class="w-full border p-2 mb-4">
+					@foreach($employees as $employee)
+						<option value="{{ $employee->id }}">{{ $employee->name }}</option>
+					@endforeach
+				</select>
+				<input type="hidden" name="leave_id" id="leave_id">
+				<input type="hidden" name="status" id="leave_status">
+				<button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
+				<!--<button type="button" class="ml-2 bg-gray-400 text-white px-4 py-2 rounded" onclick="closeManageByModal()">Cancel</button>-->
+			</form>
+		</div>
+	</div>
 
     <!-- Styles -->
     <style>
@@ -132,6 +171,7 @@
 
 						let newRow = table.row.add([
 							data.id,
+							data.employee.name,
 							data.employee.name,
 							data.leave_type,
 							data.from_date,
@@ -183,27 +223,45 @@
             });
 
             // Approve/Reject Leave
-			$(document).on('click', '.approve-btn, .reject-btn', function() {
-				let id = $(this).data('id');
-				let status = $(this).hasClass('approve-btn') ? 'approved' : 'rejected';
+			let selectedLeaveId = null;
+			let selectedStatus = null;
+
+			$(document).on('click', '.approve-btn, .reject-btn', function () {
+				selectedLeaveId = $(this).data('id');
+				selectedStatus = $(this).hasClass('approve-btn') ? 'approved' : 'rejected';
+				$('#leave_id').val(selectedLeaveId);
+				$('#leave_status').val(selectedStatus);
+				$('#manageByModal').removeClass('hidden');
+			});
+
+			function closeManageByModal() {
+				$('#manageByModal').addClass('hidden');
+			}
+
+			$('#manageByForm').on('submit', function (e) {
+				e.preventDefault();
+
+				const leaveId = $('#leave_id').val();
+				const manageBy = $('#manage_by').val();
+				const status = $('#leave_status').val();
 
 				$.ajax({
-					url: `/leaves/${id}/status`,
+					url: `/leaves/${leaveId}/status`,
 					method: 'PUT',
 					data: {
 						_token: '{{ csrf_token() }}',
-						status: status
+						status: status,
+						manage_by: manageBy
 					},
-					success: function(resp) {
-						// Update the status cell in the same row
-						const row = $(`#leavesTable tr[data-id="${id}"]`);
-						// Status is in the 7th column (index 6) based on your markup
-						row.find('td').eq(5).text(resp.status);
-
-						// Remove the approve/reject buttons after update
+					success: function (resp) {
+						const row = $(`#leavesTable tr[data-id="${leaveId}"]`);
+						row.find('td').eq(7).text(resp.manager);
+						row.find('td').eq(8).text(resp.status);
 						row.find('.approve-btn, .reject-btn').remove();
+
+						closeManageByModal();
 					},
-					error: function(xhr){
+					error: function (xhr) {
 						alert(xhr.responseJSON?.message || 'Failed to update status.');
 					}
 				});

@@ -10,22 +10,28 @@
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
 				<!-- Employees Count -->
-				<div class="bg-blue-500 text-white p-6 rounded-lg shadow-md">
-					<h3 class="text-lg font-semibold">Employees</h3>
-					<p class="text-3xl font-bold">{{ $employeeCount }}</p>
-				</div>
+				<a href="{{ route('employees.index') }}">
+					<div class="bg-blue-500 text-white p-6 rounded-lg shadow-md">
+						<h3 class="text-lg font-semibold">Employees</h3>
+						<p class="text-3xl font-bold">{{ $employeeCount }}</p>
+					</div>
+				</a>
 
 				<!-- Reviews Count -->
-				<div class="bg-green-500 text-white p-6 rounded-lg shadow-md">
-					<h3 class="text-lg font-semibold">Reviews</h3>
-					<p class="text-3xl font-bold">{{ $reviewCount }}</p>
-				</div>
+				<a href="{{ route('reviews.index') }}">
+					<div class="bg-green-500 text-white p-6 rounded-lg shadow-md">
+						<h3 class="text-lg font-semibold">Feedback</h3>
+						<p class="text-3xl font-bold">{{ $reviewCount }}</p>
+					</div>
+				</a>
 
-				<!-- Add more boxes as needed -->
-				<div class="bg-purple-500 text-white p-6 rounded-lg shadow-md">
-					<h3 class="text-lg font-semibold">Leaves</h3>
-					<p class="text-3xl font-bold">{{ $leaveCount }}</p>
-				</div>
+				<!-- Leaves Count -->
+				<a href="{{ route('leaves.index') }}">
+					<div class="bg-purple-500 text-white p-6 rounded-lg shadow-md">
+						<h3 class="text-lg font-semibold">Leaves</h3>
+						<p class="text-3xl font-bold">{{ $leaveCount }}</p>
+					</div>
+				</a>
 
 				<div class="bg-red-500 text-white p-6 rounded-lg shadow-md">
 					<h3 class="text-lg font-semibold">Pending Tasks</h3>

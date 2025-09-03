@@ -15,7 +15,8 @@ class Employee extends Authenticatable
 		'password',
 		'pan_number',
 		'address',
-		'joining_date'
+		'joining_date',
+		'bank_details'
 	];
     protected $hidden = ['password'];
 }

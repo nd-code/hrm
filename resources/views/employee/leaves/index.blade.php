@@ -9,9 +9,9 @@
         <div class="mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
 
-                <!-- Add Leave Button -->
+                <!-- Apply Leave Button -->
                 <div class="flex justify-end mb-4">
-                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Leave</button>
+                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Apply Leave</button>
                 </div>
 
                 <!-- Leaves Table -->
@@ -19,6 +19,7 @@
                     <thead>
                         <tr>
                             <th style="display:none;">Id</th>
+							<th>Employee</th>
 							<th>Leave Type</th>
                             <th>From</th>
                             <th>To</th>
@@ -31,6 +32,7 @@
                         @foreach($leaves as $leave)
                         <tr data-id="{{ $leave->id }}">
                             <td style="display:none;">{{ $leave->id }}</td>
+                            <td>{{ $leave->employee->name }}</td>
                             <td>{{ $leave->leave_type }}</td>
                             <td>{{ $leave->from_date }}</td>
                             <td>{{ $leave->to_date }}</td>
@@ -53,22 +55,26 @@
     <!-- Modal -->
     <div id="modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded shadow-lg w-1/3">
-            <h2 class="text-lg font-semibold mb-4">Add Leave</h2>
+            <h2 class="text-lg font-semibold mb-4">Apply Leave</h2>
             <form id="leaveForm">
                 @csrf
                 <select name="leave_type" id="leave_type" class="w-full mb-2 border p-2" required>
                     <option value="">Select Leave Type</option>
                     <option value="Sick Leave">Sick Leave</option>
                     <option value="Casual Leave">Casual Leave</option>
-                    <option value="Paid Leave">Paid Leave</option>
-                    <option value="Unpaid Leave">Unpaid Leave</option>
                 </select>
                 <input type="date" name="from_date" class="w-full mb-2 border p-2" required>
                 <input type="date" name="to_date" class="w-full mb-2 border p-2" required>
                 <textarea name="reason" placeholder="Reason for leave..." class="w-full mb-2 border p-2" required></textarea>
+				<label>Email To:</label>
+				<select name="employee_ids[]" multiple required class="w-full mb-2 border p-2">
+                    @foreach($employees as $employee)
+                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                    @endforeach
+                </select>
                 <div class="flex justify-end gap-2">
                     <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Apply</button>
                 </div>
             </form>
         </div>
@@ -105,7 +111,7 @@
             $('#openModal').click(() => $('#modal').removeClass('hidden'));
             $('#closeModal').click(() => $('#modal').addClass('hidden'));
 
-            // Add Leave via AJAX
+            // Apply Leave via AJAX
             $('#leaveForm').submit(function (e) {
 				e.preventDefault();
 				$.ajax({
@@ -117,6 +123,7 @@
 
 						let newRow = table.row.add([
 							data.id,
+							data.employee.name,
 							data.leave_type,
 							data.from_date,
 							data.to_date,
