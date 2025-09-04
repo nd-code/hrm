@@ -50,8 +50,14 @@
                             <td style="display:none;">{{ $review->id }}</td>
                             <td>{{ $review->employee->name }}</td>
                             <td contenteditable="true" class="editable" data-field="project_name">{{ $review->project_name }}</td>
-                            <td contenteditable="true" class="editable" data-field="date_from">{{ $review->date_from }}</td>
-                            <td contenteditable="true" class="editable" data-field="date_to">{{ $review->date_to }}</td>
+                            <td>
+								<input type="date" class="editable-date" data-field="date_from" 
+									   value="{{ $review->date_from }}">
+							</td>
+							<td>
+								<input type="date" class="editable-date" data-field="date_to" 
+									   value="{{ $review->date_to }}">
+							</td>
                             <td contenteditable="true" class="editable" data-field="review_given_by">{{ $review->review_given_by }}</td>
                             <td contenteditable="true" class="editable" data-field="review">{{ $review->review }}</td>
                             <td>
@@ -223,6 +229,41 @@
                     }
                 });
             });
+			
+			// Inline Edit for Date Pickers
+			$(document).on('change', '.editable-date', function() {
+				let id = $(this).closest('tr').data('id');
+				let field = $(this).data('field');
+				let value = $(this).val();
+
+				$.ajax({
+					url: `/reviews/${id}`,
+					method: 'PUT',
+					data: {
+						_token: '{{ csrf_token() }}',
+						[field]: value
+					},
+					success: function() {
+						console.log('Date updated successfully');
+					},
+					error: function() {
+						alert('Date update failed');
+					}
+				});
+			});
         });
     </script>
+
+	<style>
+		.editable-date {
+			border: none;
+			background: transparent;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.editable-date {
+			outline: none;
+		}
+	</style>
 </x-app-layout>

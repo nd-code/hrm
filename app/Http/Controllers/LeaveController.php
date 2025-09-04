@@ -52,7 +52,14 @@ class LeaveController extends Controller
     {
         $leave = Leave::findOrFail($id);
         $leave->update($request->only(['leave_type', 'from_date', 'to_date', 'reason', 'status']));
-        return response()->json(['success' => true]);
+		
+		$days = null;
+		if ($leave->from_date && $leave->to_date) {
+			$days = \Carbon\Carbon::parse($leave->from_date)
+				->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+		}
+		
+        return response()->json(['success' => true, 'days' => $days]);
     }
 
     public function destroy($id)
@@ -133,5 +140,22 @@ class LeaveController extends Controller
 			abort(403, 'Unauthorized access.');
 		}
 		return view('employee.leaves.show', compact('leave'));
+	}
+	
+	public function inlineUpdate(Request $request, $id)
+	{
+		$leave = Leave::findOrFail($id);
+		$leave->update($request->only(['leave_type', 'from_date', 'to_date', 'reason']));
+
+		$days = null;
+		if ($leave->from_date && $leave->to_date) {
+			$days = \Carbon\Carbon::parse($leave->from_date)
+				->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+		}
+
+		return response()->json([
+			'success' => true,
+			'days' => $days
+		]);
 	}
 }

@@ -52,4 +52,19 @@ class ReviewController extends Controller
 		$review->update($request->only(['project_name', 'date_from', 'date_to', 'review_given_by', 'review']));
 		return response()->json(['success' => true]);
 	}
+	
+	public function inlineUpdate(Request $request, $id)
+	{
+		$review = \App\Models\Review::findOrFail($id);
+
+		$review->update($request->only([
+			'project_name',
+			'date_from',
+			'date_to',
+			'review_given_by',
+			'review'
+		]));
+
+		return response()->json(['success' => true]);
+	}
 }

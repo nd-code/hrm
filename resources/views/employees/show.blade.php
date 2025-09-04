@@ -202,12 +202,22 @@
 							const wrapper = document.createElement('div');
 							wrapper.className = 'flex items-center justify-between mb-1';
 
+							// File name (click to view in browser)
 							const link = document.createElement('a');
 							link.href = `/storage/${doc.file_path}`;
 							link.textContent = doc.file_name;
 							link.target = '_blank';
-							link.className = 'text-blue-600 hover:underline';
+							link.className = 'text-blue-600 hover:underline flex-1';
 
+							// Download button
+							const downloadBtn = document.createElement('a');
+							downloadBtn.href = `/storage/${doc.file_path}`;
+							downloadBtn.download = doc.file_name;
+							downloadBtn.textContent = '⬇️';
+							downloadBtn.className = 'ml-2 text-green-600 hover:text-green-800';
+							downloadBtn.style.cursor = 'pointer';
+
+							// Delete button
 							const deleteBtn = document.createElement('button');
 							deleteBtn.textContent = '🗑️';
 							deleteBtn.className = 'ml-2 text-red-600 hover:text-red-800';
@@ -215,6 +225,7 @@
 							deleteBtn.addEventListener('click', () => deleteDocument(employeeId, doc.id));
 
 							wrapper.appendChild(link);
+							wrapper.appendChild(downloadBtn); // Added before delete
 							wrapper.appendChild(deleteBtn);
 							container.appendChild(wrapper);
 						});

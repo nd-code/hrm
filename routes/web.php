@@ -25,10 +25,13 @@ Route::middleware(['auth'])->group(function () {
 	Route::resource('reviews', ReviewController::class);
 	Route::resource('leaves', LeaveController::class);
 	Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
+	Route::post('/leaves/{id}/inline-update', [LeaveController::class, 'inlineUpdate'])->name('leaves.inline-update');
 	
 	Route::post('/employees/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
 	Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
 	Route::delete('/employees/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
+	
+	Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
 });
 
 // Admin Auth (Breeze)

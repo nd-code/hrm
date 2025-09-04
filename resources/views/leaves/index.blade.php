@@ -47,9 +47,15 @@
 								{{ implode(', ', $names) }}
 							</td>
 							<td contenteditable="true" class="editable" data-field="leave_type">{{ $leave->leave_type }}</td>
-                            <td contenteditable="true" class="editable" data-field="from_date">{{ $leave->from_date }}</td>
-                            <td contenteditable="true" class="editable" data-field="to_date">{{ $leave->to_date }}</td>
+                            <td>
+								<input type="date" class="editable-date" data-field="from_date"
+									   value="{{ $leave->from_date }}">
+							</td>
 							<td>
+								<input type="date" class="editable-date" data-field="to_date"
+									   value="{{ $leave->to_date }}">
+							</td>
+							<td id="leave-days">
 								@php
 									$fromDate = Carbon::parse($leave->from_date);
 									$toDate = Carbon::parse($leave->to_date);
@@ -266,6 +272,45 @@
 					}
 				});
 			});
+			
+			// Inline Edit for Date Pickers
+			$(document).on('change', '.editable-date', function () {
+				let id = $(this).closest('tr').data('id');
+				let field = $(this).data('field');
+				let value = $(this).val();
+
+				$.ajax({
+					url: `/leaves/${id}`,
+					method: 'PUT',
+					data: {
+						_token: '{{ csrf_token() }}',
+						[field]: value
+					},
+					success: function (data) {
+						console.log('Date updated successfully');
+						
+						if (data.success && data.days !== undefined) {
+							document.getElementById('leave-days').textContent = data.days + ' Days';
+						}
+					},
+					error: function () {
+						alert('Date update failed');
+					}
+				});
+			});
         });
     </script>
+
+	<style>
+		.editable-date {
+			border: none;
+			background: transparent;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.editable-date {
+			outline: none;
+		}
+	</style>
 </x-app-layout>
