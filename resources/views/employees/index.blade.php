@@ -33,7 +33,7 @@
                                 <textarea name="address" placeholder="Address" class="border p-2 w-full mb-2"></textarea>
                                 <div class="flex justify-end">
                                     <button type="button" id="closeModal" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">Cancel</button>
-                                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
+                                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded savebtn">Save</button>
                                 </div>
                             </form>
                         </div>
@@ -142,6 +142,7 @@
     // Submit add employee form via AJAX
     $('#addEmployeeForm').submit(function(e) {
         e.preventDefault();
+		$('.savebtn').prop('disabled', true);
         $.ajax({
             url: "{{ route('employees.store') }}",
             method: 'POST',
@@ -165,7 +166,7 @@
 										value="${response.joining_date ?? ''}"
 										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
 									/></td>`,
-					`<td>
+					`<td class="space-x-2">
 						<a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
 						<form method="POST" action="/employees/${response.id}" style="display:inline">
 							@csrf @method('DELETE')

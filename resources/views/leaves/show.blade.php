@@ -65,7 +65,7 @@
 								$toDate = Carbon::parse($leave->to_date);
 								$days = $fromDate->diffInDays($toDate) + 1;
 							@endphp
-							{{ $days }} Days
+							{{ $days }} Day(s)
 						</td>
 					</tr>
 					<tr>

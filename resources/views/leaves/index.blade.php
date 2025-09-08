@@ -27,7 +27,7 @@
 							<th>Leave Type</th>
                             <th>From</th>
                             <th>To</th>
-							<th>Number of Days</th>
+							<th>Number of Day(s)</th>
                             <th>Reason</th>
 							<th>Managed By</th>
                             <th>Status</th>
@@ -57,11 +57,18 @@
 							</td>
 							<td id="leave-days">
 								@php
-									$fromDate = Carbon::parse($leave->from_date);
-									$toDate = Carbon::parse($leave->to_date);
-									$days = $fromDate->diffInDays($toDate) + 1; // +1 if both dates are inclusive
+									if(isset($leave->leave_type) && $leave->leave_type == 'Half Day Leave')
+									{
+										$days = '0.5';
+									}
+									else
+									{
+										$fromDate = Carbon::parse($leave->from_date);
+										$toDate = Carbon::parse($leave->to_date);
+										$days = $fromDate->diffInDays($toDate) + 1; // +1 if both dates are inclusive
+									}
 								@endphp
-								{{ $days }} Days
+								{{ $days }} Day(s)
 							</td>
                             <td contenteditable="true" class="editable" data-field="reason">{{ $leave->reason }}</td>
 							<td>{{ $leave->manager?->name ?? '-' }}</td>
@@ -290,7 +297,7 @@
 						console.log('Date updated successfully');
 						
 						if (data.success && data.days !== undefined) {
-							document.getElementById('leave-days').textContent = data.days + ' Days';
+							document.getElementById('leave-days').textContent = data.days + ' Day(s)';
 						}
 					},
 					error: function () {

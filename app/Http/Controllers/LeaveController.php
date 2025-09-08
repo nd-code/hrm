@@ -35,6 +35,17 @@ class LeaveController extends Controller
 		}
 
 		$leave = Leave::create($validated);
+		
+		// Send email to all selected employees
+		if (!empty($request->employee_ids)) {
+			$employees = Employee::whereIn('id', $request->employee_ids)->get();
+			foreach ($employees as $emp) {
+				\Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$validated['from_date']} to {$validated['to_date']}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
+					$msg->to($emp->email)
+						->subject('New Leave Application Notification');
+				});
+			}
+		}
 
         // Load employee relation for AJAX response
         $leave->load('employee');
@@ -54,9 +65,16 @@ class LeaveController extends Controller
         $leave->update($request->only(['leave_type', 'from_date', 'to_date', 'reason', 'status']));
 		
 		$days = null;
-		if ($leave->from_date && $leave->to_date) {
-			$days = \Carbon\Carbon::parse($leave->from_date)
-				->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+		if(isset($leave->leave_type) && $leave->leave_type == 'Half Day Leave')
+		{
+			$days = '0.5';
+		}
+		else
+		{
+			if ($leave->from_date && $leave->to_date) {
+				$days = \Carbon\Carbon::parse($leave->from_date)
+					->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+			}
 		}
 		
         return response()->json(['success' => true, 'days' => $days]);
@@ -86,6 +104,26 @@ class LeaveController extends Controller
 			'status'    => $normalized,
 			'manage_by' => $request->manage_by,
 		]);
+		
+		// Notify the employee who applied for leave
+		if ($leave->employee) {
+			\Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$leave->from_date} to {$leave->to_date} has been {$normalized}.", function ($msg) use ($leave) {
+				$msg->to($leave->employee->email)
+					->subject('Leave Status Updated');
+			});
+		}
+
+		// Notify all selected employees in 'apply_to'
+		if (!empty($leave->apply_to)) {
+			$employeeIds = explode(',', $leave->apply_to);
+			$employees = Employee::whereIn('id', $employeeIds)->get();
+			foreach ($employees as $emp) {
+				\Mail::raw("Hello {$emp->name},\n\nThe leave request from {$leave->from_date} to {$leave->to_date} has been {$normalized}.", function ($msg) use ($emp) {
+					$msg->to($emp->email)
+						->subject('Leave Status Updated');
+				});
+			}
+		}
 
 		return response()->json([
 			'success' => true,
@@ -127,6 +165,17 @@ class LeaveController extends Controller
 		}
 
 		$leave = Leave::create($validated);
+		
+		// Send email to all selected employees
+		if (!empty($request->employee_ids)) {
+			$employees = Employee::whereIn('id', $request->employee_ids)->get();
+			foreach ($employees as $emp) {
+				\Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$validated['from_date']} to {$validated['to_date']}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
+					$msg->to($emp->email)
+						->subject('New Leave Application Notification');
+				});
+			}
+		}
 
 		// Load employee relation for AJAX response
         $leave->load('employee');
@@ -148,9 +197,16 @@ class LeaveController extends Controller
 		$leave->update($request->only(['leave_type', 'from_date', 'to_date', 'reason']));
 
 		$days = null;
-		if ($leave->from_date && $leave->to_date) {
-			$days = \Carbon\Carbon::parse($leave->from_date)
-				->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+		if(isset($leave->leave_type) && $leave->leave_type == 'Half Day Leave')
+		{
+			$days = '0.5';
+		}
+		else
+		{
+			if ($leave->from_date && $leave->to_date) {
+				$days = \Carbon\Carbon::parse($leave->from_date)
+					->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+			}
 		}
 
 		return response()->json([

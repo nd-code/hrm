@@ -27,7 +27,7 @@ class EmployeeController extends Controller
 			'joining_date' => 'nullable|date'
 		]);
 
-		$password = 'emp@123'; // Or use: Str::random(8);
+		$password = Str::random(8);
 
 		$employee = Employee::create([
 			'name' => $request->name,
@@ -42,9 +42,9 @@ class EmployeeController extends Controller
 		]);
 
 		// Send login details to employee email
-		//Mail::raw("Hi {$employee->name},\n\nYour account has been created.\nEmail: {$employee->email}\nPassword: {$password}\n\nLogin: " . url('/employee/login'), function ($msg) use ($employee) {
-			//$msg->to($employee->email)->subject('Your Employee Account');
-		//});
+		Mail::raw("Hi {$employee->name},\n\nYour account has been created.\nEmail: {$employee->email}\nPassword: {$password}\n\nYou can login here:\n" . url('/employee/login'), function ($msg) use ($employee) {
+			$msg->to($employee->email)->subject('Your Employee Account');
+		});
 
 		// If it's an AJAX request, return JSON
 		if ($request->ajax()) {

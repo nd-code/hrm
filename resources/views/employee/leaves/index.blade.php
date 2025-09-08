@@ -60,6 +60,7 @@
                 @csrf
                 <select name="leave_type" id="leave_type" class="w-full mb-2 border p-2" required>
                     <option value="">Select Leave Type</option>
+					<option value="Half Day Leave">Half Day Leave</option>
                     <option value="Sick Leave">Sick Leave</option>
                     <option value="Casual Leave">Casual Leave</option>
                 </select>

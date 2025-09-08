@@ -5,6 +5,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\EmployeeWorkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,8 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::get('/employee/leaves/create', [LeaveController::class, 'employeeCreate'])->name('employee.leaves.create');
     Route::post('/employee/leaves', [LeaveController::class, 'employeeStore'])->name('employee.leaves.store');
     Route::get('/employee/leaves/{leave}', [LeaveController::class, 'employeeShow'])->name('employee.leaves.show');
+	
+	Route::post('/employee/work/timer', [EmployeeWorkController::class, 'timerWork'])->name('employee.work.timer');
 });
 
 Route::middleware('auth')->group(function () {
