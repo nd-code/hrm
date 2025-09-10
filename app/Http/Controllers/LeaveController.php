@@ -8,12 +8,41 @@ use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
-    public function index()
-    {
-        $leaves = Leave::with('employee')->orderBy('id', 'desc')->get();
-        $employees = Employee::orderBy('id', 'desc')->get();
-        return view('leaves.index', compact('leaves', 'employees'));
-    }
+    public function index(Request $request)
+	{
+		$query = Leave::with(['employee', 'manager'])->orderBy('id', 'desc');
+
+		// Filters for AJAX request
+		if ($request->ajax()) {
+			if ($request->filled('employee_id')) {
+				$query->where('employee_id', $request->employee_id);
+			}
+			if ($request->filled('from_date')) {
+				$query->whereDate('from_date', '>=', $request->from_date);
+			}
+			if ($request->filled('to_date')) {
+				$query->whereDate('to_date', '<=', $request->to_date);
+			}
+
+			$leaves = $query->get()->map(function ($leave) {
+				// Convert apply_to IDs to employee names
+				$applyToIds = explode(',', $leave->apply_to ?? '');
+				$applyToNames = Employee::whereIn('id', $applyToIds)->pluck('name')->toArray();
+				$leave->apply_to_names = implode(', ', $applyToNames);
+
+				return $leave;
+			});
+
+			return response()->json([
+				'data' => $leaves
+			]);
+		}
+
+		$employees = Employee::orderBy('id', 'desc')->get();
+		$leaves = Leave::with(['employee', 'manager'])->orderBy('id', 'desc')->get();
+
+		return view('leaves.index', compact('employees', 'leaves'));
+	}
 
     public function store(Request $request)
     {

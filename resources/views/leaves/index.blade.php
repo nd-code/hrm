@@ -16,6 +16,25 @@
                 <div class="flex justify-end mb-4">
                     <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Leave</button>
                 </div>
+				
+				<!-- Filters -->
+				<div class="mb-4 flex space-x-4">
+					<select id="employee_filter" class="border p-2 rounded">
+						<option value="">All Employees</option>
+						@foreach($employees as $employee)
+							<option value="{{ $employee->id }}">{{ $employee->name }}</option>
+						@endforeach
+					</select>
+
+					<input type="date" id="from_date" class="border p-2 rounded">
+					<input type="date" id="to_date" class="border p-2 rounded">
+
+					<button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
+					
+					<button type="button" id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded">
+						Reset
+					</button>
+				</div>
 
                 <!-- Leaves Table -->
                 <table id="leavesTable" class="w-full">
@@ -156,18 +175,146 @@
     <script>
         $(document).ready(function () {
             let table = $('#leavesTable').DataTable({
-                columnDefs: [
-                    { targets: 0, visible: false, searchable: false },
-                    { targets: -1, orderable: false }
-                ],
-                "order": [[0, "desc"]],
-                "pageLength": 10,
-                "responsive": true,
-                "rowCallback": function (row, data, displayIndex) {
-                    $(row).removeClass('odd even');
-                    $(row).addClass(displayIndex % 2 === 0 ? 'even' : 'odd');
-                }
-            });
+				processing: true,
+				serverSide: false, // since you are returning all data after filter
+				ajax: {
+					url: '{{ route("leaves.index") }}',
+					data: function (d) {
+						d.employee_id = $('#employee_filter').val();
+						d.from_date   = $('#from_date').val();
+						d.to_date     = $('#to_date').val();
+					},
+					dataSrc: 'data' // your JSON response has "data" key
+				},
+				columns: [
+					{ data: 'id', visible: false },
+
+					// Employee
+					{ data: 'employee.name', defaultContent: '-' },
+
+					// Apply To
+					{ 
+						data: 'apply_to_names',
+						className: 'editable',
+						render: function (data, type, row) {
+							return data || '-';
+						}
+					},
+
+					// Leave Type
+					{ 
+						data: 'leave_type',
+						render: function (data, type, row) {
+							return `<span contenteditable="true" 
+										  class="editable" 
+										  data-id="${row.id}" 
+										  data-field="leave_type">${data || ''}</span>`;
+						}
+					},
+
+					// From Date
+					{ 
+						data: 'from_date',
+						render: function (data, type, row) {
+							return `<input type="date" class="editable-date" data-id="${row.id}" data-field="from_date" value="${data || ''}">`;
+						}
+					},
+
+					// To Date
+					{ 
+						data: 'to_date',
+						render: function (data, type, row) {
+							return `<input type="date" class="editable-date" data-id="${row.id}" data-field="to_date" value="${data || ''}">`;
+						}
+					},
+
+					// Number of days
+					{ 
+						data: null,
+						render: function (row) {
+							let days = 0;
+							if (row.leave_type === 'Half Day Leave') {
+								days = 0.5;
+							} else {
+								let from = new Date(row.from_date);
+								let to   = new Date(row.to_date);
+								days = Math.floor((to - from) / (1000*60*60*24)) + 1;
+							}
+							return `<span id="leave-days-${row.id}">${days} Day(s)</span>`;
+						}
+					},
+
+					// Reason
+					{ 
+						data: 'reason',
+						render: function (data, type, row) {
+							return `<span contenteditable="true" 
+										  class="editable" 
+										  data-id="${row.id}" 
+										  data-field="reason">${data || ''}</span>`;
+						}
+					},
+
+					// Managed By
+					{ data: 'manager.name', defaultContent: '-' },
+
+					// Status
+					{ 
+						data: 'status',
+						render: function (data, type, row) {
+							let status = data ? data.charAt(0).toUpperCase() + data.slice(1) : '';
+							if (data === 'Pending') {
+								return `${status} 
+									(<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${row.id}">
+										<i class="fas fa-check-circle"></i>
+									</button>
+									<button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${row.id}">
+										<i class="fas fa-times-circle"></i>
+									</button>)`;
+							}
+							return status;
+						}
+					},
+
+					// Actions
+					{ 
+						data: null,
+						orderable: false,
+						render: function (row) {
+							return `<a href="/leaves/${row.id}" title="View">
+										<i class="fas fa-eye text-blue-500 mr-2"></i>
+									</a>
+									<form method="POST" action="/leaves/${row.id}" style="display:inline">
+										<input type="hidden" name="_token" value="{{ csrf_token() }}">
+										<input type="hidden" name="_method" value="DELETE">
+										<button onclick="return confirm('Delete this leave?')" title="Delete">
+											<i class="fas fa-trash-alt text-red-500"></i>
+										</button>
+									</form>`;
+						}
+					}
+				],
+				order: [[0, "desc"]],
+				pageLength: 10,
+				responsive: true,
+				rowCallback: function (row, data, displayIndex) {
+					$(row).removeClass('odd even');
+					$(row).addClass(displayIndex % 2 === 0 ? 'even' : 'odd');
+				}
+			});
+
+			// Filter button reload
+			$('#filterBtn').on('click', function () {
+				table.ajax.reload();
+			});
+			
+			// Reset button
+			$('#resetBtn').on('click', function () {
+				$('#employee_filter').val('');
+				$('#from_date').val('');
+				$('#to_date').val('');
+				table.ajax.url('{{ route("leaves.index") }}').load();
+			});
 
             $('#openModal').click(() => $('#modal').removeClass('hidden'));
             $('#closeModal').click(() => $('#modal').addClass('hidden'));
@@ -219,21 +366,27 @@
 				});
 			});
 
-            // Inline Edit
-            $(document).on('blur', '.editable', function() {
-                let id = $(this).closest('tr').data('id');
-                let field = $(this).data('field');
-                let value = $(this).text();
+            // Inline text editing (on blur)
+			$(document).on('blur', '.editable', function () {
+				let id    = $(this).data('id');
+				let field = $(this).data('field');
+				let value = $(this).text().trim();
 
-                $.ajax({
-                    url: `/leaves/${id}`,
-                    method: 'PUT',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        [field]: value
-                    }
-                });
-            });
+				$.ajax({
+					url: `/leaves/${id}`,   // update endpoint
+					type: 'PUT',
+					data: {
+						_token: '{{ csrf_token() }}',
+						[field]: value
+					},
+					success: function (res) {
+						console.log("Updated", res);
+					},
+					error: function (xhr) {
+						alert("Update failed: " + xhr.responseText);
+					}
+				});
+			});
 
             // Approve/Reject Leave
 			let selectedLeaveId = null;
@@ -280,28 +433,28 @@
 				});
 			});
 			
-			// Inline Edit for Date Pickers
+			// Inline date editing (on change)
 			$(document).on('change', '.editable-date', function () {
-				let id = $(this).closest('tr').data('id');
+				let id    = $(this).data('id');
 				let field = $(this).data('field');
 				let value = $(this).val();
 
 				$.ajax({
 					url: `/leaves/${id}`,
-					method: 'PUT',
+					type: 'PUT',
 					data: {
 						_token: '{{ csrf_token() }}',
 						[field]: value
 					},
-					success: function (data) {
-						console.log('Date updated successfully');
+					success: function (res) {
+						console.log("Date updated", res);
 						
-						if (data.success && data.days !== undefined) {
-							document.getElementById('leave-days').textContent = data.days + ' Day(s)';
+						if (res.success && res.days !== undefined) {
+							document.getElementById('leave-days-'+id).textContent = res.days + ' Day(s)';
 						}
 					},
-					error: function () {
-						alert('Date update failed');
+					error: function (xhr) {
+						alert("Update failed: " + xhr.responseText);
 					}
 				});
 			});
