@@ -1,15 +1,16 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Feedback') }}
-        </h2>
-    </x-slot>
-
     <div class="py-12">
         <div class="mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
 
-                <!-- Filters -->
+				<h3 class="text-lg font-bold mb-4">Feedback Management</h3>
+
+                <!-- Add Review Button -->
+                <div class="flex justify-end mb-4">
+                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Feedback</button>
+                </div>
+				
+				<!-- Filters -->
                 <div class="flex gap-4 mb-4">
                     <div>
                         <label for="from_date" class="block text-sm font-medium text-gray-700">From Date</label>
@@ -23,11 +24,6 @@
                         <button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
                         <button id="resetBtn" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
                     </div>
-                </div>
-
-                <!-- Add Review Button -->
-                <div class="flex justify-end mb-4">
-                    <button id="openModal" class="bg-blue-500 text-white px-4 py-2 rounded">Add Feedback</button>
                 </div>
 
                 <!-- Reviews Table -->
