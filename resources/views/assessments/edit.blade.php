@@ -10,7 +10,7 @@
 
 					<div class="row mb-3">
 						<div class="col-lg-3">
-							<label>Employee</label>
+							<label>Employee:</label>
 							<select class="form-control" required disabled>
 								@foreach($employees as $emp)
 									<option value="{{ $emp->id }}" @selected($emp->id == $assessment->employee_id)>
@@ -23,7 +23,7 @@
 						</div>
 
 						<div class="col-lg-3">
-							<label>Date</label>
+							<label>Assessment Date:</label>
 							<input type="date" name="assessment_date" class="form-control" value="{{ $assessment->assessment_date }}" required>
 						</div>
 					</div>

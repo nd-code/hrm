@@ -15,7 +15,7 @@
 
                 <!-- Add New Assessment Button -->
                 <div class="flex justify-end mb-4">
-                    <a href="{{ route('assessments.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">+ New Assessment</a>
+                    <a href="{{ route('assessments.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">Add Assessment</a>
                 </div>
 
                 <!-- Assessment Table -->
@@ -25,7 +25,8 @@
 							<th style="display:none;">ID</th>
 							<th>Employee</th>
 							<th>Reviewer</th>
-							<th>Date</th>
+							<th>Assessment Date</th>
+							<th>Final Conclusion</th>
 							<th width="200">Actions</th>
 						</tr>
 					</thead>
@@ -36,6 +37,7 @@
 							<td class="border-bottom-0">{{ $assessment->employee->name ?? '-' }}</td>
 							<td class="border-bottom-0">{{ $assessment->reviewer->name ?? '-' }}</td>
 							<td class="border-bottom-0">{{ \Carbon\Carbon::parse($assessment->assessment_date)->format('d-m-Y') }}</td>
+							<td class="border-bottom-0">{{ $assessment->final_conclusion ?? '-' }}</td>
 							<td class="border-bottom-0">
 								<a href="{{ route('assessments.show', $assessment) }}"><i class="fas fa-eye text-blue-500 mr-2"></i></a>
 								<a href="{{ route('assessments.edit', $assessment) }}"><i class="fas fa-pencil text-blue-500 mr-2"></i></a>

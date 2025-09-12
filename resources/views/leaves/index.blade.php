@@ -170,6 +170,9 @@
 
     <script>
         $(document).ready(function () {
+			// Disable DataTables default alert popup
+			$.fn.dataTable.ext.errMode = 'none';
+			
             let table = $('#leavesTable').DataTable({
 				processing: true,
 				serverSide: false, // since you are returning all data after filter
@@ -355,6 +358,8 @@
 
 						$(newRow).attr('data-id', data.id);
 						$('#leaveForm')[0].reset();
+						
+						location.reload();
 					},
 					error: function (xhr) {
 						alert(xhr.responseJSON?.message || 'Failed to create leave.');

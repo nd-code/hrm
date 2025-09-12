@@ -66,7 +66,7 @@ class LeaveController extends Controller
 		$leave = Leave::create($validated);
 		
 		// Send email to all selected employees
-		if (!empty($request->employee_ids)) {
+		/*if (!empty($request->employee_ids)) {
 			$employees = Employee::whereIn('id', $request->employee_ids)->get();
 			foreach ($employees as $emp) {
 				\Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$validated['from_date']} to {$validated['to_date']}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
@@ -74,7 +74,7 @@ class LeaveController extends Controller
 						->subject('New Leave Application Notification');
 				});
 			}
-		}
+		}*/
 
         // Load employee relation for AJAX response
         $leave->load('employee');
