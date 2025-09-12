@@ -33,10 +33,13 @@
 					</div>
 				</a>
 
-				<div class="bg-red-500 text-white p-6 rounded-lg shadow-md">
-					<h3 class="text-lg font-semibold">Pending Tasks</h3>
-					<p class="text-3xl font-bold">0</p>
-				</div>
+				<!-- KPA Count -->
+				<a href="{{ route('assessments.index') }}">
+					<div class="bg-red-500 text-white p-6 rounded-lg shadow-md">
+						<h3 class="text-lg font-semibold">KPA</h3>
+						<p class="text-3xl font-bold">{{ $assessmentCount }}</p>
+					</div>
+				</a>
 
 			</div>
 		</div>
