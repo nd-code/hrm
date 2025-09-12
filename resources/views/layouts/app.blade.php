@@ -69,7 +69,7 @@
 								<li>
 									<a href="{{ route('assessments.index') }}"
 									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('assessments.*') ? 'bg-gray-700' : '' }}">
-										Key Assessments
+										KPA
 									</a>
 								</li>
 							@else
