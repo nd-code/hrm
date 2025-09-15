@@ -23,6 +23,17 @@
 							<label>Assessment Date:</label>
 							<input type="date" name="assessment_date" class="form-control" value="{{ date('Y-m-d') }}" required>
 						</div>
+						
+						<div class="col-lg-3">
+							<label>Type:</label>
+							<select name="type" class="form-control" required>
+								<option value="">-- Select Type --</option>
+								<option value="Weekly">Weekly</option>
+								<option value="Quarterly">Quarterly</option>
+								<option value="Half Yearly">Half Yearly</option>
+								<option value="Yearly">Yearly</option>
+							</select>
+						</div>
 					</div>
 
 					@include('assessments.partials.form-fields')

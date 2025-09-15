@@ -8,7 +8,8 @@
 				<div class="mb-3">
 					<strong>Employee:</strong> {{ $assessment->employee->name ?? '-' }} <br>
 					<strong>Reviewer:</strong> {{ $assessment->reviewer->name ?? '-' }} <br>
-					<strong>Date:</strong> {{ \Carbon\Carbon::parse($assessment->assessment_date)->format('d-m-Y') }}
+					<strong>Date:</strong> {{ \Carbon\Carbon::parse($assessment->assessment_date)->format('d-m-Y') }} <br>
+					<strong>Type:</strong> {{ $assessment->type ?? '-' }}
 				</div>
 
 				@include('assessments.partials.view-fields',['assessment'=>$assessment])

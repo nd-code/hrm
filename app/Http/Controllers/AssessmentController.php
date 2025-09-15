@@ -25,6 +25,7 @@ class AssessmentController extends Controller
         $data = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'assessment_date' => 'required|date',
+			'type' => 'required|in:Weekly,Quarterly,Half Yearly,Yearly',
 			'final_conclusion' => 'nullable|string|max:5000',
         ] + collect(range(1,15))->mapWithKeys(fn($i)=>["comment_$i"=>'nullable|string'])->toArray());
 
@@ -52,6 +53,7 @@ class AssessmentController extends Controller
         $data = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'assessment_date' => 'required|date',
+			'type' => 'required|in:Weekly,Quarterly,Half Yearly,Yearly',
 			'final_conclusion' => 'nullable|string|max:5000',
         ] + collect(range(1,15))->mapWithKeys(fn($i)=>["comment_$i"=>'nullable|string'])->toArray());
 

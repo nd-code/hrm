@@ -26,28 +26,34 @@
 							<th>Employee</th>
 							<th>Reviewer</th>
 							<th>Assessment Date</th>
+							<th>Type</th>
 							<th>Final Conclusion</th>
 							<th width="200">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach($assessments as $assessment)
-						<tr class="{{ $loop->even ? 'even' : 'odd' }}">
-							<td class="border-bottom-0" style="display:none;">{{ $assessment->id }}</td>
-							<td class="border-bottom-0">{{ $assessment->employee->name ?? '-' }}</td>
-							<td class="border-bottom-0">{{ $assessment->reviewer->name ?? '-' }}</td>
-							<td class="border-bottom-0">{{ \Carbon\Carbon::parse($assessment->assessment_date)->format('d-m-Y') }}</td>
-							<td class="border-bottom-0">{{ $assessment->final_conclusion ?? '-' }}</td>
-							<td class="border-bottom-0">
-								<a href="{{ route('assessments.show', $assessment) }}"><i class="fas fa-eye text-blue-500 mr-2"></i></a>
-								<a href="{{ route('assessments.edit', $assessment) }}"><i class="fas fa-pencil text-blue-500 mr-2"></i></a>
-								<form action="{{ route('assessments.destroy', $assessment) }}" method="POST" style="display:inline-block;">
-									@csrf @method('DELETE')
-									<button onclick="return confirm('Delete?')"><i class="fas fa-trash-alt text-red-500"></i></button>
-								</form>
-							</td>
-						</tr>
-						@endforeach
+						@forelse($assessments as $assessment)
+							<tr class="{{ $loop->even ? 'even' : 'odd' }}">
+								<td style="display:none;">{{ $assessment->id }}</td>
+								<td>{{ $assessment->employee->name ?? '-' }}</td>
+								<td>{{ $assessment->reviewer->name ?? '-' }}</td>
+								<td>{{ \Carbon\Carbon::parse($assessment->assessment_date)->format('d-m-Y') }}</td>
+								<td>{{ $assessment->type }}</td>
+								<td>{{ $assessment->final_conclusion ?? '-' }}</td>
+								<td>
+									<a href="{{ route('assessments.show', $assessment) }}"><i class="fas fa-eye text-blue-500 mr-2"></i></a>
+									<a href="{{ route('assessments.edit', $assessment) }}"><i class="fas fa-pencil text-blue-500 mr-2"></i></a>
+									<form action="{{ route('assessments.destroy', $assessment) }}" method="POST" style="display:inline-block;">
+										@csrf @method('DELETE')
+										<button onclick="return confirm('Delete?')"><i class="fas fa-trash-alt text-red-500"></i></button>
+									</form>
+								</td>
+							</tr>
+						@empty
+							<tr>
+								<td colspan="6" class="text-center text-gray-500">No assessments found</td>
+							</tr>
+						@endforelse
 					</tbody>
 				</table>
 

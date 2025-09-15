@@ -26,6 +26,16 @@
 							<label>Assessment Date:</label>
 							<input type="date" name="assessment_date" class="form-control" value="{{ $assessment->assessment_date }}" required>
 						</div>
+						
+						<div class="col-lg-3">
+							<label>Type:</label>
+							<select name="type" class="form-control" required>
+								<option value="Weekly" {{ $assessment->type == 'Weekly' ? 'selected' : '' }}>Weekly</option>
+								<option value="Quarterly" {{ $assessment->type == 'Quarterly' ? 'selected' : '' }}>Quarterly</option>
+								<option value="Half Yearly" {{ $assessment->type == 'Half Yearly' ? 'selected' : '' }}>Half Yearly</option>
+								<option value="Yearly" {{ $assessment->type == 'Yearly' ? 'selected' : '' }}>Yearly</option>
+							</select>
+						</div>
 					</div>
 
 					@include('assessments.partials.form-fields',['assessment'=>$assessment])
