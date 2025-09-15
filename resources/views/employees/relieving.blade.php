@@ -74,7 +74,7 @@
 				to <b>{{ formatDateWithSuffix(now()) }}</b>. 
 				<span class="pronoun">He/She</span> is a hardworking, trustworthy, and qualified responsible person. 
 				We have confirmed that <span class="pronoun">he/she</span> has submitted all 
-				her liabilities to the company and relieved her by 
+				his/her liabilities to the company and relieved his/her by 
 				<b>{{ formatDateWithSuffix(now()) }}</b>.<br><br>
 				We wish his/her the best of luck for his/her future.
 			</p>
