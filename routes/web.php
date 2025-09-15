@@ -23,7 +23,7 @@ use App\Http\Controllers\AssessmentController;
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('employees', EmployeeController::class);
-    Route::post('/employees/{employee}/inline-update', [EmployeeController::class, 'inlineUpdate'])->name('employees.inline-update');
+    Route::post('/employees/{id}/inline-update', [EmployeeController::class, 'inlineUpdate'])->name('employees.inline-update');
 	Route::resource('reviews', ReviewController::class);
 	Route::resource('leaves', LeaveController::class);
 	Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
@@ -31,7 +31,9 @@ Route::middleware(['auth'])->group(function () {
 	
 	Route::post('/employees/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
 	Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
-	Route::delete('/employees/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
+	Route::delete('/employees/{id}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
+	
+	Route::get('/employees/{id}/relieving-letter', [EmployeeController::class, 'relievingLetter'])->name('employees.relieving-letter');
 	
 	Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
 	

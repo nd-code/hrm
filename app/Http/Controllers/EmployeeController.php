@@ -123,4 +123,11 @@ class EmployeeController extends Controller
 
 		return response()->json(['success' => true]);
 	}
+	
+	public function relievingLetter($id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        return view('employees.relieving', compact('employee'));
+    }
 }
