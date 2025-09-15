@@ -63,7 +63,7 @@
 					</tr>
 					<tr>
 						<th class="border p-2 text-left">Relieving Letter</th>
-						<td class="border p-2"><a href="{{ route('employees.relieving-letter', $employee->id) }}"><button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button></a></td>
+						<td class="border p-2"><a target="_blank" href="{{ route('employees.relieving-letter', $employee->id) }}"><button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button></a></td>
 					</tr>
                 </table>
 
