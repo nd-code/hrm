@@ -75,12 +75,10 @@
 				<span class="pronoun">He/She</span> is a hardworking, trustworthy, and qualified responsible person. 
 				We have confirmed that <span class="pronoun">he/she</span> has submitted all 
 				her liabilities to the company and relieved her by 
-				<b>{{ formatDateWithSuffix(now()) }}</b>.
+				<b>{{ formatDateWithSuffix(now()) }}</b>.<br><br>
+				We wish his/her the best of luck for his/her future.
 			</p>
 		</div>
-        <div class="wishesh">
-            <p>We wish herthe best of luck for her future.</p>
-        </div>
         <div class="thanksLine">Thank you.</div>
         <div class="thanksName">
             Ashesh Suthar. <br>
