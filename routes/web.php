@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\EmployeeWorkController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\RelievingLetterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,8 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
 	Route::delete('/employees/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
 	
-	Route::get('/employees/{id}/relieving-letter', [EmployeeController::class, 'relievingLetter'])->name('employees.relieving-letter');
+	Route::get('/employees/{id}/relieving-letter', [RelievingLetterController::class, 'show'])->name('employees.relieving-letter');
+	Route::post('/employees/{id}/relieving-letter/save', [RelievingLetterController::class, 'save'])->name('employees.relieving-letter.save');
 	
 	Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
 	

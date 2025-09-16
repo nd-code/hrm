@@ -66,18 +66,12 @@
             Address: {{ $employee->address }}
         </div>
         <h2>To Whomsoever It May Concern</h2>
-        <div class="detail" contenteditable="true">
-			<p>
-				This is to declare that <b>{{ $employee->name }}</b> was working as 
-				<b>{{ $employee->position }}</b> with our esteemed organization 
-				from <b>{{ formatDateWithSuffix($employee->joining_date) }}</b> 
-				to <b>{{ formatDateWithSuffix(now()) }}</b>. 
-				<span class="pronoun">He/She</span> is a hardworking, trustworthy, and qualified responsible person. 
-				We have confirmed that <span class="pronoun">he/she</span> has submitted all 
-				his/her liabilities to the company and relieved his/her by 
-				<b>{{ formatDateWithSuffix(now()) }}</b>.<br><br>
-				We wish his/her the best of luck for his/her future.
-			</p>
+        <div id="letterContent" class="detail" contenteditable="true">
+			@if($letter && $letter->content)
+				{!! $letter->content !!}
+			@else
+				@include('employees.relieving-content', ['employee' => $employee])
+			@endif
 		</div>
         <div class="thanksLine">Thank you.</div>
         <div class="thanksName">
@@ -107,5 +101,29 @@
 		  padding: 5px;
 	  }*/
 	</style>
+	
+	<script>
+	let timeout = null;
+
+	document.getElementById('letterContent').addEventListener('input', function() {
+		clearTimeout(timeout);
+		timeout = setTimeout(saveLetter, 1000); // save after 1s of no typing
+	});
+
+	function saveLetter() {
+		let content = document.getElementById('letterContent').innerHTML;
+
+		fetch("{{ route('employees.relieving-letter.save', $employee->id) }}", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-TOKEN": "{{ csrf_token() }}"
+			},
+			body: JSON.stringify({
+				relieving_letter: content
+			})
+		}).catch(err => console.error("Auto-save failed", err));
+	}
+	</script>
 </body>
 </html>
