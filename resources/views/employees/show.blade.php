@@ -91,11 +91,6 @@
                         </tr>
                     </table>
 
-                    <a href="{{ route('employees.index') }}" 
-                       class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
-                       ← Back
-                    </a>
-
                 </div>
 
                 <!-- Attendance Tab -->
@@ -128,20 +123,19 @@
                                 <td>{{ $session->start_time }}</td>
                                 <td>{{ $session->end_time }}</td>
                                 <td>{{ $total }}</td>
-                                <td contenteditable="true" 
-                                    onBlur="updateWorkField(this, '{{ $session->id }}', 'project_name')">
-                                    {{ $session->project_name }}
-                                </td>
-                                <td contenteditable="true" 
-                                    onBlur="updateWorkField(this, '{{ $session->id }}', 'comment')">
-                                    {{ $session->comment }}
-                                </td>
+                                <td>{{ $session->project_name }}</td>
+                                <td>{{ $session->comment }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
 
                 </div>
+				
+				<a href="{{ route('employees.index') }}" 
+				   class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
+				   ← Back
+				</a>
             </div>
 
         </div>
@@ -205,19 +199,6 @@
                 }
             });
         });
-
-        function updateWorkField(el, id, field) {
-            $.ajax({
-                url: "/employee/" + id + "/inline-update",
-                type: "POST",
-                data: {
-                    id: id,
-                    field: field,
-                    value: el.innerText,
-                    _token: "{{ csrf_token() }}"
-                }
-            });
-        }
     </script>
 
     <!-- Styles -->
