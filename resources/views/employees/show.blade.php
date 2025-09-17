@@ -120,8 +120,12 @@
                             <tr data-id="{{ $session->id }}">
                                 <td style="display:none;">{{ $session->id }}</td>
                                 <td>{{ $session->work_date }}</td>
-                                <td>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i:s') }}</td>
-                                <td>{{ \Carbon\Carbon::parse($session->end_time)->format('H:i:s') }}</td>
+                                <td>
+									{{ $session->start_time ? \Carbon\Carbon::parse($session->start_time)->format('H:i:s') : '-' }}
+								</td>
+								<td>
+									{{ $session->end_time ? \Carbon\Carbon::parse($session->end_time)->format('H:i:s') : '-' }}
+								</td>
                                 <td>{{ $total }}</td>
                                 <td>{{ $session->project_name }}</td>
                                 <td>{{ $session->comment }}</td>
