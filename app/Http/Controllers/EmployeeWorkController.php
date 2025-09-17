@@ -37,4 +37,26 @@ class EmployeeWorkController extends Controller
 
         return redirect()->back()->with('success', $message);
     }
+	
+	public function workIndex()
+    {
+        $sessions = WorkSession::where('employee_id', auth()->id())
+			->orderBy('id', 'desc')
+			->get();
+
+		return view('employee.work.index', compact('sessions'));
+    }
+	
+	public function inlineUpdate(Request $request, $id)
+	{
+		$session = WorkSession::findOrFail($id);
+
+		// allow only project_name or comment updates
+		if (in_array($request->field, ['project_name', 'comment'])) {
+			$session->{$request->field} = $request->value;
+			$session->save();
+		}
+
+		return response()->json(['success' => true]);
+	}
 }

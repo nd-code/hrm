@@ -53,10 +53,11 @@ class LeaveController extends Controller
 			'from_date' => 'required|date',
 			'to_date' => 'required|date|after_or_equal:from_date',
 			'reason' => 'nullable|string',
+			'manage_by' => 'required|integer|exists:employees,id'
 		]);
 
 		$validated['employee_id'] = $request->employee_ids[0];
-		$validated['status'] = 'Pending';
+		$validated['status'] = 'Approved';
 		
 		// Convert array to comma-separated string
 		if ($request->has('employee_ids')) {

@@ -85,6 +85,12 @@
 										Leaves
 									</a>
 								</li>
+								<li>
+									<a href="{{ route('employee.work.index') }}"
+									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.work.index') ? 'bg-gray-700' : '' }}">
+										My Work
+									</a>
+								</li>
 							@endif
 						@endauth
 					</ul>

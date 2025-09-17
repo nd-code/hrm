@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\EmployeeDocument;
 use Illuminate\Support\Facades\Storage;
+use App\Models\WorkSession;
 
 class EmployeeController extends Controller
 {
@@ -66,7 +67,11 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-        return view('employees.show', compact('employee'));
+		$sessions = WorkSession::where('employee_id', $employee->id)
+			->orderBy('id', 'desc')
+			->get();
+
+        return view('employees.show', compact('employee', 'sessions'));
     }
 
     public function destroy(Employee $employee)

@@ -62,6 +62,8 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::get('/employee/leaves/{leave}', [LeaveController::class, 'employeeShow'])->name('employee.leaves.show');
 	
 	Route::post('/employee/work/timer', [EmployeeWorkController::class, 'timerWork'])->name('employee.work.timer');
+	Route::get('/employee/work', [EmployeeWorkController::class, 'workIndex'])->name('employee.work.index');
+	Route::post('/employee/{id}/inline-update', [EmployeeWorkController::class, 'inlineUpdate'])->name('employee.work.inline-update');
 });
 
 Route::middleware('auth')->group(function () {

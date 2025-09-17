@@ -14,6 +14,8 @@ class WorkSession extends Model
         'work_date',
         'start_time',
         'end_time',
+		'project_name',
+        'comment'
     ];
 
     protected $dates = [

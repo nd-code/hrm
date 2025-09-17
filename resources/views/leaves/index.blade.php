@@ -129,7 +129,13 @@
                 </select>
                 <input type="date" name="from_date" class="w-full mb-2 border p-2" required>
                 <input type="date" name="to_date" class="w-full mb-2 border p-2" required>
-                <textarea name="reason" placeholder="Reason for leave..." class="w-full mb-2 border p-2" required></textarea>
+                <textarea name="reason" placeholder="Reason for leave..." class="w-full border p-2" required></textarea>
+				<select name="manage_by" class="w-full border p-2 mb-4">
+					<option value="">Manage By</option>
+					@foreach($employees as $employee)
+						<option value="{{ $employee->id }}">{{ $employee->name }}</option>
+					@endforeach
+				</select>
                 <div class="flex justify-end gap-2">
                     <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
                     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
@@ -151,7 +157,7 @@
 				<input type="hidden" name="leave_id" id="leave_id">
 				<input type="hidden" name="status" id="leave_status">
 				<button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
-				<!--<button type="button" class="ml-2 bg-gray-400 text-white px-4 py-2 rounded" onclick="closeManageByModal()">Cancel</button>-->
+				<button type="button" id="closemanageByModalModal" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
 			</form>
 		</div>
 	</div>
@@ -317,6 +323,8 @@
 
             $('#openModal').click(() => $('#modal').removeClass('hidden'));
             $('#closeModal').click(() => $('#modal').addClass('hidden'));
+			
+			$('#closemanageByModalModal').click(() => $('#manageByModal').addClass('hidden'));
 
             // Add Leave via AJAX
             $('#leaveForm').submit(function (e) {
