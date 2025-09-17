@@ -52,11 +52,11 @@
 						@csrf
 						@if($todaySession && !$todaySession->end_time)
 							<button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
-								Stop Work
+								Offline
 							</button>
 						@else
 							<button class="block text-left px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">
-								Start Work
+								Online
 							</button>
 						@endif
 					</form>

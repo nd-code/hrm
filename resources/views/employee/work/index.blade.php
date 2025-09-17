@@ -15,8 +15,8 @@
                         <tr>
                             <th style="display:none;">Id</th>
                             <th>Date</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
+                            <th>Online</th>
+                            <th>Offline</th>
                             <th>Total Hours</th>
                             <th>Project Name</th>
                             <th>Comment</th>

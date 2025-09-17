@@ -20,7 +20,7 @@ class EmployeeWorkController extends Controller
             ->first();
 
         if (!$session || $session->end_time) {
-            // Start work
+            // Online
             WorkSession::create([
                 'employee_id' => auth('employee')->id(),
                 'work_date' => $today,
@@ -28,7 +28,7 @@ class EmployeeWorkController extends Controller
             ]);
             $message = 'Work started!';
         } else {
-            // Stop work
+            // Offline
             $session->update([
                 'end_time' => now(),
             ]);
