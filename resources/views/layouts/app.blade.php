@@ -97,12 +97,24 @@
 				</nav>
 
 				<div class="p-4 border-t border-gray-700">
-					<form method="POST" action="{{ route('logout') }}">
-						@csrf
-						<button class="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
-							Logout
-						</button>
-					</form>
+					<ul>
+						@if(Auth::user()->id !== 101)
+							<li>
+								<a href="{{ route('employee.profile') }}"
+									   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
+									My Details
+								</a>
+							</li>
+						@endif
+						<li>
+							<form method="POST" action="{{ route('logout') }}">
+								@csrf
+								<button class="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
+									Logout
+								</button>
+							</form>
+						</li>
+					</ul>
 				</div>
 			</aside>
 

@@ -135,4 +135,11 @@ class EmployeeController extends Controller
 
         return view('employees.relieving', compact('employee'));
     }
+	
+	public function profile()
+	{
+		$employee = auth()->user(); // logged-in employee
+
+		return view('employee.profile', compact('employee'));
+	}
 }
