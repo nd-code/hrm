@@ -24,31 +24,38 @@
                     </thead>
                     <tbody>
                         @foreach($sessions as $session)
-                        @php
-                            $start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
-                            $end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
-                            $total = ($start && $end) ? $start->diff($end)->format('%H:%I:%S') : '-';
-                        @endphp
-                        <tr data-id="{{ $session->id }}">
-                            <td style="display:none;">{{ $session->id }}</td>
-                            <td>{{ $session->work_date }}</td>
-                            <td>
-								{{ $session->start_time ? \Carbon\Carbon::parse($session->start_time)->format('H:i:s') : '-' }}
-							</td>
-							<td>
-								{{ $session->end_time ? \Carbon\Carbon::parse($session->end_time)->format('H:i:s') : '-' }}
-							</td>
-                            <td>{{ $total }}</td>
-                            <td contenteditable="true" 
-                                onBlur="updateField(this, '{{ $session->id }}', 'project_name')">
-                                {{ $session->project_name }}
-                            </td>
-                            <td contenteditable="true" 
-                                onBlur="updateField(this, '{{ $session->id }}', 'comment')">
-                                {{ $session->comment }}
-                            </td>
-                        </tr>
-                        @endforeach
+							@php
+								$start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
+								$end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
+								$total = ($start && $end) ? $start->diff($end)->format('%H:%I:%S') : '-';
+							@endphp
+							<tr data-id="{{ $session->id }}">
+								<td style="display:none;">{{ $session->id }}</td>
+								<td>{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
+
+								{{-- Start Time in 12-hour format --}}
+								<td>
+									{{ $start ? $start->format('h:i A') : '-' }}
+								</td>
+
+								{{-- End Time in 12-hour format --}}
+								<td>
+									{{ $end ? $end->format('h:i A') : '-' }}
+								</td>
+
+								{{-- Total duration (still HH:MM:SS) --}}
+								<td>{{ $total }}</td>
+
+								<td contenteditable="true" 
+									onBlur="updateField(this, '{{ $session->id }}', 'project_name')">
+									{{ $session->project_name }}
+								</td>
+								<td contenteditable="true" 
+									onBlur="updateField(this, '{{ $session->id }}', 'comment')">
+									{{ $session->comment }}
+								</td>
+							</tr>
+						@endforeach
                     </tbody>
                 </table>
 
