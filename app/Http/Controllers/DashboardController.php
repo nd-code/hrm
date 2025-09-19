@@ -25,4 +25,14 @@ class DashboardController extends Controller
 
         return view('dashboard', compact('employeeCount', 'reviewCount', 'leaveCount', 'assessmentCount', 'onlineEmployees'));
     }
+	
+	public function getOnlineEmployees()
+	{
+		$onlineEmployees = WorkSession::with('employee')
+			->whereDate('work_date', today())
+			->latest()
+			->get();
+
+		return view('online-employees', compact('onlineEmployees'));
+	}
 }

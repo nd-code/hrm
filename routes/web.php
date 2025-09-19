@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
 	Route::resource('leaves', LeaveController::class);
 	Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
 	Route::post('/leaves/{id}/inline-update', [LeaveController::class, 'inlineUpdate'])->name('leaves.inline-update');
+	Route::get('/dashboard/online', [DashboardController::class, 'getOnlineEmployees']);
 	
 	Route::post('/employees/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
 	Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
