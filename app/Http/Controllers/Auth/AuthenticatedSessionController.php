@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -23,13 +22,31 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $request->authenticate();
+        $request->validate([
+            'email' => ['required','email'],
+            'password' => ['required'],
+        ]);
 
-        $request->session()->regenerate();
+        $credentials = $request->only('email', 'password');
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // Try Admin login first (default guard: web)
+        if (Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended('/dashboard');
+        }
+
+        // Try Employee login
+        if (Auth::guard('employee')->attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended('/employee/dashboard');
+        }
+
+        // If both fail
+        throw ValidationException::withMessages([
+            'email' => __('auth.failed'),
+        ]);
     }
 
     /**
@@ -37,10 +54,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Logout both guards
         Auth::guard('web')->logout();
+        Auth::guard('employee')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

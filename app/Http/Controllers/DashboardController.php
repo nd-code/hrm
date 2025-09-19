@@ -30,7 +30,7 @@ class DashboardController extends Controller
 	{
 		$onlineEmployees = WorkSession::with('employee')
 			->whereDate('work_date', today())
-			->latest()
+			->orderBy('id', 'desc')
 			->get();
 
 		return view('online-employees', compact('onlineEmployees'));

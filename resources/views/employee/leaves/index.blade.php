@@ -64,7 +64,9 @@
                     <option value="Sick Leave">Sick Leave</option>
                     <option value="Casual Leave">Casual Leave</option>
                 </select>
+				<label>From Date:</label>
                 <input type="date" name="from_date" class="w-full mb-2 border p-2" required>
+				<label>To Date:</label>
                 <input type="date" name="to_date" class="w-full mb-2 border p-2" required>
                 <textarea name="reason" placeholder="Reason for leave..." class="w-full mb-2 border p-2" required></textarea>
 				<label>Email To:</label>
