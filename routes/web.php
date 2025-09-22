@@ -8,6 +8,8 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\EmployeeWorkController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\RelievingLetterController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,10 @@ Route::middleware(['auth'])->group(function () {
 	Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
 	
 	Route::resource('assessments', AssessmentController::class);
+        
+        Route::get('/settings', [SettingController::class, 'index'])->name('setting');
+        Route::resource('vendors', VendorController::class);
+        Route::post('/vendors/{vendor}/inline-update', [VendorController::class, 'inlineUpdate']);
 });
 
 // Admin Auth (Breeze)

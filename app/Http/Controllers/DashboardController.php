@@ -26,13 +26,26 @@ class DashboardController extends Controller
         return view('dashboard', compact('employeeCount', 'reviewCount', 'leaveCount', 'assessmentCount', 'onlineEmployees'));
     }
 	
-	public function getOnlineEmployees()
-	{
-		$onlineEmployees = WorkSession::with('employee')
-			->whereDate('work_date', today())
-			->orderBy('id', 'desc')
-			->get();
+    public function getOnlineEmployees()
+    {
+        $now = Carbon::now();
+        $yesterday = $now->copy()->subDay()->startOfDay();
 
-		return view('online-employees', compact('onlineEmployees'));
-	}
+        $onlineEmployees = WorkSession::with('employee')
+            ->where(function ($q) use ($now, $yesterday) {
+                // Sessions that started today
+                $q->whereDate('work_date', $now->toDateString());
+
+                // OR sessions that started yesterday but are still active past midnight
+                $q->orWhere(function ($q2) use ($yesterday, $now) {
+                    $q2->whereDate('work_date', $yesterday->toDateString())
+                       ->whereNull('end_time')
+                       ->orWhere('end_time', '>=', $yesterday->copy()->endOfDay());
+                });
+            })
+            ->latest()
+            ->get();
+
+        return view('online-employees', compact('onlineEmployees'));
+    }
 }
