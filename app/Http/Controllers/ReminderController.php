@@ -10,7 +10,7 @@ class ReminderController extends Controller
 {
     public function index()
     {
-        $reminders = Reminder::where('employee_id', auth()->id())
+        $reminders = Reminder::where('employee_id', auth('employee')->id())
             ->latest()
             ->get();
 
@@ -26,7 +26,7 @@ class ReminderController extends Controller
         ]);
 
         $reminder = Reminder::create([
-            'employee_id' => auth()->id(),
+            'employee_id' => auth('employee')->id(),
             'date'        => $request->date,
             'subject'     => $request->subject,
             'description' => $request->description,

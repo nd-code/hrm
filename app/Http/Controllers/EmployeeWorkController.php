@@ -40,7 +40,7 @@ class EmployeeWorkController extends Controller
 	
 	public function workIndex()
     {
-        $sessions = WorkSession::where('employee_id', auth()->id())
+        $sessions = WorkSession::where('employee_id', auth('employee')->id())
 			->orderBy('id', 'desc')
 			->get();
 

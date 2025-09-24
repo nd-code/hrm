@@ -73,7 +73,7 @@
                     {{-- Reminders Section --}}
                     {{-- ============================= --}}
                     @php
-                        $todayReminders = Reminder::where('employee_id', auth()->id())
+                        $todayReminders = Reminder::where('employee_id', auth('employee')->id())
                             ->where('status', 'Pending')
                             ->whereDate('date', '<=', today()) // due today or overdue
                             ->orderBy('date', 'asc')
