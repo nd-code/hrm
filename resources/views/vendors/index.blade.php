@@ -24,16 +24,16 @@
 
                                 <!-- Category Dropdown -->
                                 <select name="category" class="border p-2 w-full mb-2" required>
-									<option value="">-- Select Category --</option>
-									<option value="AC Repair">AC Repair</option>
-									<option value="Carpenter">Carpenter</option>
-									<option value="Electrician">Electrician</option>
-									<option value="IT services">IT services</option>
-									<option value="Painter">Painter</option>
-									<option value="Plumber">Plumber</option>
-								</select>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="AC Repair">AC Repair</option>
+                                    <option value="Carpenter">Carpenter</option>
+                                    <option value="Electrician">Electrician</option>
+                                    <option value="IT services">IT services</option>
+                                    <option value="Painter">Painter</option>
+                                    <option value="Plumber">Plumber</option>
+                                </select>
 
-								<label>Last working date:</label>
+				<label>Last working date:</label>
                                 <input type="date" name="date" class="border p-2 w-full mb-2">
                                 <textarea name="remark" placeholder="Remark" class="border p-2 w-full mb-2"></textarea>
 

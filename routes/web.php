@@ -10,6 +10,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\RelievingLetterController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ReminderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,26 +28,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('employees', EmployeeController::class);
     Route::post('/employees/{employee}/inline-update', [EmployeeController::class, 'inlineUpdate'])->name('employees.inline-update');
-	Route::resource('reviews', ReviewController::class);
-	Route::resource('leaves', LeaveController::class);
-	Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
-	Route::post('/leaves/{id}/inline-update', [LeaveController::class, 'inlineUpdate'])->name('leaves.inline-update');
-	Route::get('/dashboard/online', [DashboardController::class, 'getOnlineEmployees']);
-	
-	Route::post('/employees/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
-	Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
-	Route::delete('/employees/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
-	
-	Route::get('/employees/{id}/relieving-letter', [RelievingLetterController::class, 'show'])->name('employees.relieving-letter');
-	Route::post('/employees/{id}/relieving-letter/save', [RelievingLetterController::class, 'save'])->name('employees.relieving-letter.save');
-	
-	Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
-	
-	Route::resource('assessments', AssessmentController::class);
-        
-        Route::get('/settings', [SettingController::class, 'index'])->name('setting');
-        Route::resource('vendors', VendorController::class);
-        Route::post('/vendors/{vendor}/inline-update', [VendorController::class, 'inlineUpdate']);
+    Route::resource('reviews', ReviewController::class);
+    Route::resource('leaves', LeaveController::class);
+    Route::put('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.status');
+    Route::post('/leaves/{id}/inline-update', [LeaveController::class, 'inlineUpdate'])->name('leaves.inline-update');
+    Route::get('/dashboard/online', [DashboardController::class, 'getOnlineEmployees']);
+
+    Route::post('/employees/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
+    Route::get('/employees/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
+    Route::delete('/employees/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
+
+    Route::get('/employees/{id}/relieving-letter', [RelievingLetterController::class, 'show'])->name('employees.relieving-letter');
+    Route::post('/employees/{id}/relieving-letter/save', [RelievingLetterController::class, 'save'])->name('employees.relieving-letter.save');
+
+    Route::post('/reviews/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
+
+    Route::resource('assessments', AssessmentController::class);
+
+    Route::get('/settings', [SettingController::class, 'index'])->name('setting');
+    Route::resource('vendors', VendorController::class);
+    Route::post('/vendors/{vendor}/inline-update', [VendorController::class, 'inlineUpdate']);
 });
 
 // Admin Auth (Breeze)
@@ -68,11 +69,17 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/leaves', [LeaveController::class, 'employeeStore'])->name('employee.leaves.store');
     Route::get('/employee/leaves/{leave}', [LeaveController::class, 'employeeShow'])->name('employee.leaves.show');
 	
-	Route::post('/employee/work/timer', [EmployeeWorkController::class, 'timerWork'])->name('employee.work.timer');
-	Route::get('/employee/work', [EmployeeWorkController::class, 'workIndex'])->name('employee.work.index');
-	Route::post('/employee/{id}/inline-update', [EmployeeWorkController::class, 'inlineUpdate'])->name('employee.work.inline-update');
-	
-	Route::get('/employee/profile', [EmployeeController::class, 'profile'])->name('employee.profile');
+    Route::post('/employee/work/timer', [EmployeeWorkController::class, 'timerWork'])->name('employee.work.timer');
+    Route::get('/employee/work', [EmployeeWorkController::class, 'workIndex'])->name('employee.work.index');
+    Route::post('/employee/{id}/inline-update', [EmployeeWorkController::class, 'inlineUpdate'])->name('employee.work.inline-update');
+
+    Route::get('/employee/profile', [EmployeeController::class, 'profile'])->name('employee.profile');
+
+    Route::resource('/employee/reminders', ReminderController::class);
+    Route::post('/employee/reminders/{reminder}/inline-update', [ReminderController::class, 'inlineUpdate'])->name('employee.reminders.inlineUpdate');
+    
+    // Mark a reminder completed
+    Route::post('/employee/reminders/{reminder}/complete', [ReminderController::class, 'complete'])->name('employee.reminders.complete');
 });
 
 Route::middleware('auth')->group(function () {

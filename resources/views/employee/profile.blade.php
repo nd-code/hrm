@@ -16,7 +16,11 @@
                         <tr>
                             <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
                             <td class="border p-2">
-                                {{ $employee->$field }}
+                                @if($field === 'joining_date' && !empty($employee->$field))
+                                    {{ \Carbon\Carbon::parse($employee->$field)->format('d-m-Y') }}
+                                @else
+                                    {{ $employee->$field }}
+                                @endif
                             </td>
                         </tr>
                     @endforeach

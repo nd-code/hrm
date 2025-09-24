@@ -1,24 +1,30 @@
 @php
-	use App\Models\WorkSession;
+    use App\Models\WorkSession;
+    use App\Models\Reminder;
 @endphp
+
 <x-app-layout>
-	<x-slot name="header">
+    <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Employee Dashboard') }}
         </h2>
     </x-slot>
-	<div class="py-12">
+
+    <div class="py-12">
         <div class="mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-					<h2 class="mb-4">Welcome {{ auth()->guard('employee')->user()->name }}</h2>
-					
-					@if(session('success'))
+
+                    <h2 class="mb-4">Welcome {{ auth()->guard('employee')->user()->name }}</h2>
+
+                    {{-- Flash success message --}}
+                    @if(session('success'))
                         <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
                             {{ session('success') }}
                         </div>
                     @endif
 
+                    {{-- Work session status --}}
                     @php
                         $session = WorkSession::where('employee_id', Auth::id())
                             ->whereDate('work_date', today())
@@ -40,27 +46,75 @@
                             You haven't started working yet today.
                         </div>
                     @endif
-					
-					@php
-						$todaySession = WorkSession::where('employee_id', Auth::id())
-							->whereDate('work_date', today())
-							->latest()
-							->first();
-					@endphp
 
-					<form method="POST" action="{{ route('employee.work.timer') }}">
-						@csrf
-						@if($todaySession && !$todaySession->end_time)
-							<button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
-								Offline
-							</button>
-						@else
-							<button class="block text-left px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">
-								Online
-							</button>
-						@endif
-					</form>
-				</div>
+                    {{-- Work session toggle button --}}
+                    @php
+                        $todaySession = WorkSession::where('employee_id', Auth::id())
+                            ->whereDate('work_date', today())
+                            ->latest()
+                            ->first();
+                    @endphp
+
+                    <form method="POST" action="{{ route('employee.work.timer') }}">
+                        @csrf
+                        @if($todaySession && !$todaySession->end_time)
+                            <button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+                                Offline
+                            </button>
+                        @else
+                            <button class="block text-left px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">
+                                Online
+                            </button>
+                        @endif
+                    </form>
+
+                    {{-- ============================= --}}
+                    {{-- Reminders Section --}}
+                    {{-- ============================= --}}
+                    @php
+                        $todayReminders = Reminder::where('status', 'Pending')
+                            ->whereDate('date', '<=', today()) // due today or overdue
+                            ->orderBy('date', 'asc')
+                            ->get();
+                    @endphp
+
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold mb-3">Today's Reminders</h3>
+
+                        @if($todayReminders->count())
+                            <table class="w-full border">
+                                <thead>
+                                    <tr>
+                                        <th class="border px-2 py-1">Date</th>
+                                        <th class="border px-2 py-1">Subject</th>
+                                        <th class="border px-2 py-1">Description</th>
+                                        <th class="border px-2 py-1">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($todayReminders as $reminder)
+                                        <tr>
+                                            <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($reminder->date)->format('d-m-Y') }}</td>
+                                            <td class="border px-2 py-1">{{ $reminder->subject }}</td>
+                                            <td class="border px-2 py-1">{{ $reminder->description }}</td>
+                                            <td class="border px-2 py-1">
+                                                <form action="{{ route('employee.reminders.complete', $reminder->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded">
+                                                        Clear
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <p class="text-gray-600">No reminders for today 🎉</p>
+                        @endif
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

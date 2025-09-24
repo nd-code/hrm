@@ -102,6 +102,13 @@
                                                         <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> My Work
                                                     </a>
                                                 </li>
+                                                
+                                                <li>
+                                                    <a href="{{ route('reminders.index') }}"
+                                                       class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reminders.index') ? 'bg-gray-700' : '' }}">
+                                                        <i class="fa-solid fa-bell me-2 text-yellow-400"></i> Reminders
+                                                    </a>
+                                                </li>
                                             @endif
                                         @endauth
                                     </ul>

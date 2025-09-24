@@ -34,8 +34,8 @@
                             <td style="display:none;">{{ $leave->id }}</td>
                             <td>{{ $leave->employee->name }}</td>
                             <td>{{ $leave->leave_type }}</td>
-                            <td>{{ $leave->from_date }}</td>
-                            <td>{{ $leave->to_date }}</td>
+                            <td>{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
                             <td>{{ $leave->reason }}</td>
                             <td>{{ ucfirst($leave->status) }}</td>
                             <td>
