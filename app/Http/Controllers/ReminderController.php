@@ -10,10 +10,11 @@ class ReminderController extends Controller
 {
     public function index()
     {
-        // Show all reminders (both Pending & Completed)
-        return view('employee.reminders.index', [
-            'reminders' => Reminder::orderBy('date', 'desc')->get()
-        ]);
+        $reminders = Reminder::where('employee_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return view('employee.reminders.index', compact('reminders'));
     }
 
     public function store(Request $request)
@@ -25,6 +26,7 @@ class ReminderController extends Controller
         ]);
 
         $reminder = Reminder::create([
+            'employee_id' => auth()->id(),
             'date'        => $request->date,
             'subject'     => $request->subject,
             'description' => $request->description,

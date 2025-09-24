@@ -26,20 +26,27 @@
 
                     {{-- Work session status --}}
                     @php
-                        $session = WorkSession::where('employee_id', Auth::id())
+                        // First check if there's any open session (even from yesterday)
+                        $openSession = WorkSession::where('employee_id', Auth::id())
+                            ->whereNull('end_time')
+                            ->latest()
+                            ->first();
+
+                        // Then check today's latest session (your original logic)
+                        $todaySession = WorkSession::where('employee_id', Auth::id())
                             ->whereDate('work_date', today())
                             ->latest()
                             ->first();
                     @endphp
 
-                    @if($session && !$session->end_time)
+                    @if($openSession)
                         <div class="p-4 bg-green-100 text-green-800 rounded mb-4">
                             You are <strong>working</strong>
-                            (Started at: {{ $session->start_time->format('H:i A') }})
+                            (Started at: {{ $openSession->start_time->format('H:i A, d M Y') }})
                         </div>
-                    @elseif($session && $session->end_time)
+                    @elseif($todaySession && $todaySession->end_time)
                         <div class="p-4 bg-red-100 text-red-800 rounded mb-4">
-                            Last work session ended at: {{ $session->end_time->format('H:i A') }}
+                            Last work session ended at: {{ $todaySession->end_time->format('H:i A') }}
                         </div>
                     @else
                         <div class="p-4 bg-gray-100 text-gray-800 rounded mb-4">
@@ -47,17 +54,11 @@
                         </div>
                     @endif
 
-                    {{-- Work session toggle button --}}
-                    @php
-                        $todaySession = WorkSession::where('employee_id', Auth::id())
-                            ->whereDate('work_date', today())
-                            ->latest()
-                            ->first();
-                    @endphp
 
+                    {{-- Work session toggle button --}}
                     <form method="POST" action="{{ route('employee.work.timer') }}">
                         @csrf
-                        @if($todaySession && !$todaySession->end_time)
+                        @if($openSession)
                             <button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
                                 Offline
                             </button>
@@ -72,7 +73,8 @@
                     {{-- Reminders Section --}}
                     {{-- ============================= --}}
                     @php
-                        $todayReminders = Reminder::where('status', 'Pending')
+                        $todayReminders = Reminder::where('employee_id', auth()->id())
+                            ->where('status', 'Pending')
                             ->whereDate('date', '<=', today()) // due today or overdue
                             ->orderBy('date', 'asc')
                             ->get();

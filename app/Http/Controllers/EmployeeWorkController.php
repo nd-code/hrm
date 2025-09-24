@@ -11,28 +11,28 @@ class EmployeeWorkController extends Controller
 {
     public function timerWork(Request $request)
     {
-        $today = Carbon::today();
+        $employeeId = auth('employee')->id();
 
-        // Find today's session
-        $session = WorkSession::where('employee_id', auth('employee')->id())
-            ->whereDate('work_date', $today)
+        // Check if there is an open session (end_time is NULL)
+        $openSession = WorkSession::where('employee_id', $employeeId)
+            ->whereNull('end_time')
             ->latest()
             ->first();
 
-        if (!$session || $session->end_time) {
-            // Online
-            WorkSession::create([
-                'employee_id' => auth('employee')->id(),
-                'work_date' => $today,
-                'start_time' => now(),
-            ]);
-            $message = 'Work started!';
-        } else {
-            // Offline
-            $session->update([
+        if ($openSession) {
+            // Offline → close session
+            $openSession->update([
                 'end_time' => now(),
             ]);
             $message = 'Work stopped!';
+        } else {
+            // Online → start a new session (regardless of date rollover)
+            WorkSession::create([
+                'employee_id' => $employeeId,
+                'work_date'   => today(),
+                'start_time'  => now(),
+            ]);
+            $message = 'Work started!';
         }
 
         return redirect()->back()->with('success', $message);
