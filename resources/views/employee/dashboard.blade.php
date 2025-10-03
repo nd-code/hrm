@@ -81,7 +81,7 @@
                     @endphp
 
                     <div class="mt-8">
-                        <h3 class="text-lg font-semibold mb-3">Today's Reminders</h3>
+                        <h3 class="text-lg font-semibold mb-3">Your Reminders</h3>
 
                         @if($todayReminders->count())
                             <table class="w-full border">

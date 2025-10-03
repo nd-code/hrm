@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Broadcast;
+use App\Models\Employee;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +14,10 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('App.Models.Employee.{id}', function ($user, $id) {
+    // allow only if logged in employee id matches channel id
     return (int) $user->id === (int) $id;
 });

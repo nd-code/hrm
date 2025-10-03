@@ -22,17 +22,7 @@ class DashboardController extends Controller
         $yesterday = $now->copy()->subDay()->startOfDay();
 
         $onlineEmployees = WorkSession::with('employee')
-            ->where(function ($q) use ($now, $yesterday) {
-                // Sessions that started today
-                $q->whereDate('work_date', $now->toDateString());
-
-                // OR sessions that started yesterday but are still active past midnight
-                $q->orWhere(function ($q2) use ($yesterday, $now) {
-                    $q2->whereDate('work_date', $yesterday->toDateString())
-                       ->whereNull('end_time')
-                       ->orWhere('end_time', '>=', $yesterday->copy()->endOfDay());
-                });
-            })
+            ->whereNull('end_time')   // means timer still running
             ->latest()
             ->get();
 
@@ -45,17 +35,7 @@ class DashboardController extends Controller
         $yesterday = $now->copy()->subDay()->startOfDay();
 
         $onlineEmployees = WorkSession::with('employee')
-            ->where(function ($q) use ($now, $yesterday) {
-                // Sessions that started today
-                $q->whereDate('work_date', $now->toDateString());
-
-                // OR sessions that started yesterday but are still active past midnight
-                $q->orWhere(function ($q2) use ($yesterday, $now) {
-                    $q2->whereDate('work_date', $yesterday->toDateString())
-                       ->whereNull('end_time')
-                       ->orWhere('end_time', '>=', $yesterday->copy()->endOfDay());
-                });
-            })
+            ->whereNull('end_time')   // means timer still running
             ->latest()
             ->get();
 

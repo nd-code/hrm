@@ -11,6 +11,8 @@ use App\Http\Controllers\RelievingLetterController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,9 @@ use App\Http\Controllers\ReminderController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// this will create /broadcasting/auth route
+Broadcast::routes(['middleware' => ['auth']]);
 
 // Admin routes
 Route::middleware(['auth'])->group(function () {
@@ -48,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [SettingController::class, 'index'])->name('setting');
     Route::resource('vendors', VendorController::class);
     Route::post('/vendors/{vendor}/inline-update', [VendorController::class, 'inlineUpdate']);
+    
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::post('/admin/notifications/send', [NotificationController::class, 'sendNotification'])->name('admin.notifications.send');
 });
 
 // Admin Auth (Breeze)
@@ -80,6 +88,12 @@ Route::middleware(['auth:employee'])->group(function () {
     
     // Mark a reminder completed
     Route::post('/employee/reminders/{reminder}/complete', [ReminderController::class, 'complete'])->name('employee.reminders.complete');
+    
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('employee.notifications');
+    Route::post('/notifications/mark-read', function (Request $request) {
+        auth()->user()->unreadNotifications->markAsRead();
+        return response()->json(['success' => true]);
+    })->name('notifications.markRead');
 });
 
 Route::middleware('auth')->group(function () {
