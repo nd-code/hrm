@@ -70,54 +70,100 @@
                     </form>
 
                     {{-- ============================= --}}
-                    {{-- Reminders Section --}}
+                    {{-- Reminders + Notifications Section --}}
                     {{-- ============================= --}}
-                    @php
-                        $todayReminders = Reminder::where('employee_id', auth('employee')->id())
-                            ->where('status', 'Pending')
-                            ->whereDate('date', '<=', today()) // due today or overdue
-                            ->orderBy('date', 'asc')
-                            ->get();
-                    @endphp
 
-                    <div class="mt-8">
-                        <h3 class="text-lg font-semibold mb-3">Your Reminders</h3>
+                    <div class="flex gap-6 mt-8">
+                        {{-- ============================= --}}
+                        {{-- Reminders Section --}}
+                        {{-- ============================= --}}
 
-                        @if($todayReminders->count())
-                            <table class="w-full border">
-                                <thead>
-                                    <tr>
-                                        <th class="border px-2 py-1">Date</th>
-                                        <th class="border px-2 py-1">Subject</th>
-                                        <th class="border px-2 py-1">Description</th>
-                                        <th class="border px-2 py-1">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($todayReminders as $reminder)
+                        @php
+                            $todayReminders = Reminder::where('employee_id', auth('employee')->id())
+                                ->where('status', 'Pending')
+                                ->whereDate('date', '<=', today()) // due today or overdue
+                                ->orderBy('date', 'asc')
+                                ->get();
+                        @endphp
+
+                        <div class="w-1/2">
+                            <h3 class="text-lg font-semibold mb-3">📝 Your Reminders</h3>
+
+                            @if($todayReminders->count())
+                                <table class="w-full border">
+                                    <thead>
                                         <tr>
-                                            <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($reminder->date)->format('d-m-Y') }}</td>
-                                            <td class="border px-2 py-1">{{ $reminder->subject }}</td>
-                                            <td class="border px-2 py-1">{{ $reminder->description }}</td>
-                                            <td class="border px-2 py-1">
-                                                <form action="{{ route('employee.reminders.complete', $reminder->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded">
-                                                        Clear
-                                                    </button>
-                                                </form>
-                                            </td>
+                                            <th class="border px-2 py-1">Date</th>
+                                            <th class="border px-2 py-1">Subject</th>
+                                            <th class="border px-2 py-1">Description</th>
+                                            <th class="border px-2 py-1">Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <p class="text-gray-600">No reminders for today 🎉</p>
-                        @endif
-                    </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($todayReminders as $reminder)
+                                            <tr>
+                                                <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($reminder->date)->format('d-m-Y') }}</td>
+                                                <td class="border px-2 py-1">{{ $reminder->subject }}</td>
+                                                <td class="border px-2 py-1">{{ $reminder->description }}</td>
+                                                <td class="border px-2 py-1">
+                                                    <form action="{{ route('employee.reminders.complete', $reminder->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded">
+                                                            Clear
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p class="text-gray-600">No reminder 🎉</p>
+                            @endif
+                        </div>
 
+                        {{-- ============================= --}}
+                        {{-- Notifications Section --}}
+                        {{-- ============================= --}}
+
+                        @php
+                            $latestNotifications = auth('employee')->user()
+                                ->notifications()
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                        @endphp
+
+                        <div class="w-1/2">
+                            <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+                            @if($latestNotifications->count())
+                                <ul class="space-y-2">
+                                    @foreach ($latestNotifications as $note)
+                                        <li class="flex items-center gap-2 p-2 border rounded bg-gray-50">
+                                            <span class="blinking text-gray-800 font-medium">
+                                                {{ $note->data['message'] ?? '' }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 ml-auto">
+                                                {{ $note->created_at->diffForHumans() }}
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-gray-600">No notification 🎉</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+<style>
+@keyframes blink {
+    50% { opacity: 0; }
+}
+.blinking {
+    animation: blink 1s step-start infinite;
+}
+</style>
 </x-app-layout>

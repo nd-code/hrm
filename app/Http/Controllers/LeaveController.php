@@ -137,23 +137,30 @@ class LeaveController extends Controller
 		
 		// Notify the employee who applied for leave
 		if ($leave->employee) {
-			\Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$leave->from_date} to {$leave->to_date} has been {$normalized}.", function ($msg) use ($leave) {
-				$msg->to($leave->employee->email)
-					->subject('Leave Status Updated');
-			});
-		}
+                    $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
+                    $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
+
+                    \Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($leave) {
+                        $msg->to($leave->employee->email)
+                            ->subject('Leave Status Updated');
+                    });
+                }
 
 		// Notify all selected employees in 'apply_to'
 		if (!empty($leave->apply_to)) {
-			$employeeIds = explode(',', $leave->apply_to);
-			$employees = Employee::whereIn('id', $employeeIds)->get();
-			foreach ($employees as $emp) {
-				\Mail::raw("Hello {$emp->name},\n\nThe leave request from {$leave->from_date} to {$leave->to_date} has been {$normalized}.", function ($msg) use ($emp) {
-					$msg->to($emp->email)
-						->subject('Leave Status Updated');
-				});
-			}
-		}
+                    $employeeIds = explode(',', $leave->apply_to);
+                    $employees = Employee::whereIn('id', $employeeIds)->get();
+
+                    $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
+                    $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
+
+                    foreach ($employees as $emp) {
+                        \Mail::raw("Hello {$emp->name},\n\nThe leave request from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($emp) {
+                            $msg->to($emp->email)
+                                ->subject('Leave Status Updated');
+                        });
+                    }
+                }
 
 		return response()->json([
 			'success' => true,
@@ -198,14 +205,18 @@ class LeaveController extends Controller
 		
 		// Send email to all selected employees
 		if (!empty($request->employee_ids)) {
-			$employees = Employee::whereIn('id', $request->employee_ids)->get();
-			foreach ($employees as $emp) {
-				\Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$validated['from_date']} to {$validated['to_date']}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
-					$msg->to($emp->email)
-						->subject('New Leave Application Notification');
-				});
-			}
-		}
+                    $employees = Employee::whereIn('id', $request->employee_ids)->get();
+
+                    $fromDate = \Carbon\Carbon::parse($validated['from_date'])->format('d M Y');
+                    $toDate   = \Carbon\Carbon::parse($validated['to_date'])->format('d M Y');
+
+                    foreach ($employees as $emp) {
+                        \Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$fromDate} to {$toDate}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
+                            $msg->to($emp->email)
+                                ->subject('New Leave Application Notification');
+                        });
+                    }
+                }
 
 		// Load employee relation for AJAX response
         $leave->load('employee');

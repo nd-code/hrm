@@ -24,15 +24,7 @@
         <!-- Left Sidebar -->
         <aside class="w-64 bg-gray-800 text-white flex flex-col">
             <div class="p-4 text-2xl font-bold border-b border-gray-700">
-                @auth
-                    @if(Auth::user()->id === 1)
-                        <a href="/"><img src="{{ asset('images/ais.png') }}" /></a>
-                    @else
-                        <a href="/dashboard"><img src="{{ asset('images/ais.png') }}" /></a>
-                    @endif
-                @else
-                    <a href="/"><img src="{{ asset('images/ais.png') }}" /></a>
-                @endauth
+                <a href="/dashboard"><img src="{{ asset('images/ais.png') }}" /></a>
             </div>
 
             <nav class="flex-1 p-4">
@@ -103,7 +95,7 @@
 
             <div class="p-4 border-t border-gray-700">
                 <ul>
-                    @if(Auth::user()->id == 101)
+                    @if(Auth::user()->id === 101)
                         <li>
                             <a href="{{ route('setting') }}"
                                class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
@@ -133,7 +125,35 @@
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
-            @if(Auth::user()->id != 101)
+            @if(Auth::user()->id === 101)
+                <!-- Send Notification Top Header -->
+                <header class="bg-white shadow px-6 py-3 flex justify-end">
+                    <div class="flex justify-end position-relative">
+                        <div class="relative inline-block">
+                            <!-- Plus Icon Trigger -->
+                            <a href="javascript:void(0);" 
+                               class="w-10 h-10 flex items-center justify-center text-xl bg-white border rounded-full shadow hover:bg-gray-50 transition"
+                               id="popupNotification">
+                               <i class="fa-solid fa-plus text-blue-400"></i>
+                            </a>
+
+                            <!-- Popup -->
+                            <div id="notificationPopup"
+                                 class="absolute top-14 right-0 w-96 bg-white border rounded-lg shadow-lg p-4 hidden z-50">
+                                <button id="closePopup" class="absolute top-2 right-2 text-red-500">✖</button>
+                                <h2 class="text-lg font-semibold mb-3">Send Notification</h2>
+                                <form id="notificationForm" action="{{ route('admin.notifications.send') }}" method="POST">
+                                    @csrf
+                                    <textarea name="message" class="w-full border rounded p-2 resize-none h-32" placeholder="Type your message..." required></textarea>
+                                    <div class="mt-3 flex justify-end">
+                                        <button type="submit" class="px-3 py-2 bg-blue-500 text-white rounded">Post</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            @else
                 <!-- 🔔 Top Header -->
                 <header class="bg-white shadow px-6 py-3 flex justify-end">
                     <div class="relative">
@@ -148,18 +168,14 @@
                         <!-- Dropdown -->
                         <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow rounded">
                             <ul id="notificationList" class="max-h-60 overflow-y-auto">
-                                @if(Auth::user()->unreadNotifications->isEmpty())
-                                    <li class="px-3 py-2 text-gray-500">No new notifications</li>
-                                @else
-                                    @foreach(Auth::user()->unreadNotifications as $note)
-                                        <li class="px-3 py-2 border-b">
-                                            {{ $note->data['message'] ?? '' }}
-                                            <span class="text-gray-500 text-xs float-right">
-                                                {{ $note->created_at->diffForHumans() }}
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                @endif
+                                @foreach(Auth::user()->unreadNotifications as $note)
+                                    <li class="px-3 py-2 border-b">
+                                        {{ $note->data['message'] ?? '' }}
+                                        <span class="text-gray-500 text-xs float-right">
+                                            {{ $note->created_at->diffForHumans() }}
+                                        </span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -180,7 +196,34 @@
             window.userId = {{ auth()->id() }};
         @endauth
         
-        @if(Auth::user()->id != 101)
+        @if(Auth::user()->id === 101)
+            const popupBtn = document.getElementById('popupNotification');
+            const popup = document.getElementById('notificationPopup');
+            const closeBtn = document.getElementById('closePopup');
+
+            popupBtn.addEventListener('click', () => popup.classList.toggle('hidden'));
+            closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+
+            // AJAX submit
+            document.getElementById('notificationForm').addEventListener('submit', function(e){
+                e.preventDefault();
+                let form = e.target;
+                let data = new FormData(form);
+
+                fetch(form.action, {
+                    method: "POST",
+                    headers: { 'X-CSRF-TOKEN': data.get('_token') },
+                    body: data
+                })
+                .then(res => res.json())
+                .then(resp => {
+                    popup.classList.add('hidden');
+                    form.reset();
+                    alert("✅ Notification sent!");
+                })
+                .catch(err => console.error(err));
+            });
+        @else
             document.addEventListener("DOMContentLoaded", () => {
                 const bell = document.getElementById('notifBell');
                 const dropdown = document.getElementById('notifDropdown');
