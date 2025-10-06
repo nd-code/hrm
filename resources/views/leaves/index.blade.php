@@ -43,7 +43,6 @@
                             <th>From</th>
                             <th>To</th>
 							<th>Number of Day(s)</th>
-                            <th>Reason</th>
 							<th>Managed By</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -85,7 +84,6 @@
 								@endphp
 								{{ $days }} Day(s)
 							</td>
-                            <td contenteditable="true" class="editable" data-field="reason">{{ $leave->reason }}</td>
 							<td>{{ $leave->manager?->name ?? '-' }}</td>
                             <td>{{ ucfirst($leave->status) }}@if($leave->status == 'Pending')  (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="{{ $leave->id }}"><i class="fas fa-check-circle"></i></button><button class="reject-btn text-red-500 mr-2" title="Reject" data-id="{{ $leave->id }}"><i class="fas fa-times-circle"></i></button>)@endif</td>
                             <td>
@@ -249,17 +247,6 @@
 						}
 					},
 
-					// Reason
-					{ 
-						data: 'reason',
-						render: function (data, type, row) {
-							return `<span contenteditable="true" 
-										  class="editable" 
-										  data-id="${row.id}" 
-										  data-field="reason">${data || ''}</span>`;
-						}
-					},
-
 					// Managed By
 					{ data: 'manager.name', defaultContent: '-' },
 
@@ -343,7 +330,6 @@
 							data.leave_type,
 							data.from_date,
 							data.to_date,
-							data.reason,
 							`Pending (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${data.id}">
 								<i class="fas fa-check-circle"></i>
 							 </button>
@@ -435,6 +421,8 @@
 						row.find('.approve-btn, .reject-btn').remove();
 
 						closeManageByModal();
+                                                
+                                                location.reload();
 					},
 					error: function (xhr) {
 						alert(xhr.responseJSON?.message || 'Failed to update status.');

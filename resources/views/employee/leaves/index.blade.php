@@ -23,7 +23,6 @@
 							<th>Leave Type</th>
                             <th>From</th>
                             <th>To</th>
-                            <th>Reason</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -36,7 +35,6 @@
                             <td>{{ $leave->leave_type }}</td>
                             <td>{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
-                            <td>{{ $leave->reason }}</td>
                             <td>{{ ucfirst($leave->status) }}</td>
                             <td>
 								<a href="{{ route('employee.leaves.show', $leave->id) }}" title="View">
@@ -116,37 +114,46 @@
 
             // Apply Leave via AJAX
             $('#leaveForm').submit(function (e) {
-				e.preventDefault();
-				$.ajax({
-					url: '{{ route("employee.leaves.store") }}',
-					method: 'POST',
-					data: $(this).serialize(),
-					success: function (data) {
-						$('#modal').addClass('hidden');
+                e.preventDefault();
+                $.ajax({
+                    url: '{{ route("employee.leaves.store") }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        $('#modal').addClass('hidden');
 
-						let newRow = table.row.add([
-							data.id,
-							data.employee.name,
-							data.leave_type,
-							data.from_date,
-							data.to_date,
-							data.reason,
-							`Pending`,
-							`
-							<a href="/leaves/${data.id}" title="View">
-								<i class="fas fa-eye text-blue-500 mr-2"></i>
-							</a>
-							`
-						]).draw().node();
+                        // format dates from YYYY-MM-DD to DD-MM-YYYY
+                        function formatDate(dateStr) {
+                            if (!dateStr) return '';
+                            let [year, month, day] = dateStr.split("-");
+                            return `${day}-${month}-${year}`;
+                        }
 
-						$(newRow).attr('data-id', data.id);
-						$('#leaveForm')[0].reset();
-					},
-					error: function (xhr) {
-						alert(xhr.responseJSON?.message || 'Failed to create leave.');
-					}
-				});
-			});
+                        let fromDate = formatDate(data.from_date);
+                        let toDate   = formatDate(data.to_date);
+
+                        let newRow = table.row.add([
+                            data.id,
+                            data.employee.name,
+                            data.leave_type,
+                            fromDate,
+                            toDate,
+                            `Pending`,
+                            `
+                            <a href="/employee/leaves/${data.id}" title="View">
+                                <i class="fas fa-eye text-blue-500 mr-2"></i>
+                            </a>
+                            `
+                        ]).draw().node();
+
+                        $(newRow).attr('data-id', data.id);
+                        $('#leaveForm')[0].reset();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Failed to create leave.');
+                    }
+                });
+            });
         });
     </script>
 </x-app-layout>

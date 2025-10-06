@@ -87,7 +87,7 @@
                         @endphp
 
                         <div class="w-1/2">
-                            <h3 class="text-lg font-semibold mb-3">📝 Your Reminders</h3>
+                            <h3 class="text-lg font-semibold mb-3">📝 Reminders</h3>
 
                             @if($todayReminders->count())
                                 <table class="w-full border">
