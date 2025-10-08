@@ -22,6 +22,12 @@
                        Attendance
                     </a>
                 </li>
+                <li class="mr-1">
+                    <a href="#tab-leaves"
+                       class="tab-link bg-white inline-block py-2 px-4 text-gray-500 hover:text-blue-600">
+                       Leaves
+                    </a>
+                </li>
             </ul>
 
             <!-- Tab Contents -->
@@ -131,6 +137,59 @@
 									<td>{{ $session->comment }}</td>
 								</tr>
 							@endforeach
+                        </tbody>
+                    </table>
+
+                </div>
+                
+                <!-- Leaves Tab -->
+                <div id="tab-leaves" class="tab-content hidden p-4">
+
+                    <h3 class="text-lg font-bold mb-4">Leaves</h3>
+
+                    <p class="mb-4"><strong>Total Leaves:</strong> {{ $totalLeaves }}</p>
+
+                    <h4 class="text-md font-semibold mb-2">Month Wise Leaves</h4>
+                    <table class="w-full border-collapse border border-gray-300 mb-4">
+                        <thead>
+                            <tr>
+                                <th class="border p-2">Month</th>
+                                <th class="border p-2">Total Leaves</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($monthWise as $month => $count)
+                                <tr>
+                                    <td class="border p-2">{{ \Carbon\Carbon::parse($month . '-01')->format('F Y') }}</td>
+                                    <td class="border p-2">{{ $count }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <h4 class="text-md font-semibold mb-2">All Leaves</h4>
+                    <table id="leaveTable" class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr>
+                                <th class="border p-2">From</th>
+                                <th class="border p-2">To</th>
+                                <th class="border p-2">Days</th>
+                                <th class="border p-2">Type</th>
+                                <th class="border p-2">Reason</th>
+                                <th class="border p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($leaves as $leave)
+                                <tr>
+                                    <td class="border p-2">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
+                                    <td class="border p-2">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
+                                    <td class="border p-2">{{ $leave->days }}</td>
+                                    <td class="border p-2">{{ ucfirst($leave->leave_type) }}</td>
+                                    <td class="border p-2">{{ $leave->reason }}</td>
+                                    <td class="border p-2">{{ ucfirst($leave->status) }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
 
@@ -370,6 +429,16 @@
             $('#workTable').DataTable({
                 columnDefs: [{ targets: 0, visible: false, searchable: false }],
                 order: [[0, "desc"]],
+                pageLength: 10,
+                responsive: true,
+                rowCallback: function (row, data, displayIndex) {
+                    $(row).removeClass('odd even');
+                    $(row).addClass(displayIndex % 2 === 0 ? 'even' : 'odd');
+                }
+            });
+            
+            // Initialize DataTable for Leaves
+            $('#leaveTable').DataTable({
                 pageLength: 10,
                 responsive: true,
                 rowCallback: function (row, data, displayIndex) {

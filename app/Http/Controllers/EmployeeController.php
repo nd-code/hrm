@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use App\Models\EmployeeDocument;
 use Illuminate\Support\Facades\Storage;
 use App\Models\WorkSession;
+use App\Models\Leave;
+use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
@@ -67,11 +69,31 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-		$sessions = WorkSession::where('employee_id', $employee->id)
-			->orderBy('id', 'desc')
-			->get();
+        $sessions = WorkSession::where('employee_id', $employee->id)
+            ->orderBy('id', 'desc')
+            ->get();
 
-        return view('employees.show', compact('employee', 'sessions'));
+        // Fetch employee leaves
+        $leaves = Leave::where('employee_id', $employee->id)->get();
+
+        // Total leaves (sum of days)
+        $totalLeaves = 0;
+        foreach ($leaves as $leave) {
+            $from = Carbon::parse($leave->from_date);
+            $to = Carbon::parse($leave->to_date);
+            $days = $from->diffInDays($to) + 1; // inclusive
+            $totalLeaves += $days;
+            $leave->days = $days; // store for blade
+        }
+
+        // Month-wise leaves
+        $monthWise = $leaves->groupBy(function ($leave) {
+            return Carbon::parse($leave->from_date)->format('Y-m');
+        })->map(function ($group) {
+            return $group->sum('days');
+        });
+
+        return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise'));
     }
 
     public function destroy(Employee $employee)
