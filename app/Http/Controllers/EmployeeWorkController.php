@@ -23,6 +23,7 @@ class EmployeeWorkController extends Controller
             // Offline → close session
             $openSession->update([
                 'end_time' => now(),
+                'comment' => $request->comment
             ]);
             $message = 'Work stopped!';
         } else {

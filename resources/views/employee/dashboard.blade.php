@@ -59,6 +59,7 @@
                     <form method="POST" action="{{ route('employee.work.timer') }}">
                         @csrf
                         @if($openSession)
+                            <textarea id="comment" name="comment" placeholder="Enter your work details here...." class="mb-2" style="width: 300px;"></textarea>
                             <button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
                                 Offline
                             </button>

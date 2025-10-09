@@ -205,13 +205,15 @@ class LeaveController extends Controller
 		
 		// Send email to all selected employees
 		if (!empty($request->employee_ids)) {
+                    $employee = Employee::whereIn('id', auth('employee')->id())->get();
+                    
                     $employees = Employee::whereIn('id', $request->employee_ids)->get();
 
                     $fromDate = \Carbon\Carbon::parse($validated['from_date'])->format('d M Y');
                     $toDate   = \Carbon\Carbon::parse($validated['to_date'])->format('d M Y');
 
                     foreach ($employees as $emp) {
-                        \Mail::raw("Hello {$emp->name},\n\nA new leave has been applied from {$fromDate} to {$toDate}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
+                        \Mail::raw("Hello {$emp->name},\n\n{$employee->name} has been applied leave from {$fromDate} to {$toDate}.\nLeave Type: {$validated['leave_type']}\nReason: {$validated['reason']}", function ($msg) use ($emp) {
                             $msg->to($emp->email)
                                 ->subject('New Leave Application Notification');
                         });
