@@ -205,7 +205,7 @@ class LeaveController extends Controller
 		
 		// Send email to all selected employees
 		if (!empty($request->employee_ids)) {
-                    $employee = Employee::whereIn('id', auth('employee')->id())->get();
+                    $employee = Employee::find(auth('employee')->id());
                     
                     $employees = Employee::whereIn('id', $request->employee_ids)->get();
 
