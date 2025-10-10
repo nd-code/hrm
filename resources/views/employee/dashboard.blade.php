@@ -141,7 +141,7 @@
                                 <ul class="space-y-2">
                                     @foreach ($latestNotifications as $note)
                                         <li class="flex items-center gap-2 p-2 border rounded bg-gray-50">
-                                            <span class="blinking text-gray-800 font-medium">
+                                            <span class="text-gray-800 font-medium">
                                                 {{ $note->data['message'] ?? '' }}
                                             </span>
                                             <span class="text-xs text-gray-500 ml-auto">
@@ -159,12 +159,4 @@
             </div>
         </div>
     </div>
-<style>
-@keyframes blink {
-    50% { opacity: 0; }
-}
-.blinking {
-    animation: blink 1s step-start infinite;
-}
-</style>
 </x-app-layout>
