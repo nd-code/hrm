@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Notifications\EmployeeNotification;
+use App\Models\Notification;
 
 class NotificationController extends Controller
 {
@@ -18,6 +19,7 @@ class NotificationController extends Controller
         // Notify employees
         $employees = Employee::all();
         foreach ($employees as $employee) {
+            Notification::create(['message' => $request->message]);
             $employee->notify(new \App\Notifications\EmployeeNotification($request->message));
         }
 
