@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Notifications\AdminToEmployeeNotification;
 use App\Events\SendNotificationEvent;
-use App\Models\Notification;
 
 class NotificationController extends Controller
 {
@@ -17,7 +16,11 @@ class NotificationController extends Controller
             'message' => 'required|string|max:255',
         ]);
         
-        Notification::create(['message' => $request->message]);
+        $employees = Employee::all();
+
+        foreach ($employees as $employee) {
+            $employee->notify(new AdminToEmployeeNotification($request->message));
+        }
 
         // broadcast event
         event(new SendNotificationEvent($request->message));
