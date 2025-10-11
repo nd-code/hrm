@@ -14,11 +14,11 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = DB::table('notifications as n1')
-            ->join(DB::raw('(SELECT notifiable_id, MAX(created_at) as latest_created_at 
+            ->join(DB::raw('(SELECT data, MAX(created_at) as latest_created_at 
                              FROM notifications 
-                             GROUP BY notifiable_id) as n2'),
+                             GROUP BY data) as n2'),
                 function($join) {
-                    $join->on('n1.notifiable_id', '=', 'n2.notifiable_id')
+                    $join->on('n1.data', '=', 'n2.data')
                          ->on('n1.created_at', '=', 'n2.latest_created_at');
                 })
             ->select('n1.*')

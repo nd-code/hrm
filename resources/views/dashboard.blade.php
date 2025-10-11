@@ -99,20 +99,20 @@
             <div class="w-full flex gap-6 mt-8">
                 <div class="w-full">
                     <h3 class="text-lg font-semibold mb-3">🕒 Employees on Leave Today</h3>
-                    @if($employeesOnLeave->isEmpty())
-                        <p class="text-muted">No employees are on leave today.</p>
-                    @else
-                        <table class="w-full border">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 border">Employee Name</th>
-                                    <th class="px-4 py-2 border">Leave Type</th>
-                                    <th class="px-4 py-2 border">From Date</th>
-                                    <th class="px-4 py-2 border">To Date</th>
-                                    <th class="px-4 py-2 border">Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <table class="w-full border">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 border">Employee Name</th>
+                                <th class="px-4 py-2 border">Leave Type</th>
+                                <th class="px-4 py-2 border">From Date</th>
+                                <th class="px-4 py-2 border">To Date</th>
+                                <th class="px-4 py-2 border">Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($employeesOnLeave->isEmpty())
+                                <tr><td class="px-4 py-2 border" colspan="5">No employees are on leave today.</td></tr>
+                            @else
                                 @foreach($employeesOnLeave as $leave)
                                     <tr>
                                         <td class="px-4 py-2 border">{{ $leave->employee->name }}</td>
@@ -122,9 +122,9 @@
                                         <td class="px-4 py-2 border">{{ $leave->reason }}</td>
                                     </tr>
                                 @endforeach
-                            </tbody>
-                        </table>
-                    @endif
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
