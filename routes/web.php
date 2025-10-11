@@ -54,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('vendors', VendorController::class);
     Route::post('/vendors/{vendor}/inline-update', [VendorController::class, 'inlineUpdate']);
     
-    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::get('/notifications/list', [NotificationController::class, 'index'])->name('notifications');
     Route::post('/admin/notifications/send', [NotificationController::class, 'sendNotification'])->name('admin.notifications.send');
 });
 

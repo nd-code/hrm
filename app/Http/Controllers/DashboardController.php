@@ -8,6 +8,7 @@ use App\Models\Leave;
 use App\Models\Assessment;
 use Carbon\Carbon;
 use App\Models\WorkSession;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -25,8 +26,30 @@ class DashboardController extends Controller
             ->whereNull('end_time')   // means timer still running
             ->latest()
             ->get();
+        
+        $notifications = DB::table('notifications as n1')
+            ->join(DB::raw('(SELECT notifiable_id, MAX(created_at) as latest_created_at 
+                             FROM notifications 
+                             GROUP BY notifiable_id) as n2'),
+                function($join) {
+                    $join->on('n1.notifiable_id', '=', 'n2.notifiable_id')
+                         ->on('n1.created_at', '=', 'n2.latest_created_at');
+                })
+            ->select('n1.*')
+            ->orderBy('n1.created_at', 'desc')
+            ->take(5)
+            ->get();
+                
+        $today = Carbon::today();
 
-        return view('dashboard', compact('employeeCount', 'reviewCount', 'leaveCount', 'assessmentCount', 'onlineEmployees'));
+        // Employees on leave today
+        $employeesOnLeave = Leave::with('employee')
+            ->where('from_date', '<=', $today)
+            ->where('to_date', '>=', $today)
+            ->where('status', 'Approved')
+            ->get();
+
+        return view('dashboard', compact('employeeCount', 'reviewCount', 'leaveCount', 'assessmentCount', 'onlineEmployees', 'notifications', 'employeesOnLeave'));
     }
 	
     public function getOnlineEmployees()

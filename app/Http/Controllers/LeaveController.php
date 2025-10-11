@@ -155,7 +155,7 @@ class LeaveController extends Controller
                     $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
                     foreach ($employees as $emp) {
-                        \Mail::raw("Hello {$emp->name},\n\nThe leave request from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($emp) {
+                        \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($emp) {
                             $msg->to($emp->email)
                                 ->subject('Leave Status Updated');
                         });

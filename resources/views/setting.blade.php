@@ -19,6 +19,12 @@
                         <h3 class="text-lg font-semibold">Candidate List</h3>
                     </div>
                 </a>
+                
+                <a href="{{ url('/notifications/list') }}">
+                    <div class="p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold">Notifications</h3>
+                    </div>
+                </a>
             </div>
         </div>
     </div>

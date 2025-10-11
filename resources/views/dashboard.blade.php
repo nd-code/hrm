@@ -43,24 +43,89 @@
 
             </div>
 
-            <!-- Online Employees -->
-            <div class="bg-white shadow-sm sm:rounded-lg p-6 mt-6">
-                <h3 class="text-lg font-semibold mb-4">Online Employees</h3>
+            <!-- Online Employees & Notifications -->
+            <div class="w-full flex gap-6 mt-8">
+                {{-- ============================= --}}
+                {{-- Online Employees Section --}}
+                {{-- ============================= --}}
+                
+                <div class="w-1/2">
+                    <h3 class="text-lg font-semibold mb-3">🟢 Online Employees</h3>
+                    <table class="w-full border">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 border">Employee</th>
+                                <th class="px-4 py-2 border">Date</th>
+                                <th class="px-4 py-2 border">Start Time</th>
+                                <th class="px-4 py-2 border">End Time</th>
+                                <th class="px-4 py-2 border">Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="online-employees-body">
+                            @include('online-employees', ['onlineEmployees' => $onlineEmployees])
+                        </tbody>
+                    </table>
+                </div>
+                
+                {{-- ============================= --}}
+                {{-- Notifications Section --}}
+                {{-- ============================= --}}
 
-                <table class="w-full border">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="px-4 py-2 border">Employee</th>
-                            <th class="px-4 py-2 border">Date</th>
-                            <th class="px-4 py-2 border">Start Time</th>
-                            <th class="px-4 py-2 border">End Time</th>
-                            <th class="px-4 py-2 border">Total Hours</th>
-                        </tr>
-                    </thead>
-                    <tbody id="online-employees-body">
-                        @include('online-employees', ['onlineEmployees' => $onlineEmployees])
-                    </tbody>
-                </table>
+                <div class="w-1/2">
+                    <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+                    @if($notifications->count())
+                        <ul class="space-y-2">
+                            @foreach ($notifications as $note)
+                                @php
+                                    $data = json_decode($note->data, true);
+                                @endphp
+                                <li class="flex items-center gap-2 p-2 border rounded bg-gray-50">
+                                    <span class="text-gray-800 font-medium">
+                                        {{ $data['message'] ?? '' }}
+                                    </span>
+                                    <span class="text-xs text-gray-500 ml-auto">
+                                        {{ \Carbon\Carbon::parse($note->latest_created_at ?? $note->created_at)->diffForHumans() }}
+                                    </span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-gray-600">No notification 🎉</p>
+                    @endif
+                </div>
+            </div>
+            
+            <!-- Online Employees & Notifications -->
+            <div class="w-full flex gap-6 mt-8">
+                <div class="w-full">
+                    <h3 class="text-lg font-semibold mb-3">🕒 Employees on Leave Today</h3>
+                    @if($employeesOnLeave->isEmpty())
+                        <p class="text-muted">No employees are on leave today.</p>
+                    @else
+                        <table class="w-full border">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 border">Employee Name</th>
+                                    <th class="px-4 py-2 border">Leave Type</th>
+                                    <th class="px-4 py-2 border">From Date</th>
+                                    <th class="px-4 py-2 border">To Date</th>
+                                    <th class="px-4 py-2 border">Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($employeesOnLeave as $leave)
+                                    <tr>
+                                        <td class="px-4 py-2 border">{{ $leave->employee->name }}</td>
+                                        <td class="px-4 py-2 border">{{ $leave->leave_type }}</td>
+                                        <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
+                                        <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
+                                        <td class="px-4 py-2 border">{{ $leave->reason }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
