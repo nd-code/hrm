@@ -27,16 +27,10 @@ class DashboardController extends Controller
             ->latest()
             ->get();
         
-        $notifications = DB::table('notifications as n1')
-            ->join(DB::raw('(SELECT data, MAX(created_at) as latest_created_at 
-                             FROM notifications 
-                             GROUP BY data) as n2'),
-                function($join) {
-                    $join->on('n1.data', '=', 'n2.data')
-                         ->on('n1.created_at', '=', 'n2.latest_created_at');
-                })
-            ->select('n1.*')
-            ->orderBy('n1.created_at', 'desc')
+        $notifications = DB::table('notifications')
+            ->selectRaw('data, MAX(created_at) as created_at')
+            ->groupBy('data')
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
                 
