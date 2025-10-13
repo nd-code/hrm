@@ -57,8 +57,6 @@
                                 <th class="px-4 py-2 border">Employee</th>
                                 <th class="px-4 py-2 border">Date</th>
                                 <th class="px-4 py-2 border">Start Time</th>
-                                <th class="px-4 py-2 border">End Time</th>
-                                <th class="px-4 py-2 border">Total Hours</th>
                             </tr>
                         </thead>
                         <tbody id="online-employees-body">
@@ -72,7 +70,27 @@
                 {{-- ============================= --}}
 
                 <div class="w-1/2">
-                    <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+                    <h3 class="text-lg font-semibold mb-3">🕒 Employees on Leave Today</h3>
+                    <table class="w-full border">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-2 border">Employee Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($employeesOnLeave->isEmpty())
+                                <tr><td class="px-4 py-2 border">No employees are on leave today.</td></tr>
+                            @else
+                                @foreach($employeesOnLeave as $leave)
+                                    <tr>
+                                        <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employees.show', $leave->employee->id) }}">{{ $leave->employee->name }}</a></td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    
+                    <h3 class="text-lg font-semibold mt-4 mb-3">📌 Notifications</h3>
                     @if($notifications->count())
                         <ul class="space-y-2">
                             @foreach ($notifications as $note)
@@ -95,38 +113,6 @@
                 </div>
             </div>
             
-            <!-- Online Employees & Notifications -->
-            <div class="w-full flex gap-6 mt-8">
-                <div class="w-full">
-                    <h3 class="text-lg font-semibold mb-3">🕒 Employees on Leave Today</h3>
-                    <table class="w-full border">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="px-4 py-2 border">Employee Name</th>
-                                <th class="px-4 py-2 border">Leave Type</th>
-                                <th class="px-4 py-2 border">From Date</th>
-                                <th class="px-4 py-2 border">To Date</th>
-                                <th class="px-4 py-2 border">Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if($employeesOnLeave->isEmpty())
-                                <tr><td class="px-4 py-2 border" colspan="5">No employees are on leave today.</td></tr>
-                            @else
-                                @foreach($employeesOnLeave as $leave)
-                                    <tr>
-                                        <td class="px-4 py-2 border">{{ $leave->employee->name }}</td>
-                                        <td class="px-4 py-2 border">{{ $leave->leave_type }}</td>
-                                        <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
-                                        <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
-                                        <td class="px-4 py-2 border">{{ $leave->reason }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 

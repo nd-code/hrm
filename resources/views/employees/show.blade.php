@@ -171,6 +171,7 @@
                     <table id="leaveTable" class="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr>
+                                <th style="display:none;">ID</th> <!-- Added ID Column -->
                                 <th class="border p-2">From</th>
                                 <th class="border p-2">To</th>
                                 <th class="border p-2">Days</th>
@@ -182,6 +183,7 @@
                         <tbody>
                             @foreach($leaves as $leave)
                                 <tr>
+                                    <td style="display:none;">{{ $leave->id }}</td> <!-- ID Cell -->
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
                                     <td class="border p-2">{{ $leave->days }}</td>
@@ -439,6 +441,7 @@
             
             // Initialize DataTable for Leaves
             $('#leaveTable').DataTable({
+                order: [[0, "desc"]],
                 pageLength: 10,
                 responsive: true,
                 rowCallback: function (row, data, displayIndex) {
@@ -453,5 +456,6 @@
     <style>
         #workTable tr.odd { background-color: #f9fafb; }
         #workTable tr.even { background-color: #ffffff; }
+        #leaveTable{width: 100% !important;}
     </style>
 </x-app-layout>

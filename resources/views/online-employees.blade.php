@@ -9,10 +9,8 @@
             <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employees.show', $session->employee->id) }}">{{ $session->employee->name }}</a></td>
             <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
             <td class="px-4 py-2 border">{{ $start ? $start->format('h:i A') : '-' }}</td>
-            <td class="px-4 py-2 border">{{ $end ? $end->format('h:i A') : '-' }}</td>
-            <td class="px-4 py-2 border">{{ $total }}</td>
         </tr>
     @endforeach
 @else
-    <tr><td class="px-4 py-2 border" colspan="5">No employees are online.</td></tr>
+    <tr><td class="px-4 py-2 border" colspan="3">No employees are online.</td></tr>
 @endif

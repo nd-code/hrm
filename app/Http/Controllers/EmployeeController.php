@@ -74,7 +74,7 @@ class EmployeeController extends Controller
             ->get();
 
         // Fetch employee leaves
-        $leaves = Leave::where('employee_id', $employee->id)->get();
+        $leaves = Leave::where('employee_id', $employee->id)->orderBy('id', 'desc')->get();
 
         // Total leaves (sum of days)
         $totalLeaves = 0;
