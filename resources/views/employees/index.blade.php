@@ -23,7 +23,12 @@
                                 <input type="email" name="email" placeholder="Email" class="border p-2 w-full mb-2" required>
 								<input type="text" name="employee_id" placeholder="Employee ID" class="border p-2 w-full mb-2" required>
                                 <input type="text" name="phone" placeholder="Phone" class="border p-2 w-full mb-2">
-                                <input type="text" name="position" placeholder="Position" class="border p-2 w-full mb-2">
+                                <select name="position" class="border p-2 w-full mb-2" required>
+                                    <option value="">Select Position</option>
+                                    @foreach($positions as $pos)
+                                        <option value="{{ $pos->id }}">{{ $pos->name }}</option>
+                                    @endforeach
+                                </select>
                                 <input type="text" name="pan_number" placeholder="PAN Number" class="border p-2 w-full mb-2">
 								<input type="date" name="joining_date" placeholder="Joining Date" class="border p-2 w-full mb-2">
                                 <textarea name="address" placeholder="Address" class="border p-2 w-full mb-2"></textarea>
@@ -66,8 +71,14 @@
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'phone', this.innerText)">
                                     {{ $emp->phone }}
                                 </td>
-                                <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'position', this.innerText)">
-                                    {{ $emp->position }}
+                                <td>
+                                    <select onchange="updateField({{ $emp->id }}, 'position', this.value)" class="border p-1 rounded">
+                                        @foreach($positions as $pos)
+                                            <option value="{{ $pos->id }}" {{ $pos->id == $emp->position ? 'selected' : '' }}>
+                                                {{ $pos->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'pan_number', this.innerText)">
                                     {{ $emp->pan_number }}

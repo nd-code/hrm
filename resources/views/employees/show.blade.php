@@ -55,6 +55,14 @@
                                             data-id="{{ $employee->id }}">
                                             {{ $employee->$field ?: 'Add here....' }}
                                         </span>
+                                    @elseif ($field === 'position')
+                                        <select onchange="updateField({{ $employee->id }}, 'position', this.value)" class="border p-1 rounded">
+                                            @foreach($positions as $pos)
+                                                <option value="{{ $pos->id }}" {{ $pos->id == $employee->position ? 'selected' : '' }}>
+                                                    {{ $pos->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     @else
                                         <span class="editable"
                                             data-field="{{ $field }}"

@@ -11,15 +11,17 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\WorkSession;
 use App\Models\Leave;
 use Carbon\Carbon;
+use App\Models\Position;
 
 class EmployeeController extends Controller
 {
     public function index()
-	{
-		return view('employees.index', [
-			'employees' => Employee::orderBy('created_at', 'desc')->get()
-		]);
-	}
+    {
+        return view('employees.index', [
+            'employees' => Employee::orderBy('created_at', 'desc')->get(),
+            'positions' => Position::orderBy('id')->get(), // ✅ fetch positions
+        ]);
+    }
 
     public function store(Request $request)
 	{
@@ -92,8 +94,10 @@ class EmployeeController extends Controller
         })->map(function ($group) {
             return $group->sum('days');
         });
+        
+        $positions = Position::orderBy('id')->get();
 
-        return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise'));
+        return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise', 'positions'));
     }
 
     public function destroy(Employee $employee)
