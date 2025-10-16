@@ -86,6 +86,16 @@
                                     <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> My Work
                                 </a>
                             </li>
+                            
+                            @if(Auth::user()->position === '1' || Auth::user()->position === '2' || Auth::user()->position === '3' || Auth::user()->position === '10')
+                                <li>
+                                    <a href="{{ route('employee.team.index') }}"
+                                       class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.team.index') ? 'bg-gray-700' : '' }}">
+                                        <i class="fa-solid fa-user-group me-2 text-green-400"></i> My Team
+                                    </a>
+                                </li>
+                            @endif
+
                             <li>
                                 <a href="{{ route('reminders.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reminders.index') ? 'bg-gray-700' : '' }}">

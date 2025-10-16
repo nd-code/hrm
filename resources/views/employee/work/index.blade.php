@@ -8,6 +8,8 @@
     <div class="py-12">
         <div class="mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                
+                <h3 class="text-lg font-bold mb-4">My Work</h3>
 
                 <!-- My Work Table -->
                 <table id="workTable" class="w-full">

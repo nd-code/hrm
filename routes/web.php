@@ -13,6 +13,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\TeamController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,12 @@ Route::middleware(['auth:employee'])->group(function () {
         auth()->user()->unreadNotifications->markAsRead();
         return response()->json(['success' => true]);
     })->name('notifications.markRead');
+    
+    Route::get('/employee/team', [TeamController::class, 'teamIndex'])->name('employee.team.index');
+    Route::post('/employee/team/store', [TeamController::class, 'store'])->name('employee.team.store');
+    Route::delete('/employee/team/destroy/{id}', [TeamController::class, 'destroy'])->name('employee.team.destroy');
+    Route::post('/employee/team/leave/{id}/approve', [TeamController::class, 'approve'])->name('employee.team.leave.approve');
+    Route::post('/employee/team/leave/{id}/reject', [TeamController::class, 'reject'])->name('employee.team.leave.reject');
 });
 
 Route::middleware('auth')->group(function () {
