@@ -156,11 +156,31 @@
                                  class="absolute top-14 right-0 w-96 bg-white border rounded-lg shadow-lg p-4 hidden z-50">
                                 <button id="closePopup" class="absolute top-2 right-2 text-red-500">✖</button>
                                 <h2 class="text-lg font-semibold mb-3">Send Notification</h2>
+
+                                <!-- Form -->
                                 <form id="notificationForm" action="{{ route('admin.notifications.send') }}" method="POST">
                                     @csrf
-                                    <textarea name="message" class="w-full border rounded p-2 resize-none h-32" placeholder="Type your message..." required></textarea>
-                                    <div class="mt-3 flex justify-end">
-                                        <button type="submit" class="px-3 py-2 bg-blue-500 text-white rounded">Post</button>
+                                    <textarea name="message"
+                                              class="w-full border rounded p-2 resize-none h-32"
+                                              placeholder="Type your message..." required></textarea>
+
+                                    <div class="mt-3 flex justify-end items-center gap-2">
+                                        <!-- Loader (hidden by default) -->
+                                        <div id="loader" class="hidden">
+                                            <svg class="animate-spin h-5 w-5 text-blue-500"
+                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                        stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor"
+                                                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            </svg>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <button type="submit" id="submitBtn"
+                                                class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                                            Post
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -214,15 +234,22 @@
             const popupBtn = document.getElementById('popupNotification');
             const popup = document.getElementById('notificationPopup');
             const closeBtn = document.getElementById('closePopup');
+            const loader = document.getElementById('loader');
+            const submitBtn = document.getElementById('submitBtn');
 
             popupBtn.addEventListener('click', () => popup.classList.toggle('hidden'));
             closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
 
-            // AJAX submit
-            document.getElementById('notificationForm').addEventListener('submit', function(e){
+            // AJAX submit with loader near Post button
+            document.getElementById('notificationForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 let form = e.target;
                 let data = new FormData(form);
+
+                // Show loader & disable button
+                loader.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Posting...";
 
                 fetch(form.action, {
                     method: "POST",
@@ -235,7 +262,16 @@
                     form.reset();
                     alert("✅ Notification sent!");
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error(err);
+                    alert("❌ Failed to send notification. Please try again.");
+                })
+                .finally(() => {
+                    // Hide loader & reset button
+                    loader.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Post";
+                });
             });
         @else
             document.addEventListener("DOMContentLoaded", () => {

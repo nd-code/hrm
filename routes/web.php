@@ -57,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/notifications/list', [NotificationController::class, 'index'])->name('notifications');
     Route::post('/admin/notifications/send', [NotificationController::class, 'sendNotification'])->name('admin.notifications.send');
+    Route::post('/notifications/delete-by-data', [NotificationController::class, 'deleteByData'])->name('notifications.deleteByData');
 });
 
 // Admin Auth (Breeze)
