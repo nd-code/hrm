@@ -48,7 +48,7 @@
                 {{-- ============================= --}}
                 {{-- Online Employees Section --}}
                 {{-- ============================= --}}
-                
+
                 <div class="w-1/2">
                     <h3 class="text-lg font-semibold mb-3">🟢 Online Employees</h3>
                     <table class="w-full border">
@@ -64,7 +64,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 {{-- ============================= --}}
                 {{-- Notifications Section --}}
                 {{-- ============================= --}}
@@ -89,30 +89,33 @@
                             @endif
                         </tbody>
                     </table>
-                    
-                    <h3 class="text-lg font-semibold mt-4 mb-3">📌 Notifications</h3>
-                    @if($notifications->count())
-                        <ul class="space-y-2">
-                            @foreach ($notifications as $note)
-                                @php
-                                    $data = json_decode($note->data, true);
-                                @endphp
-                                <li class="flex items-center gap-2 p-2 border rounded bg-gray-50">
-                                    <span class="text-gray-800 font-medium">
-                                        {{ $data['message'] ?? '' }}
-                                    </span>
-                                    <span class="text-xs text-gray-500 ml-auto">
-                                        {{ \Carbon\Carbon::parse($note->latest_created_at ?? $note->created_at)->diffForHumans() }}
-                                    </span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <p class="text-gray-600">No notification 🎉</p>
-                    @endif
+
+                    <div class="p-3 mb-0 mt-4 text-sm text-red-800 border border-red-300  bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
+
+                        <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+                        @if($notifications->count())
+                            <ul class="">
+                                @foreach ($notifications as $note)
+                                    @php
+                                        $data = json_decode($note->data, true);
+                                    @endphp
+                                    <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
+                                        <span class="text-gray-800 font-medium">
+                                            {{ $data['message'] ?? '' }}
+                                        </span> <br>
+                                        <span class="text-xs text-gray-500 ml-auto timeNotification">
+                                            {{ \Carbon\Carbon::parse($note->latest_created_at ?? $note->created_at)->diffForHumans() }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-gray-600">No notification 🎉</p>
+                        @endif
+                    </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 
@@ -132,4 +135,29 @@
     // Refresh every 5 seconds
         setInterval(loadOnlineEmployees, 5000);
     </script>
+
+
+<style>
+    .notificationBox {
+        position: relative;
+        border:0 !important;
+        border:1px solid #f1d6d6 !important;
+    }
+    .notificationBox:first-child {
+        border-bottom:0 !important;
+    }
+    .timeNotification {
+        background: #f5d2d2;
+        padding: 1px 8px;
+        border-radius: 15px;
+        border: 1px solid #f5d2d2;
+        margin-top: 5px;
+        display: inline-block;
+        font-size: 11px !important;
+        color: #9c2f2f;
+        font-weight:500;
+    }
+</style>
+
+
 </x-app-layout>
