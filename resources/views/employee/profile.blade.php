@@ -1,3 +1,6 @@
+@php
+use App\Models\Position;
+@endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -18,6 +21,11 @@
                             <td class="border p-2">
                                 @if($field === 'joining_date' && !empty($employee->$field))
                                     {{ \Carbon\Carbon::parse($employee->$field)->format('d-m-Y') }}
+                                @elseif ($field === 'position')
+                                    @php
+                                        $position = Position::find($employee->$field);
+                                    @endphp
+                                    {{ $position ? $position->name : '—' }}
                                 @else
                                     {{ $employee->$field }}
                                 @endif
