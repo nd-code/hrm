@@ -85,7 +85,9 @@
                     <form method="POST" action="{{ route('employee.work.timer') }}">
                         @csrf
                         @if($openSession)
-                            <textarea id="comment" name="comment" placeholder="Enter your work details here...." class="mb-2" style="width: 300px;"></textarea>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-3">
+                            <textarea id="comment" name="comment" placeholder="Enter your work details here...." class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-500 resize-none"></textarea>
+                        </div>
                             <button class="block text-left px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
                                 Offline
                             </button>
@@ -150,7 +152,7 @@
                     {{-- Reminders + Notifications Section --}}
                     {{-- ============================= --}}
 
-                    <div class="flex gap-6 mt-8">
+                    <div class="flex items-start gap-6 mt-8">
                         {{-- ============================= --}}
                         {{-- Reminders Section --}}
                         {{-- ============================= --}}

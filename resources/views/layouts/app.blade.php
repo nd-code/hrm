@@ -18,6 +18,31 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+    #notifBell .fa-bell {
+      font-size: 24px;
+      display: inline-block;        /* required for transform */
+      transform-origin: 50% 10%;   /* pivot at top */
+      color: #f59e0b;
+      outline:none;
+    }
+    #notifBell .ring {
+      animation: ring 1s ease-in-out infinite;
+      box-shadow:none;
+    }
+    @keyframes ring {
+      0%   { transform: rotate(0); }
+      10%  { transform: rotate(15deg); }
+      20%  { transform: rotate(-10deg); }
+      30%  { transform: rotate(5deg); }
+      40%  { transform: rotate(-5deg); }
+      50%  { transform: rotate(3deg); }
+      60%  { transform: rotate(-2deg); }
+      70%,100% { transform: rotate(0); }
+    }
+    </style>
+
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
@@ -86,7 +111,7 @@
                                     <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> My Work
                                 </a>
                             </li>
-                            
+
                             @if(Auth::user()->position === '1' || Auth::user()->position === '2' || Auth::user()->position === '3' || Auth::user()->position === '10')
                                 <li>
                                     <a href="{{ route('employee.team.index') }}"
@@ -145,7 +170,7 @@
                     <div class="flex justify-end position-relative">
                         <div class="relative inline-block">
                             <!-- Plus Icon Trigger -->
-                            <a href="javascript:void(0);" 
+                            <a href="javascript:void(0);"
                                class="w-10 h-10 flex items-center justify-center text-xl bg-white border rounded-full shadow hover:bg-gray-50 transition"
                                id="popupNotification">
                                <i class="fa-solid fa-plus text-blue-400"></i>
@@ -192,7 +217,7 @@
                 <header class="bg-white shadow px-6 py-3 flex justify-end">
                     <div class="relative">
                         <button id="notifBell" class="relative text-2xl">
-                            🔔
+                         <i class="fa-solid fa-bell ring"></i>
                             <span id="notifCount"
                                   class="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
                                   {{ Auth::user()->unreadNotifications->count() ?? 0 }}
@@ -224,12 +249,12 @@
     </div>
 
     @stack('scripts')
-    
+
     <script>
         @auth
             window.userId = {{ auth()->id() }};
         @endauth
-        
+
         @if(Auth::user()->id === 101)
             const popupBtn = document.getElementById('popupNotification');
             const popup = document.getElementById('notificationPopup');
