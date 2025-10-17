@@ -3,13 +3,13 @@
     use App\Models\Reminder;
     use App\Models\Leave;
     use App\Models\Team;
-    
+
     $teamEmployees = Team::with('employee')
         ->where('parent_employee_id', auth('employee')->id())
         ->get();
 
     $existingIds = $teamEmployees->pluck('employee_id')->toArray();
-    
+
     // Get team members currently on leave today
     $today = \Carbon\Carbon::today();
 
@@ -36,8 +36,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="mx-auto sm:px-6 lg:px-8">
+    <div class="py-4">
+        <div class="mx-auto sm:px-1 lg:px-1">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
@@ -95,7 +95,7 @@
                             </button>
                         @endif
                     </form>
-                    
+
                     @if(Auth::user()->position === '1' || Auth::user()->position === '2' || Auth::user()->position === '3' || Auth::user()->position === '10')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                             <!-- Online Employees -->
@@ -163,12 +163,12 @@
                                 ->get();
                         @endphp
 
-                        <div class="w-1/2">
+                        <div class="w-1/2 p-3 mb-0 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800">
                             <h3 class="text-lg font-semibold mb-3">📝 Reminders</h3>
 
                             @if($todayReminders->count())
-                                <table class="w-full border">
-                                    <thead>
+                                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
                                             <th class="border px-2 py-1">Date</th>
                                             <th class="border px-2 py-1">Subject</th>
@@ -178,14 +178,14 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($todayReminders as $reminder)
-                                            <tr>
+                                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                                                 <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($reminder->date)->format('d-m-Y') }}</td>
                                                 <td class="border px-2 py-1">{{ $reminder->subject }}</td>
                                                 <td class="border px-2 py-1">{{ $reminder->description }}</td>
                                                 <td class="border px-2 py-1">
                                                     <form action="{{ route('employee.reminders.complete', $reminder->id) }}" method="POST">
                                                         @csrf
-                                                        <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded">
+                                                        <button type="submit" class="px-2 py-1 text-xs font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                                                             Clear
                                                         </button>
                                                     </form>
@@ -211,16 +211,16 @@
                                 ->get();
                         @endphp
 
-                        <div class="w-1/2">
+                        <div class="w-1/2 space-y-2 p-3 mb-0 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
                             <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
                             @if($latestNotifications->count())
-                                <ul class="space-y-2">
+                                <ul class="">
                                     @foreach ($latestNotifications as $note)
-                                        <li class="flex items-center gap-2 p-2 border rounded bg-gray-50">
+                                        <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
                                             <span class="text-gray-800 font-medium">
                                                 {{ $note->data['message'] ?? '' }}
-                                            </span>
-                                            <span class="text-xs text-gray-500 ml-auto">
+                                            </span> <br>
+                                            <span class="text-xs text-gray-500 ml-auto timeNotification ">
                                                 {{ $note->created_at->diffForHumans() }}
                                             </span>
                                         </li>
@@ -236,3 +236,25 @@
         </div>
     </div>
 </x-app-layout>
+
+<style>
+    .notificationBox {
+        position: relative;
+        border:0 !important;
+        border:1px solid #f1d6d6 !important;
+    }
+    .notificationBox:first-child {
+        border-bottom:0 !important;
+    }
+    .timeNotification {
+        background: #f5d2d2;
+        padding: 1px 8px;
+        border-radius: 15px;
+        border: 1px solid #f5d2d2;
+        margin-top: 5px;
+        display: inline-block;
+        font-size: 11px !important;
+        color: #9c2f2f;
+        font-weight:500;
+    }
+</style>
