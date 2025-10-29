@@ -33,7 +33,7 @@
 
                                     <form action="{{ route('notifications.deleteByData') }}" method="POST" onsubmit="return confirm('Are you sure want to clear this notification?');">
                                         @csrf
-                                        <input type="hidden" name="data" value="{{ $note->data }}">
+                                        <input type="hidden" name="message" value="{{ $data['message'] }}">
                                         <button type="submit" class="text-red-500 hover:text-red-700 ml-2" title="Delete notification">Clear</button>
                                     </form>
                                 </li>

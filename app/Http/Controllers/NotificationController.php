@@ -54,10 +54,9 @@ class NotificationController extends Controller
     
     public function deleteByData(Request $request)
     {
-        $data = $request->input('data');
-
-        // Delete all notifications with that same data
-        DB::table('notifications')->where('data', $data)->delete();
+        DB::table('notifications')
+            ->whereJsonContains('data->message', $request->message)
+            ->delete();
 
         return redirect()->back()->with('success', 'Notification cleared.');
     }
