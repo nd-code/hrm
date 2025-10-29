@@ -62,7 +62,7 @@
         <div class="nameAddress mt-2">
             To, <br>
             <b>{{ $employee->name }}</b><br>
-            Designation: {{ $employee->position }}<br>
+            Designation: {{ $position->name }}<br>
             Address: {{ $employee->address }}
         </div>
         <h2>To Whomsoever It May Concern</h2>

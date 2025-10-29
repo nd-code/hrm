@@ -10,7 +10,7 @@
             <h3 class="text-lg font-bold mb-4">Reminder Info</h3>
 
             <table class="w-full border-collapse border border-gray-300 mb-4">
-                @foreach (['date', 'subject', 'description'] as $field)
+                @foreach (['date', 'subject', 'description', 'status'] as $field)
                     <tr>
                         <th class="border p-2 text-left capitalize">{{ ucfirst($field) }}</th>
                         <td class="border p-2">
@@ -24,6 +24,10 @@
                                       data-field="{{ $field }}"
                                       data-id="{{ $reminder->id }}">
                                       {{ $reminder->$field ?: 'Add here....' }}
+                                </span>
+                            @elseif ($field === 'status')
+                                <span>
+                                      {{ $reminder->$field }}
                                 </span>
                             @else
                                 <span class="editable"

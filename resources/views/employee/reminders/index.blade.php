@@ -39,6 +39,7 @@
                                 <th>Date</th>
                                 <th>Subject</th>
                                 <th>Description</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -55,6 +56,9 @@
                                 </td>
                                 <td contenteditable="true" onBlur="updateReminderField({{ $reminder->id }}, 'description', this.innerText)">
                                     {{ $reminder->description }}
+                                </td>
+                                <td contenteditable="false">
+                                    {{ $reminder->status }}
                                 </td>
                                 <td class="space-x-2">
                                     <a href="{{ route('reminders.show', $reminder->id) }}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
@@ -115,6 +119,7 @@
                     `<input type="date" value="${response.date}" onchange="updateReminderField(${response.id}, 'date', this.value)" />`,
                     `<td contenteditable="true" onBlur="updateReminderField(${response.id}, 'subject', this.innerText)">${response.subject}</td>`,
                     `<td contenteditable="true" onBlur="updateReminderField(${response.id}, 'description', this.innerText)">${response.description ?? ''}</td>`,
+                    `<td contenteditable="false">Pending</td>`,
                     `<td class="space-x-2">
                         <a href="/reminders/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
                         <form method="POST" action="/reminders/${response.id}" style="display:inline">

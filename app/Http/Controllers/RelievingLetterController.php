@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\RelievingLetter;
 use Illuminate\Http\Request;
+use App\Models\Position;
 
 class RelievingLetterController extends Controller
 {
     public function show($id)
 	{
 		$employee = Employee::findOrFail($id);
+                
+                $position = Position::where('id', $employee->position)->first();
 
 		$letter = \App\Models\RelievingLetter::where('employee_id', $employee->id)->first();
 
-		return view('employees.relieving', compact('employee', 'letter'));
+		return view('employees.relieving', compact('employee', 'position', 'letter'));
 	}
 
     public function save(Request $request, $id)
