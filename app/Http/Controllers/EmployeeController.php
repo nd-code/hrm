@@ -168,4 +168,37 @@ class EmployeeController extends Controller
 
 		return view('employee.profile', compact('employee'));
 	}
+        
+        public function details($id)
+        {
+            $employee = Employee::findOrFail($id);
+
+            $sessions = WorkSession::where('employee_id', $id)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            // Fetch employee leaves
+            $leaves = Leave::where('employee_id', $id)->orderBy('id', 'desc')->get();
+
+            // Total leaves (sum of days)
+            $totalLeaves = 0;
+            foreach ($leaves as $leave) {
+                $from = Carbon::parse($leave->from_date);
+                $to = Carbon::parse($leave->to_date);
+                $days = $from->diffInDays($to) + 1; // inclusive
+                $totalLeaves += $days;
+                $leave->days = $days; // store for blade
+            }
+
+            // Month-wise leaves
+            $monthWise = $leaves->groupBy(function ($leave) {
+                return Carbon::parse($leave->from_date)->format('Y-m');
+            })->map(function ($group) {
+                return $group->sum('days');
+            });
+
+            $positions = Position::orderBy('id')->get();
+
+            return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise', 'positions'));
+        }
 }

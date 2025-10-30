@@ -103,7 +103,7 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/team/leave/{id}/approve', [TeamController::class, 'approve'])->name('employee.team.leave.approve');
     Route::post('/employee/team/leave/{id}/reject', [TeamController::class, 'reject'])->name('employee.team.leave.reject');
     
-    Route::get('/employee/{id}', [EmployeeController::class, 'show'])->name('employee.details');
+    Route::get('/employee/{id}', [EmployeeController::class, 'details'])->name('employee.details');
 });
 
 Route::middleware('auth')->group(function () {
