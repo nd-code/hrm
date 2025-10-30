@@ -102,6 +102,8 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::delete('/employee/team/destroy/{id}', [TeamController::class, 'destroy'])->name('employee.team.destroy');
     Route::post('/employee/team/leave/{id}/approve', [TeamController::class, 'approve'])->name('employee.team.leave.approve');
     Route::post('/employee/team/leave/{id}/reject', [TeamController::class, 'reject'])->name('employee.team.leave.reject');
+    
+    Route::get('/employee/{id}', [EmployeeController::class, 'show'])->name('employee.details');
 });
 
 Route::middleware('auth')->group(function () {

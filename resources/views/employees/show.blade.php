@@ -10,15 +10,17 @@
 
             <!-- Tabs -->
             <ul id="tabs" class="flex border-b mb-6">
-                <li class="-mb-px mr-1">
-                    <a href="#tab-info"
-                       class="tab-link bg-white inline-block border-l border-t border-r rounded-t py-2 px-4 font-semibold text-blue-600">
-                       Employee Information
-                    </a>
-                </li>
+                @if(Auth::user()->id === 101)
+                    <li class="-mb-px mr-1">
+                        <a href="#tab-info"
+                           class="tab-link bg-white inline-block border-l border-t border-r rounded-t py-2 px-4 font-semibold text-blue-600">
+                           Employee Information
+                        </a>
+                    </li>
+                @endif
                 <li class="mr-1">
                     <a href="#tab-work"
-                       class="tab-link bg-white inline-block py-2 px-4 text-gray-500 hover:text-blue-600">
+                       @if(Auth::user()->id === 101) class="tab-link bg-white inline-block py-2 px-4 text-gray-500 hover:text-blue-600" @else class="tab-link bg-white inline-block border-l border-t border-r rounded-t py-2 px-4 font-semibold text-blue-600" @endif>
                        Attendance
                     </a>
                 </li>
@@ -32,83 +34,85 @@
 
             <!-- Tab Contents -->
             <div id="tab-contents">
-                <!-- Employee Information Tab -->
-                <div id="tab-info" class="tab-content p-4">
-                    
-                    <h3 class="text-lg font-bold mb-4">{{ $employee->name }}'s Info</h3>
+                @if(Auth::user()->id === 101)
+                    <!-- Employee Information Tab -->
+                    <div id="tab-info" class="tab-content p-4">
 
-                    <table class="w-full border-collapse border border-gray-300 mb-4">
-                        @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details'] as $field)
+                        <h3 class="text-lg font-bold mb-4">{{ $employee->name }}'s Info</h3>
+
+                        <table class="w-full border-collapse border border-gray-300 mb-4">
+                            @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details'] as $field)
+                                <tr>
+                                    <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
+                                    <td class="border p-2">
+                                        @if ($field === 'joining_date')
+                                            <input
+                                                type="date"
+                                                class="joining-date-input"
+                                                value="{{ $employee->$field }}"
+                                                onchange="updateField({{ $employee->id }}, '{{ $field }}', this.value)"
+                                            />
+                                        @elseif ($field === 'bank_details')
+                                            <span class="editable-textarea"
+                                                data-field="{{ $field }}"
+                                                data-id="{{ $employee->id }}">
+                                                {{ $employee->$field ?: 'Add here....' }}
+                                            </span>
+                                        @elseif ($field === 'position')
+                                            <select onchange="updateField({{ $employee->id }}, 'position', this.value)" class="border p-1 rounded">
+                                                @foreach($positions as $pos)
+                                                    <option value="{{ $pos->id }}" {{ $pos->id == $employee->position ? 'selected' : '' }}>
+                                                        {{ $pos->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            <span class="editable"
+                                                data-field="{{ $field }}"
+                                                data-id="{{ $employee->id }}">
+                                                {{ $employee->$field }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                             <tr>
-                                <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
+                                <th class="border p-2 text-left">Documents</th>
                                 <td class="border p-2">
-                                    @if ($field === 'joining_date')
-                                        <input
-                                            type="date"
-                                            class="joining-date-input"
-                                            value="{{ $employee->$field }}"
-                                            onchange="updateField({{ $employee->id }}, '{{ $field }}', this.value)"
-                                        />
-                                    @elseif ($field === 'bank_details')
-                                        <span class="editable-textarea"
-                                            data-field="{{ $field }}"
-                                            data-id="{{ $employee->id }}">
-                                            {{ $employee->$field ?: 'Add here....' }}
-                                        </span>
-                                    @elseif ($field === 'position')
-                                        <select onchange="updateField({{ $employee->id }}, 'position', this.value)" class="border p-1 rounded">
-                                            @foreach($positions as $pos)
-                                                <option value="{{ $pos->id }}" {{ $pos->id == $employee->position ? 'selected' : '' }}>
-                                                    {{ $pos->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    @else
-                                        <span class="editable"
-                                            data-field="{{ $field }}"
-                                            data-id="{{ $employee->id }}">
-                                            {{ $employee->$field }}
-                                        </span>
-                                    @endif
+                                    <div id="documents-loading" class="hidden mb-2">
+                                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                        </svg>
+                                        Uploading...
+                                    </div>
+
+                                    <div id="documents-list" class="mb-2 text-sm">
+                                        Loading...
+                                    </div>
+
+                                    <input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
+                                    <button type="button" onclick="document.getElementById('document-upload').click()"
+                                        class="bg-blue-500 text-white px-3 py-1 rounded">
+                                        Upload Document
+                                    </button>
                                 </td>
                             </tr>
-                        @endforeach
-                        <tr>
-                            <th class="border p-2 text-left">Documents</th>
-                            <td class="border p-2">
-                                <div id="documents-loading" class="hidden mb-2">
-                                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                                    </svg>
-                                    Uploading...
-                                </div>
-                                
-                                <div id="documents-list" class="mb-2 text-sm">
-                                    Loading...
-                                </div>
+                            <tr>
+                                <th class="border p-2 text-left">Relieving Letter</th>
+                                <td class="border p-2">
+                                    <a target="_blank" href="{{ route('employees.relieving-letter', $employee->id) }}">
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
 
-                                <input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
-                                <button type="button" onclick="document.getElementById('document-upload').click()"
-                                    class="bg-blue-500 text-white px-3 py-1 rounded">
-                                    Upload Document
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="border p-2 text-left">Relieving Letter</th>
-                            <td class="border p-2">
-                                <a target="_blank" href="{{ route('employees.relieving-letter', $employee->id) }}">
-                                    <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
-
-                </div>
+                    </div>
+                @endif
 
                 <!-- Attendance Tab -->
-                <div id="tab-work" class="tab-content hidden p-4">
+                <div id="tab-work" class="tab-content @if(Auth::user()->id === 101) hidden @endif p-4">
                     
                     <h3 class="text-lg font-bold mb-4">Attendance</h3>
 

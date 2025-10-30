@@ -114,7 +114,7 @@
                                     <tbody>
                                         @forelse($onlineTeamMembers as $session)
                                             <tr>
-                                                <td class="px-4 py-2 border">{{ $session->employee->name }}</td>
+                                                <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $session->employee->id) }}">{{ $session->employee->name }}</a></td>
                                                 <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($session->start_time)->format('d-m-Y') }}</td>
                                                 <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($session->start_time)->format('h:i A') }}</td>
                                             </tr>

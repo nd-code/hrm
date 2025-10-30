@@ -80,7 +80,7 @@
                                     @foreach($teamEmployees as $teamEmp)
                                     <tr data-id="{{ $teamEmp->id }}">
                                         <td style="display:none;">{{ $teamEmp->id }}</td>
-                                        <td>{{ $teamEmp->employee->name }}</td>
+                                        <td><a style="text-decoration: underline;" href="{{ route('employee.details', $teamEmp->employee->id) }}">{{ $teamEmp->employee->name }}</a></td>
                                         <td>{{ $teamEmp->employee->email }}</td>
                                         <td>{{ $teamEmp->employee->phone }}</td>
                                         <td>
