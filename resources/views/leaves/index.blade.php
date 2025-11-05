@@ -147,11 +147,13 @@
 		<div class="bg-white p-6 rounded shadow-lg w-96">
 			<h2 class="text-lg font-bold mb-4">Select Manager</h2>
 			<form id="manageByForm">
-				<select name="manage_by" id="manage_by" class="w-full border p-2 mb-4">
+				<select name="manage_by" id="manage_by" class="w-full border p-2 mb-2">
 					@foreach($employees as $employee)
 						<option value="{{ $employee->id }}">{{ $employee->name }}</option>
 					@endforeach
 				</select>
+                                <label>Comment:</label>
+                                <textarea name="comment" id="comment" placeholder="Comment..." class="w-full border p-2 mb-2"></textarea>
 				<input type="hidden" name="leave_id" id="leave_id">
 				<input type="hidden" name="status" id="leave_status">
 				<button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
@@ -405,6 +407,7 @@
 				const leaveId = $('#leave_id').val();
 				const manageBy = $('#manage_by').val();
 				const status = $('#leave_status').val();
+                                const comment = $('#comment').val();
 
 				$.ajax({
 					url: `/leaves/${leaveId}/status`,
@@ -412,7 +415,8 @@
 					data: {
 						_token: '{{ csrf_token() }}',
 						status: status,
-						manage_by: manageBy
+						manage_by: manageBy,
+                                                comment: comment
 					},
 					success: function (resp) {
 						const row = $(`#leavesTable tr[data-id="${leaveId}"]`);

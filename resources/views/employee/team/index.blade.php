@@ -139,22 +139,26 @@
                                         <td>{{ $leave->reason }}</td>
                                         <td>
                                             @if($leave->status === 'Pending')
-                                                <form action="{{ route('employee.team.leave.approve', $leave->id) }}" 
-                                                      method="POST" 
-                                                      style="display:inline"
-                                                      onsubmit="return confirm('Are you sure you want to APPROVE this leave request?')">
+                                                {{-- Approve --}}
+                                                <form action="{{ route('employee.team.leave.approve', $leave->id) }}" method="POST" style="display:inline;">
                                                     @csrf
-                                                    <button type="submit" class="approve-btn text-green-500 ml-2 mr-2" title="Approve">
+                                                    <textarea name="comment" placeholder="Enter comment" class="hidden mt-2 border rounded p-1"></textarea>
+                                                    <button type="button" 
+                                                            onclick="showCommentBox(this, 'approve')" 
+                                                            class="approve-btn text-green-500 ml-2 mr-2" 
+                                                            title="Approve">
                                                         <i class="fas fa-check-circle"></i>
                                                     </button>
                                                 </form>
 
-                                                <form action="{{ route('employee.team.leave.reject', $leave->id) }}" 
-                                                      method="POST" 
-                                                      style="display:inline"
-                                                      onsubmit="return confirm('Are you sure you want to REJECT this leave request?')">
+                                                {{-- Reject --}}
+                                                <form action="{{ route('employee.team.leave.reject', $leave->id) }}" method="POST" style="display:inline;">
                                                     @csrf
-                                                    <button type="submit" class="reject-btn text-red-500 mr-2" title="Reject">
+                                                    <textarea name="comment" placeholder="Enter comment" class="hidden mt-2 border rounded p-1"></textarea>
+                                                    <button type="button" 
+                                                            onclick="showCommentBox(this, 'reject')" 
+                                                            class="reject-btn text-red-500 mr-2" 
+                                                            title="Reject">
                                                         <i class="fas fa-times-circle"></i>
                                                     </button>
                                                 </form>
@@ -266,6 +270,30 @@
             });
         });
     });
+    </script>
+    
+    <script>
+    function showCommentBox(button, action) {
+        const form = button.closest('form');
+        const textarea = form.querySelector('textarea');
+
+        if (textarea.classList.contains('hidden')) {
+            textarea.classList.remove('hidden');
+            textarea.focus();
+            button.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            button.title = `Submit ${action}`;
+        } else {
+            /*if (!textarea.value.trim()) {
+                alert('Please enter a comment before submitting.');
+                textarea.focus();
+                return;
+            }*/
+
+            if (confirm(`Are you sure you want to ${action.toUpperCase()} this leave?`)) {
+                form.submit();
+            }
+        }
+    }
     </script>
     
     <!-- Styles -->

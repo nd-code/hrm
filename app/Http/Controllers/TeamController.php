@@ -61,12 +61,21 @@ class TeamController extends Controller
         $leave->manage_by = auth('employee')->id();
         $leave->save();
         
+        $employeeId = auth('employee')->id();
+        $employee = Employee::find($employeeId);
+        $name = $employee ? $employee->name : 'Unknown';
+        
         // Notify the employee who applied for leave
         if ($leave->employee) {
             $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
             $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
-            \Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been Approved.", function ($msg) use ($leave) {
+            $message = "Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been Approved by {$name}.";
+            if (!empty($_POST['comment'])) {
+                $message .= "\n\nNote: ".$_POST['comment'];
+            }
+
+            \Mail::raw($message, function ($msg) use ($leave) {
                 $msg->to($leave->employee->email)
                     ->subject('Leave Status Updated');
             });
@@ -81,7 +90,7 @@ class TeamController extends Controller
             $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
             foreach ($employees as $emp) {
-                \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been Approved.", function ($msg) use ($emp) {
+                \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been Approved by {$name}.", function ($msg) use ($emp) {
                     $msg->to($emp->email)
                         ->subject('Leave Status Updated');
                 });
@@ -98,12 +107,21 @@ class TeamController extends Controller
         $leave->manage_by = auth('employee')->id();
         $leave->save();
         
+        $employeeId = auth('employee')->id();
+        $employee = Employee::find($employeeId);
+        $name = $employee ? $employee->name : 'Unknown';
+        
         // Notify the employee who applied for leave
         if ($leave->employee) {
             $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
             $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
-            \Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been Rejected.", function ($msg) use ($leave) {
+            $message = "Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been Rejected by {$name}.";
+            if (!empty($_POST['comment'])) {
+                $message .= "\n\nNote: ".$_POST['comment'];
+            }
+
+            \Mail::raw($message, function ($msg) use ($leave) {
                 $msg->to($leave->employee->email)
                     ->subject('Leave Status Updated');
             });
@@ -118,7 +136,7 @@ class TeamController extends Controller
             $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
             foreach ($employees as $emp) {
-                \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been Rejected.", function ($msg) use ($emp) {
+                \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been Rejected by {$name}.", function ($msg) use ($emp) {
                     $msg->to($emp->email)
                         ->subject('Leave Status Updated');
                 });

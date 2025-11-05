@@ -137,10 +137,24 @@ class LeaveController extends Controller
 		
 		// Notify the employee who applied for leave
 		if ($leave->employee) {
+                    $userId = auth()->id();
+                    if ($userId !== null && $userId == 101) {
+                        $name = 'Super Admin';
+                    } else {
+                        $employeeId = auth('employee')->id();
+                        $employee = Employee::find($employeeId);
+                        $name = $employee ? $employee->name : 'Unknown';
+                    }
+
                     $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
                     $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
-                    \Mail::raw("Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($leave) {
+                    $message = "Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been {$normalized} by {$name}.";
+                    if (!empty($request->comment)) {
+                        $message .= "\n\nNote: {$request->comment}";
+                    }
+
+                    \Mail::raw($message, function ($msg) use ($leave) {
                         $msg->to($leave->employee->email)
                             ->subject('Leave Status Updated');
                     });
@@ -155,7 +169,7 @@ class LeaveController extends Controller
                     $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
                     foreach ($employees as $emp) {
-                        \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been {$normalized}.", function ($msg) use ($emp) {
+                        \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been {$normalized} by {$name}.", function ($msg) use ($emp) {
                             $msg->to($emp->email)
                                 ->subject('Leave Status Updated');
                         });
