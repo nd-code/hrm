@@ -32,20 +32,20 @@
       animation: shake 0.6s ease-in-out 2;
     }
     
-    #notifCount{
+    .notifCountRR{
         padding: 0px;
     }
-    .text-xs {
+    .notifCountRR.text-xs {
         font-size: 1.5rem;
         line-height: 1.5rem;
     }
-    .-top-1 {
+    .notifCountRR.-top-1 {
         top: -.25rem;
     }
-    .-right-2 {
+    .notifCountRR.-right-2 {
         right: -0.6rem;
     }
-    .px-1 {
+    .notifCountRR.px-1 {
         padding-right: .50rem !important;
         padding-left: .50rem !important;
     }
@@ -236,7 +236,7 @@
                             @endif
 
                             <span id="notifCount"
-                                class="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full {{ $unreadCount == 0 ? 'hidden' : '' }}">
+                                class="notifCountRR absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full {{ $unreadCount == 0 ? 'hidden' : '' }}">
                                 {{ $unreadCount }}
                             </span>
                         </button>
