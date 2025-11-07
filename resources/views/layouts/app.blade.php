@@ -20,26 +20,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-    #notifBell .fa-bell {
-      font-size: 24px;
-      display: inline-block;        /* required for transform */
-      transform-origin: 50% 10%;   /* pivot at top */
-      color: #f59e0b;
-      outline:none;
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-15deg); }
+      40% { transform: rotate(15deg); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
     }
-    #notifBell .ring {
-      animation: ring 1s ease-in-out infinite;
-      box-shadow:none;
-    }
-    @keyframes ring {
-      0%   { transform: rotate(0); }
-      10%  { transform: rotate(15deg); }
-      20%  { transform: rotate(-10deg); }
-      30%  { transform: rotate(5deg); }
-      40%  { transform: rotate(-5deg); }
-      50%  { transform: rotate(3deg); }
-      60%  { transform: rotate(-2deg); }
-      70%,100% { transform: rotate(0); }
+
+    .bell-shake {
+      animation: shake 0.6s ease-in-out 2;
     }
     </style>
 
@@ -215,26 +205,36 @@
             @else
                 <!-- 🔔 Top Header -->
                 <header class="bg-white shadow px-6 py-3 flex justify-end">
-                    <div class="relative">
+                    <div class="relative" style="margin-right: 40px;">
+                        @php
+                            $unreadCount = Auth::user()->unreadNotifications->count();
+                        @endphp
+
                         <button id="notifBell" class="relative text-2xl">
-                         <i class="fa-solid fa-bell ring"></i>
+                            @if($unreadCount > 0)
+                                <i id="bellIcon" class="fa-solid fa-bell text-yellow-500" style="font-size: 40px;"></i>
+                            @else
+                                <i id="bellIcon" class="fa-solid fa-bell-slash text-gray-400" style="font-size: 40px;"></i>
+                            @endif
+
                             <span id="notifCount"
-                                  class="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-                                  {{ Auth::user()->unreadNotifications->count() ?? 0 }}
+                                class="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full {{ $unreadCount == 0 ? 'hidden' : '' }}">
+                                {{ $unreadCount }}
                             </span>
                         </button>
 
-                        <!-- Dropdown -->
                         <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow rounded">
                             <ul id="notificationList" class="max-h-60 overflow-y-auto">
-                                @foreach(Auth::user()->unreadNotifications as $note)
+                                @forelse(Auth::user()->unreadNotifications as $note)
                                     <li class="px-3 py-2 border-b">
                                         {{ $note->data['message'] ?? '' }}
                                         <span class="text-gray-500 text-xs float-right">
                                             {{ $note->created_at->diffForHumans() }}
                                         </span>
                                     </li>
-                                @endforeach
+                                @empty
+                                    <!--<li class="px-3 py-2 text-gray-500 text-sm text-center">No new notifications</li>-->
+                                @endforelse
                             </ul>
                         </div>
                     </div>
