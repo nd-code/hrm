@@ -31,6 +31,24 @@
     .bell-shake {
       animation: shake 0.6s ease-in-out 2;
     }
+    
+    #notifCount{
+        padding: 0px;
+    }
+    .text-xs {
+        font-size: 1.5rem;
+        line-height: 1.5rem;
+    }
+    .-top-1 {
+        top: -.25rem;
+    }
+    .-right-2 {
+        right: -0.6rem;
+    }
+    .px-1 {
+        padding-right: .50rem !important;
+        padding-left: .50rem !important;
+    }
     </style>
 
 </head>
