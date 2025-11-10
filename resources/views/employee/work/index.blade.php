@@ -26,38 +26,43 @@
                     </thead>
                     <tbody>
                         @foreach($sessions as $session)
-							@php
-								$start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
-								$end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
-								$total = ($start && $end) ? $start->diff($end)->format('%H:%I:%S') : '-';
-							@endphp
-							<tr data-id="{{ $session->id }}">
-								<td style="display:none;">{{ $session->id }}</td>
-								<td>{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
+                            @php
+                                $start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
+                                $end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
 
-								{{-- Start Time in 12-hour format --}}
-								<td>
-									{{ $start ? $start->format('h:i A') : '-' }}
-								</td>
+                                // Calculate total duration including date difference
+                                if ($start && $end) {
+                                    $diffInSeconds = $end->diffInSeconds($start);
+                                    $hours = floor($diffInSeconds / 3600);
+                                    $minutes = floor(($diffInSeconds % 3600) / 60);
+                                    $seconds = $diffInSeconds % 60;
+                                    $total = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                                } else {
+                                    $total = '-';
+                                }
+                            @endphp
 
-								{{-- End Time in 12-hour format --}}
-								<td>
-									{{ $end ? $end->format('h:i A') : '-' }}
-								</td>
+                            <tr data-id="{{ $session->id }}">
+                                <td style="display:none;">{{ $session->id }}</td>
+                                <td>{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
 
-								{{-- Total duration (still HH:MM:SS) --}}
-								<td>{{ $total }}</td>
+                                {{-- Start Time in 12-hour format --}}
+                                <td>{{ $start ? $start->format('h:i A') : '-' }}</td>
 
-								<td contenteditable="true" 
-									onBlur="updateField(this, '{{ $session->id }}', 'project_name')">
-									{{ $session->project_name }}
-								</td>
-								<td contenteditable="true" 
-									onBlur="updateField(this, '{{ $session->id }}', 'comment')">
-									{{ $session->comment }}
-								</td>
-							</tr>
-						@endforeach
+                                {{-- End Time in 12-hour format --}}
+                                <td>{{ $end ? $end->format('h:i A') : '-' }}</td>
+
+                                {{-- Total duration including date difference --}}
+                                <td>{{ $total }}</td>
+
+                                <td contenteditable="true" onBlur="updateField(this, '{{ $session->id }}', 'project_name')">
+                                    {{ $session->project_name }}
+                                </td>
+                                <td contenteditable="true" onBlur="updateField(this, '{{ $session->id }}', 'comment')">
+                                    {{ $session->comment }}
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
 

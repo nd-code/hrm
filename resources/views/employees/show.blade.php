@@ -130,25 +130,35 @@
                         </thead>
                         <tbody>
                             @foreach($sessions as $session)
-								@php
-									$start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
-									$end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
-									$total = ($start && $end) ? $start->diff($end)->format('%H:%I:%S') : '-';
-								@endphp
-								<tr data-id="{{ $session->id }}">
-									<td style="display:none;">{{ $session->id }}</td>
-									<td>{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
-									<td>
-										{{ $start ? $start->format('h:i A') : '-' }}
-									</td>
-									<td>
-										{{ $end ? $end->format('h:i A') : '-' }}
-									</td>
-									<td>{{ $total }}</td>
-									<td>{{ $session->project_name }}</td>
-									<td>{{ $session->comment }}</td>
-								</tr>
-							@endforeach
+                                @php
+                                    $start = $session->start_time ? \Carbon\Carbon::parse($session->start_time) : null;
+                                    $end = $session->end_time ? \Carbon\Carbon::parse($session->end_time) : null;
+
+                                    // ✅ Updated total calculation to include date differences
+                                    if ($start && $end) {
+                                        $diffInSeconds = $end->diffInSeconds($start);
+                                        $hours = floor($diffInSeconds / 3600);
+                                        $minutes = floor(($diffInSeconds % 3600) / 60);
+                                        $seconds = $diffInSeconds % 60;
+                                        $total = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                                    } else {
+                                        $total = '-';
+                                    }
+                                @endphp
+                                <tr data-id="{{ $session->id }}">
+                                    <td style="display:none;">{{ $session->id }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($session->work_date)->format('d-m-Y') }}</td>
+                                    <td>
+                                        {{ $start ? $start->format('h:i A') : '-' }}
+                                    </td>
+                                    <td>
+                                        {{ $end ? $end->format('h:i A') : '-' }}
+                                    </td>
+                                    <td>{{ $total }}</td>
+                                    <td>{{ $session->project_name }}</td>
+                                    <td>{{ $session->comment }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
 

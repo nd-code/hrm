@@ -1,4 +1,5 @@
 @php
+    use Carbon\Carbon;
     use App\Models\WorkSession;
     use App\Models\Reminder;
     use App\Models\Leave;
@@ -10,21 +11,35 @@
 
     $existingIds = $teamEmployees->pluck('employee_id')->toArray();
 
-    // Get team members currently on leave today
-    $today = \Carbon\Carbon::today();
+    $now = Carbon::now();
+    $today = Carbon::today();
 
+    // Define your 24-hour display window (9 PM today → 9 PM tomorrow)
+    $displayStart = Carbon::today()->setTime(21, 0); // 9 PM today
+    $displayEnd = (clone $displayStart)->addDay();   // 9 PM next day
+
+    // Determine which date's leaves to show
+    if ($now->lt($displayStart)) {
+        // Before 9 PM today → show leaves from yesterday
+        $leaveDate = Carbon::yesterday()->toDateString();
+    } else {
+        // After 9 PM today → show today's leaves
+        $leaveDate = Carbon::today()->toDateString();
+    }
+
+    // Fetch leaves for the selected date
     $teamLeaves = Leave::with('employee')
         ->whereIn('employee_id', $existingIds)
-        ->where('from_date', '<=', $today)
-        ->where('to_date', '>=', $today)
+        ->where('from_date', '<=', $leaveDate)
+        ->where('to_date', '>=', $leaveDate)
         ->where('status', 'Approved')
         ->orderBy('id', 'desc')
         ->get();
 
-    // Get online team members (from work_sessions table)
+    // Get online team members
     $onlineTeamMembers = WorkSession::with('employee')
         ->whereIn('employee_id', $existingIds)
-        ->whereNull('end_time') // means still working
+        ->whereNull('end_time')
         ->latest()
         ->get();
 @endphp
@@ -137,7 +152,7 @@
                                     <tbody>
                                         @forelse($teamLeaves as $leave)
                                             <tr>
-                                                <td class="px-4 py-2 border">{{ $leave->employee->name }}</td>
+                                                <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $session->employee->id) }}">{{ $leave->employee->name }}</a></td>
                                             </tr>
                                         @empty
                                             <tr><td colspan="2" class="px-4 py-2 border">No team members on leave today.</td></tr>

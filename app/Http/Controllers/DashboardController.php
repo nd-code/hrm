@@ -20,30 +20,52 @@ class DashboardController extends Controller
         $assessmentCount = Assessment::count();
 
         $now = Carbon::now();
-        $yesterday = $now->copy()->subDay()->startOfDay();
+        $today = Carbon::today();
 
+        // Define your 24-hour window (9 PM → next day 9 PM)
+        $displayStart = Carbon::today()->setTime(21, 0); // 9 PM today
+        $displayEnd = (clone $displayStart)->addDay();   // 9 PM next day
+
+        // Determine which date's leaves to show
+        if ($now->lt($displayStart)) {
+            // Before 9 PM today → show leaves from yesterday
+            $leaveDate = Carbon::yesterday()->toDateString();
+        } else {
+            // After 9 PM today → show today's leaves
+            $leaveDate = Carbon::today()->toDateString();
+        }
+
+        // Employees on leave (based on 9 PM → next day 9 PM logic)
+        $employeesOnLeave = Leave::with('employee')
+            ->where('from_date', '<=', $leaveDate)
+            ->where('to_date', '>=', $leaveDate)
+            ->where('status', 'Approved')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Online employees
         $onlineEmployees = WorkSession::with('employee')
             ->whereNull('end_time')   // means timer still running
             ->latest()
             ->get();
-        
+
+        // Notifications
         $notifications = DB::table('notifications')
             ->selectRaw('data, MAX(created_at) as created_at')
             ->groupBy('data')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
-                
-        $today = Carbon::today();
 
-        // Employees on leave today
-        $employeesOnLeave = Leave::with('employee')
-            ->where('from_date', '<=', $today)
-            ->where('to_date', '>=', $today)
-            ->where('status', 'Approved')
-            ->get();
-
-        return view('dashboard', compact('employeeCount', 'reviewCount', 'leaveCount', 'assessmentCount', 'onlineEmployees', 'notifications', 'employeesOnLeave'));
+        return view('dashboard', compact(
+            'employeeCount',
+            'reviewCount',
+            'leaveCount',
+            'assessmentCount',
+            'onlineEmployees',
+            'notifications',
+            'employeesOnLeave'
+        ));
     }
 	
     public function getOnlineEmployees()
