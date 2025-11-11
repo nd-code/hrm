@@ -31,7 +31,7 @@
     .bell-shake {
       animation: shake 0.6s ease-in-out 2;
     }
-    
+
     .notifCountRR{
         padding: 0px;
     }
@@ -49,13 +49,30 @@
         padding-right: .50rem !important;
         padding-left: .50rem !important;
     }
+    #sidebar.active {
+        width: 6rem;
+    }
+    #sidebar.active .navText {
+        font-size:0;
+    }
+    #sidebar.active li a, #sidebar.active li button {
+        height:40px;
+    }
+    .menu-icon {
+      font-size: 24px;
+      cursor: pointer;
+      user-select: none;
+    }
+    #sidebar.active .p-active {
+        padding: 14px !important;
+    }
     </style>
 
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
         <!-- Left Sidebar -->
-        <aside class="w-64 bg-gray-800 text-white flex flex-col">
+        <aside class="w-64 bg-gray-800 text-white flex flex-col" id="sidebar">
             <div class="p-4 text-2xl font-bold border-b border-gray-700">
                 @if(Auth::user()->id === 101)
                     <a href="{{ route('dashboard') }}"><img src="{{ asset('images/ais.png') }}" /></a>
@@ -64,7 +81,7 @@
                 @endif
             </div>
 
-            <nav class="flex-1 p-4">
+            <nav class="flex-1 p-4 p-active">
                 <ul class="space-y-2">
                     @auth
                         @if(Auth::user()->id === 101)
@@ -72,31 +89,31 @@
                             <li>
                                 <a href="{{ route('dashboard') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-gauge me-2 text-blue-400"></i> Dashboard
+                                    <i class="fa-solid fa-gauge me-2 text-blue-400"></i> <span class="navText">Dashboard</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('employees.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employees.*') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-users me-2 text-green-400"></i> Employees List
+                                    <i class="fa-solid fa-users me-2 text-green-400"></i> <span class="navText">Employees List</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('reviews.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reviews.*') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-regular fa-comments me-2 text-yellow-400"></i> Feedback
+                                    <i class="fa-regular fa-comments me-2 text-yellow-400"></i> <span class="navText">Feedback</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('leaves.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('leaves.*') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-regular fa-calendar-days me-2 text-purple-400"></i> Leave Management
+                                    <i class="fa-regular fa-calendar-days me-2 text-purple-400"></i> <span class="navText">Leave Management</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('assessments.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('assessments.*') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-chart-line me-2 text-red-400"></i> KPA
+                                    <i class="fa-solid fa-chart-line me-2 text-red-400"></i> <span class="navText">KPA</span>
                                 </a>
                             </li>
                         @else
@@ -104,19 +121,19 @@
                             <li>
                                 <a href="{{ route('employee.dashboard') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.dashboard') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-house-user me-2 text-cyan-400"></i> My Dashboard
+                                    <i class="fa-solid fa-house-user me-2 text-cyan-400"></i> <span class="navText">My Dashboard</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('employee.leaves.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.leaves.index') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-regular fa-calendar-check me-2 text-pink-400"></i> Leaves
+                                    <i class="fa-regular fa-calendar-check me-2 text-pink-400"></i> <span class="navText">Leaves</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('employee.work.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.work.index') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> My Work
+                                    <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> <span class="navText">My Work</span>
                                 </a>
                             </li>
 
@@ -124,7 +141,7 @@
                                 <li>
                                     <a href="{{ route('employee.team.index') }}"
                                        class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.team.index') ? 'bg-gray-700' : '' }}">
-                                        <i class="fa-solid fa-user-group me-2 text-green-400"></i> My Team
+                                        <i class="fa-solid fa-user-group me-2 text-green-400"></i> <span class="navText">My Team</span>
                                     </a>
                                 </li>
                             @endif
@@ -132,7 +149,7 @@
                             <li>
                                 <a href="{{ route('reminders.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reminders.index') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-bell me-2 text-yellow-400"></i> Reminders
+                                    <i class="fa-solid fa-bell me-2 text-yellow-400"></i> <span class="navText">Reminders</span>
                                 </a>
                             </li>
                         @endif
@@ -140,20 +157,20 @@
                 </ul>
             </nav>
 
-            <div class="p-4 border-t border-gray-700">
+            <div class="p-4 border-t border-gray-700 p-active">
                 <ul>
                     @if(Auth::user()->id === 101)
                         <li>
                             <a href="{{ route('setting') }}"
                                class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
-                                <i class="fa-solid fa-gear me-2 text-gray-400"></i> Setting
+                                <i class="fa-solid fa-gear me-2 text-gray-400"></i> <span class="navText">Setting</span>
                             </a>
                         </li>
                     @else
                         <li>
                             <a href="{{ route('employee.profile') }}"
                                class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
-                                <i class="fa-regular fa-id-card me-2 text-indigo-400"></i> My Details
+                                <i class="fa-regular fa-id-card me-2 text-indigo-400"></i> <span class="navText">My Details</span>
                             </a>
                         </li>
                     @endif
@@ -162,7 +179,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
-                                <i class="fa-solid fa-right-from-bracket me-2 text-red-500"></i> Logout
+                                <i class="fa-solid fa-right-from-bracket me-2 text-red-500"></i> <span class="navText">Logout</span>
                             </button>
                         </form>
                     </li>
@@ -222,8 +239,12 @@
                 </header>
             @else
                 <!-- 🔔 Top Header -->
-                <header class="bg-white shadow px-6 py-3 flex justify-end">
-                    <div class="relative" style="margin-right: 40px;">
+                <header class="bg-white shadow px-6 py-3 ">
+                    <div class="relative float-left" style="margin-right: 0;">
+
+                        <span id="menuIcon" class="menu-icon">&#9776;</span>
+                    </div>
+                    <div class="relative float-right" style="margin-right: 0;">
                         @php
                             $unreadCount = Auth::user()->unreadNotifications->count();
                         @endphp
@@ -356,5 +377,21 @@
             });
         @endif
     </script>
+    <script>
+    const menuIcon = document.getElementById("menuIcon");
+    const sidebar = document.getElementById("sidebar");
+
+    menuIcon.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+
+      // Change icon between ☰ and ✖
+      if (sidebar.classList.contains("active")) {
+       // menuIcon.innerHTML = "&times;"; // ✖
+        menuIcon.innerHTML = "&#9776;"; // ✖
+      } else {
+        menuIcon.innerHTML = "&#9776;"; // ☰
+      }
+    });
+  </script>
 </body>
 </html>
