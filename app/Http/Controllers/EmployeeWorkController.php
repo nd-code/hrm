@@ -6,6 +6,8 @@ use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use PDF;
+use App\Models\Employee;
 
 class EmployeeWorkController extends Controller
 {
@@ -39,13 +41,25 @@ class EmployeeWorkController extends Controller
         return redirect()->back()->with('success', $message);
     }
 	
-	public function workIndex()
+	public function workIndex(Request $request)
     {
-        $sessions = WorkSession::where('employee_id', auth('employee')->id())
-			->orderBy('id', 'desc')
-			->get();
+        $employeeId = auth('employee')->id();
 
-		return view('employee.work.index', compact('sessions'));
+        $query = WorkSession::where('employee_id', $employeeId)
+            ->orderBy('id', 'desc');
+
+        // Apply filters only if provided
+        if ($request->from_date) {
+            $query->whereDate('work_date', '>=', $request->from_date);
+        }
+
+        if ($request->to_date) {
+            $query->whereDate('work_date', '<=', $request->to_date);
+        }
+
+        $sessions = $query->get();
+
+        return view('employee.work.index', compact('sessions'));
     }
 	
 	public function inlineUpdate(Request $request, $id)
@@ -60,4 +74,26 @@ class EmployeeWorkController extends Controller
 
 		return response()->json(['success' => true]);
 	}
+        
+        public function exportPdf(Request $request)
+        {
+            $id = auth('employee')->id();
+            
+            $query = WorkSession::where('employee_id', $id);
+
+            if ($request->from_date)
+                $query->whereDate('work_date', '>=', $request->from_date);
+
+            if ($request->to_date)
+                $query->whereDate('work_date', '<=', $request->to_date);
+
+            $data = $query->orderBy('id', 'desc')->get();
+
+            $employee = Employee::find($id);
+
+            $pdf = \PDF::loadView('pdf.attendances', compact('data', 'employee'))
+                        ->setPaper('a4', 'portrait');
+
+            return $pdf->download('attendance-report-' . now()->format('Y-m-d') . '.pdf');
+        }
 }

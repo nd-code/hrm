@@ -115,6 +115,36 @@
                 <div id="tab-work" class="tab-content @if(Auth::user()->id === 101) hidden @endif p-4">
                     
                     <h3 class="text-lg font-bold mb-4">Attendance</h3>
+                    
+                    <!-- Attendance Filters -->
+                    <div class="mb-4 flex items-end gap-4">
+
+                        <div>
+                            <label class="block text-sm font-medium">From Date</label>
+                            <input type="date" id="att_from" class="border p-2 rounded w-40">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium">To Date</label>
+                            <input type="date" id="att_to" class="border p-2 rounded w-40">
+                        </div>
+
+                        <button id="att_filter_btn"
+                                class="bg-blue-600 text-white px-4 py-2 rounded">
+                            Filter
+                        </button>
+
+                        <button id="att_reset_btn"
+                                class="bg-gray-600 text-white px-4 py-2 rounded">
+                            Reset
+                        </button>
+
+                        <button id="att_export_pdf_btn"
+                                class="bg-green-600 text-white px-4 py-2 rounded">
+                            Export PDF
+                        </button>
+
+                    </div>
 
                     <table id="workTable" class="w-full" style="width:100%;">
                         <thead>
@@ -218,11 +248,18 @@
                     </table>
 
                 </div>
-				
-				<a href="{{ route('employees.index') }}" 
-				   class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
-				   ← Back
-				</a>
+		
+                @if(Auth::user()->id === 101)
+                    <a href="{{ route('employees.index') }}" 
+                       class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
+                       ← Back
+                    </a>
+                @else
+                    <a href="{{ route('employee.team.index') }}" 
+                       class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
+                       ← Back
+                    </a>
+                @endif
             </div>
 
         </div>
@@ -450,15 +487,48 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#workTable').DataTable({
-                columnDefs: [{ targets: 0, visible: false, searchable: false }],
-                order: [[0, "desc"]],
-                pageLength: 10,
-                responsive: true,
-                rowCallback: function (row, data, displayIndex) {
-                    $(row).removeClass('odd even');
-                    $(row).addClass(displayIndex % 2 === 0 ? 'even' : 'odd');
-                }
+            let table = $('#workTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('employees.attendance.filter', $employee->id) }}",
+                    data: function (d) {
+                        d.from_date = $('#att_from').val();
+                        d.to_date = $('#att_to').val();
+                    }
+                },
+                columns: [
+                    { data: 'id', visible: false },
+                    { data: 'work_date' },
+                    { data: 'online' },
+                    { data: 'offline' },
+                    { data: 'total' },
+                    { data: 'project_name' },
+                    { data: 'comment' }
+                ]
+            });
+
+            // Filter
+            $('#att_filter_btn').on('click', function () {
+                table.ajax.reload();
+            });
+
+            // Reset
+            $('#att_reset_btn').on('click', function () {
+                $('#att_from').val('');
+                $('#att_to').val('');
+                table.ajax.reload();
+            });
+
+            // Export PDF
+            $('#att_export_pdf_btn').on('click', function () {
+                const from = $('#att_from').val();
+                const to = $('#att_to').val();
+
+                window.open(
+                    "{{ route('employees.attendance.export.pdf', $employee->id) }}?from_date=" + from + "&to_date=" + to,
+                    "_blank"
+                );
             });
             
             // Initialize DataTable for Leaves

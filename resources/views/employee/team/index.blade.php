@@ -162,6 +162,10 @@
                                                         <i class="fas fa-times-circle"></i>
                                                     </button>
                                                 </form>
+                                                
+                                                <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="{{ $leave->id }}">
+                                                    <i class="fas fa-reply"></i>
+                                                </button>
                                             @else
                                                 <span>{{ ucfirst($leave->status) }}</span>
                                             @endif
@@ -170,6 +174,27 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            
+                            <!-- Reply Modal -->
+                            <div id="replyModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                                <div class="bg-white p-6 rounded shadow-lg w-96">
+                                    <h2 class="text-lg font-semibold mb-3">Leave Discussion</h2>
+
+                                    <div id="repliesContainer" class="max-h-60 overflow-y-auto border p-2 mb-3 text-sm">
+                                        <p class="text-gray-500 italic">Loading...</p>
+                                    </div>
+
+                                    <form id="replyForm">
+                                        @csrf
+                                        <textarea name="message" id="replyMessage" placeholder="Type your reply..." class="w-full border p-2 mb-3" required></textarea>
+                                        <input type="hidden" name="leave_id" id="reply_leave_id">
+                                        <div class="flex justify-end gap-2">
+                                            <button type="button" id="closeReplyModal" class="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
+                                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -268,6 +293,61 @@
                 tab.classList.remove("text-gray-500");
                 document.querySelector(tab.getAttribute("href")).classList.remove("hidden");
             });
+        });
+    });
+    
+    // === Reply Thread Logic ===
+    $(document).on('click', '.reply-btn', function () {
+        const leaveId = $(this).data('id');
+        $('#reply_leave_id').val(leaveId);
+        $('#replyModal').removeClass('hidden');
+        $('#repliesContainer').html('<p class="text-gray-500 italic">Loading...</p>');
+
+        // Load existing replies
+        $.get(`/leaves/${leaveId}/replies`, function (replies) {
+            let html = '';
+            if (replies.length === 0) {
+                html = '<p class="text-gray-500 italic">No replies yet.</p>';
+            } else {
+                replies.forEach(r => {
+                    html += `
+                        <div class="mb-2 border-b pb-1">
+                            <strong>${r.employee.name}</strong>
+                            <span class="text-xs text-gray-400">${new Date(r.created_at).toLocaleString()}</span><br>
+                            ${r.message}
+                        </div>
+                    `;
+                });
+            }
+            $('#repliesContainer').html(html);
+        });
+    });
+
+    $('#closeReplyModal').on('click', function () {
+        $('#replyModal').addClass('hidden');
+        $('#replyMessage').val('');
+    });
+
+    $('#replyForm').on('submit', function (e) {
+        e.preventDefault();
+        const leaveId = $('#reply_leave_id').val();
+        const message = $('#replyMessage').val();
+
+        $.post(`/leaves/${leaveId}/replies`, {
+            _token: '{{ csrf_token() }}',
+            message: message
+        }).done(function (resp) {
+            $('#replyMessage').val('');
+            const r = resp.reply;
+            $('#repliesContainer').append(`
+                <div class="mb-2 border-b pb-1">
+                    <strong>${r.employee.name}</strong>
+                    <span class="text-xs text-gray-400">${new Date(r.created_at).toLocaleString()}</span><br>
+                    ${r.message}
+                </div>
+            `);
+        }).fail(function (xhr) {
+            alert(xhr.responseJSON?.message || 'Failed to send reply.');
         });
     });
     </script>

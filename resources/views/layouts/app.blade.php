@@ -57,10 +57,13 @@
         <!-- Left Sidebar -->
         <aside class="w-64 bg-gray-800 text-white flex flex-col">
             <div class="p-4 text-2xl font-bold border-b border-gray-700">
-                @if(Auth::user()->id === 101)
+                @if(Auth::check() && Auth::user()->id === 101)
                     <a href="{{ route('dashboard') }}"><img src="{{ asset('images/ais.png') }}" /></a>
-                @else
+                @elseif(Auth::check())
                     <a href="{{ route('employee.dashboard') }}"><img src="{{ asset('images/ais.png') }}" /></a>
+                @else
+                    <!-- not authenticated: show logo but no dashboard link -->
+                    <img src="{{ asset('images/ais.png') }}" alt="{{ config('app.name', 'Laravel') }}" />
                 @endif
             </div>
 
@@ -120,7 +123,7 @@
                                 </a>
                             </li>
 
-                            @if(Auth::user()->position === '1' || Auth::user()->position === '2' || Auth::user()->position === '3' || Auth::user()->position === '10')
+                            @if(in_array(Auth::user()->position, ['1', '2', '3', '10']))
                                 <li>
                                     <a href="{{ route('employee.team.index') }}"
                                        class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.team.index') ? 'bg-gray-700' : '' }}">
@@ -142,122 +145,128 @@
 
             <div class="p-4 border-t border-gray-700">
                 <ul>
-                    @if(Auth::user()->id === 101)
+                    @auth
+                        @if(Auth::user()->id === 101)
+                            <li>
+                                <a href="{{ route('setting') }}"
+                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
+                                    <i class="fa-solid fa-gear me-2 text-gray-400"></i> Setting
+                                </a>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ route('employee.profile') }}"
+                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
+                                    <i class="fa-regular fa-id-card me-2 text-indigo-400"></i> My Details
+                                </a>
+                            </li>
+                        @endif
+
                         <li>
-                            <a href="{{ route('setting') }}"
-                               class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
-                                <i class="fa-solid fa-gear me-2 text-gray-400"></i> Setting
-                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
+                                    <i class="fa-solid fa-right-from-bracket me-2 text-red-500"></i> Logout
+                                </button>
+                            </form>
                         </li>
                     @else
-                        <li>
-                            <a href="{{ route('employee.profile') }}"
-                               class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
-                                <i class="fa-regular fa-id-card me-2 text-indigo-400"></i> My Details
-                            </a>
-                        </li>
-                    @endif
-
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
-                                <i class="fa-solid fa-right-from-bracket me-2 text-red-500"></i> Logout
-                            </button>
-                        </form>
-                    </li>
+                        <!-- If not authenticated, optionally show login/register links (kept out to avoid changing flow) -->
+                    @endauth
                 </ul>
             </div>
         </aside>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
-            @if(Auth::user()->id === 101)
-                <!-- Send Notification Top Header -->
-                <header class="bg-white shadow px-6 py-3 flex justify-end">
-                    <div class="flex justify-end position-relative">
-                        <div class="relative inline-block">
-                            <!-- Plus Icon Trigger -->
-                            <a href="javascript:void(0);"
-                               class="w-10 h-10 flex items-center justify-center text-xl bg-white border rounded-full shadow hover:bg-gray-50 transition"
-                               id="popupNotification">
-                               <i class="fa-solid fa-plus text-blue-400"></i>
-                            </a>
+            @auth
+                @if(Auth::user()->id === 101)
+                    <!-- Send Notification Top Header -->
+                    <header class="bg-white shadow px-6 py-3 flex justify-end">
+                        <div class="flex justify-end position-relative">
+                            <div class="relative inline-block">
+                                <!-- Plus Icon Trigger -->
+                                <a href="javascript:void(0);"
+                                   class="w-10 h-10 flex items-center justify-center text-xl bg-white border rounded-full shadow hover:bg-gray-50 transition"
+                                   id="popupNotification">
+                                   <i class="fa-solid fa-plus text-blue-400"></i>
+                                </a>
 
-                            <!-- Popup -->
-                            <div id="notificationPopup"
-                                 class="absolute top-14 right-0 w-96 bg-white border rounded-lg shadow-lg p-4 hidden z-50">
-                                <button id="closePopup" class="absolute top-2 right-2 text-red-500">✖</button>
-                                <h2 class="text-lg font-semibold mb-3">Send Notification</h2>
+                                <!-- Popup -->
+                                <div id="notificationPopup"
+                                     class="absolute top-14 right-0 w-96 bg-white border rounded-lg shadow-lg p-4 hidden z-50">
+                                    <button id="closePopup" class="absolute top-2 right-2 text-red-500">✖</button>
+                                    <h2 class="text-lg font-semibold mb-3">Send Notification</h2>
 
-                                <!-- Form -->
-                                <form id="notificationForm" action="{{ route('admin.notifications.send') }}" method="POST">
-                                    @csrf
-                                    <textarea name="message"
-                                              class="w-full border rounded p-2 resize-none h-32"
-                                              placeholder="Type your message..." required></textarea>
+                                    <!-- Form -->
+                                    <form id="notificationForm" action="{{ route('admin.notifications.send') }}" method="POST">
+                                        @csrf
+                                        <textarea name="message"
+                                                  class="w-full border rounded p-2 resize-none h-32"
+                                                  placeholder="Type your message..." required></textarea>
 
-                                    <div class="mt-3 flex justify-end items-center gap-2">
-                                        <!-- Loader (hidden by default) -->
-                                        <div id="loader" class="hidden">
-                                            <svg class="animate-spin h-5 w-5 text-blue-500"
-                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                        stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor"
-                                                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                            </svg>
+                                        <div class="mt-3 flex justify-end items-center gap-2">
+                                            <!-- Loader (hidden by default) -->
+                                            <div id="loader" class="hidden">
+                                                <svg class="animate-spin h-5 w-5 text-blue-500"
+                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                            stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor"
+                                                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                                </svg>
+                                            </div>
+
+                                            <!-- Submit Button -->
+                                            <button type="submit" id="submitBtn"
+                                                    class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                                                Post
+                                            </button>
                                         </div>
-
-                                        <!-- Submit Button -->
-                                        <button type="submit" id="submitBtn"
-                                                class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                                            Post
-                                        </button>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </header>
-            @else
-                <!-- 🔔 Top Header -->
-                <header class="bg-white shadow px-6 py-3 flex justify-end">
-                    <div class="relative" style="margin-right: 40px;">
-                        @php
-                            $unreadCount = Auth::user()->unreadNotifications->count();
-                        @endphp
+                    </header>
+                @else
+                    <!-- 🔔 Top Header -->
+                    <header class="bg-white shadow px-6 py-3 flex justify-end">
+                        <div class="relative" style="margin-right: 40px;">
+                            @php
+                                $unreadCount = Auth::user()->unreadNotifications->count();
+                            @endphp
 
-                        <button id="notifBell" class="relative text-2xl">
-                            @if($unreadCount > 0)
-                                <i id="bellIcon" class="fa-solid fa-bell text-yellow-500" style="font-size: 40px;"></i>
-                            @else
-                                <i id="bellIcon" class="fa-solid fa-bell-slash text-gray-400" style="font-size: 40px;"></i>
-                            @endif
+                            <button id="notifBell" class="relative text-2xl">
+                                @if($unreadCount > 0)
+                                    <i id="bellIcon" class="fa-solid fa-bell text-yellow-500" style="font-size: 40px;"></i>
+                                @else
+                                    <i id="bellIcon" class="fa-solid fa-bell-slash text-gray-400" style="font-size: 40px;"></i>
+                                @endif
 
-                            <span id="notifCount"
-                                class="notifCountRR absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full {{ $unreadCount == 0 ? 'hidden' : '' }}">
-                                {{ $unreadCount }}
-                            </span>
-                        </button>
+                                <span id="notifCount"
+                                    class="notifCountRR absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full {{ $unreadCount == 0 ? 'hidden' : '' }}">
+                                    {{ $unreadCount }}
+                                </span>
+                            </button>
 
-                        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow rounded">
-                            <ul id="notificationList" class="max-h-60 overflow-y-auto">
-                                @forelse(Auth::user()->unreadNotifications as $note)
-                                    <li class="px-3 py-2 border-b">
-                                        {{ $note->data['message'] ?? '' }}
-                                        <span class="text-gray-500 text-xs float-right">
-                                            {{ $note->created_at->diffForHumans() }}
-                                        </span>
-                                    </li>
-                                @empty
-                                    <!--<li class="px-3 py-2 text-gray-500 text-sm text-center">No new notifications</li>-->
-                                @endforelse
-                            </ul>
+                            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white shadow rounded">
+                                <ul id="notificationList" class="max-h-60 overflow-y-auto">
+                                    @forelse(Auth::user()->unreadNotifications as $note)
+                                        <li class="px-3 py-2 border-b">
+                                            {{ $note->data['message'] ?? '' }}
+                                            <span class="text-gray-500 text-xs float-right">
+                                                {{ $note->created_at->diffForHumans() }}
+                                            </span>
+                                        </li>
+                                    @empty
+                                        <!--<li class="px-3 py-2 text-gray-500 text-sm text-center">No new notifications</li>-->
+                                    @endforelse
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                </header>
-            @endif
+                    </header>
+                @endif
+            @endauth
 
             <main class="flex-1 p-6">
                 {{ $slot ?? '' }}
@@ -273,88 +282,91 @@
             window.userId = {{ auth()->id() }};
         @endauth
 
-        @if(Auth::user()->id === 101)
-            const popupBtn = document.getElementById('popupNotification');
-            const popup = document.getElementById('notificationPopup');
-            const closeBtn = document.getElementById('closePopup');
-            const loader = document.getElementById('loader');
-            const submitBtn = document.getElementById('submitBtn');
+        @auth
+            @if(Auth::user()->id === 101)
+                const popupBtn = document.getElementById('popupNotification');
+                const popup = document.getElementById('notificationPopup');
+                const closeBtn = document.getElementById('closePopup');
+                const loader = document.getElementById('loader');
+                const submitBtn = document.getElementById('submitBtn');
 
-            popupBtn.addEventListener('click', () => popup.classList.toggle('hidden'));
-            closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+                if (popupBtn) popupBtn.addEventListener('click', () => popup.classList.toggle('hidden'));
+                if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
 
-            // AJAX submit with loader near Post button
-            document.getElementById('notificationForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                let form = e.target;
-                let data = new FormData(form);
+                // AJAX submit with loader near Post button
+                const notificationForm = document.getElementById('notificationForm');
+                if (notificationForm) {
+                    notificationForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        let form = e.target;
+                        let data = new FormData(form);
 
-                // Show loader & disable button
-                loader.classList.remove('hidden');
-                submitBtn.disabled = true;
-                submitBtn.textContent = "Posting...";
+                        // Show loader & disable button
+                        if (loader) loader.classList.remove('hidden');
+                        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Posting..."; }
 
-                fetch(form.action, {
-                    method: "POST",
-                    headers: { 'X-CSRF-TOKEN': data.get('_token') },
-                    body: data
-                })
-                .then(res => res.json())
-                .then(resp => {
-                    popup.classList.add('hidden');
-                    form.reset();
-                    alert("✅ Notification sent!");
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("❌ Failed to send notification. Please try again.");
-                })
-                .finally(() => {
-                    // Hide loader & reset button
-                    loader.classList.add('hidden');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Post";
-                });
-            });
-        @else
-            document.addEventListener("DOMContentLoaded", () => {
-                const bell = document.getElementById('notifBell');
-                const dropdown = document.getElementById('notifDropdown');
-                const notifCount = document.getElementById('notifCount');
-
-                if (bell && dropdown) {
-                    bell.addEventListener('click', (e) => {
-                        e.stopPropagation(); // prevent immediate close
-                        dropdown.classList.toggle('hidden');
-
-                        // 🔔 Mark as read if dropdown is now visible
-                        if (!dropdown.classList.contains('hidden')) {
-                            fetch("{{ route('notifications.markRead') }}", {
-                                method: "POST",
-                                headers: {
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                    "Accept": "application/json"
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success && notifCount) {
-                                    notifCount.innerText = "0";
-                                }
-                            })
-                            .catch(err => console.error(err));
-                        }
-                    });
-
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', (e) => {
-                        if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
-                            dropdown.classList.add('hidden');
-                        }
+                        fetch(form.action, {
+                            method: "POST",
+                            headers: { 'X-CSRF-TOKEN': data.get('_token') },
+                            body: data
+                        })
+                        .then(res => res.json())
+                        .then(resp => {
+                            if (popup) popup.classList.add('hidden');
+                            form.reset();
+                            alert("✅ Notification sent!");
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("❌ Failed to send notification. Please try again.");
+                        })
+                        .finally(() => {
+                            // Hide loader & reset button
+                            if (loader) loader.classList.add('hidden');
+                            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Post"; }
+                        });
                     });
                 }
-            });
-        @endif
+            @else
+                document.addEventListener("DOMContentLoaded", () => {
+                    const bell = document.getElementById('notifBell');
+                    const dropdown = document.getElementById('notifDropdown');
+                    const notifCount = document.getElementById('notifCount');
+
+                    if (bell && dropdown) {
+                        bell.addEventListener('click', (e) => {
+                            e.stopPropagation(); // prevent immediate close
+                            dropdown.classList.toggle('hidden');
+
+                            // 🔔 Mark as read if dropdown is now visible
+                            if (!dropdown.classList.contains('hidden')) {
+                                fetch("{{ route('notifications.markRead') }}", {
+                                    method: "POST",
+                                    headers: {
+                                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                        "Accept": "application/json"
+                                    }
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success && notifCount) {
+                                        notifCount.innerText = "0";
+                                    }
+                                })
+                                .catch(err => console.error(err));
+                            }
+                        });
+
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', (e) => {
+                            if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                                dropdown.classList.add('hidden');
+                            }
+                        });
+                    }
+                });
+            @endif
+        @endauth
     </script>
 </body>
 </html>

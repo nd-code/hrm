@@ -93,7 +93,7 @@ Route::middleware(['auth:employee'])->group(function () {
     
     Route::get('/notifications', [NotificationController::class, 'index'])->name('employee.notifications');
     Route::post('/notifications/mark-read', function (Request $request) {
-        auth()->user()->unreadNotifications->markAsRead();
+        auth('employee')->user()->unreadNotifications->markAsRead();
         return response()->json(['success' => true]);
     })->name('notifications.markRead');
     
@@ -104,6 +104,10 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/team/leave/{id}/reject', [TeamController::class, 'reject'])->name('employee.team.leave.reject');
     
     Route::get('/employee/{id}', [EmployeeController::class, 'details'])->name('employee.details');
+    
+    Route::post('/employee/leaves/{id}/reply', [LeaveController::class, 'addReply'])->name('employee.leave.reply');
+    
+    Route::get('/employee/work/export-pdf', [EmployeeWorkController::class, 'exportPdf'])->name('employee.work.export.pdf');
 });
 
 Route::middleware('auth')->group(function () {
@@ -111,3 +115,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/leaves/{id}/replies', [LeaveController::class, 'getReplies']);
+Route::post('/leaves/{id}/replies', [LeaveController::class, 'addReply']);
+
+Route::get('/leaves/export/pdf', [LeaveController::class, 'exportPdf'])->name('leaves.export.pdf');
+
+Route::get('/employees/{id}/attendance/filter', [EmployeeController::class, 'attendanceFilter'])->name('employees.attendance.filter');
+Route::get('/employees/{id}/attendance/export-pdf', [EmployeeController::class, 'attendanceExportPdf'])->name('employees.attendance.export.pdf');

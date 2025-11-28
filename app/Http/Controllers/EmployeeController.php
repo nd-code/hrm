@@ -201,4 +201,97 @@ class EmployeeController extends Controller
 
             return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise', 'positions'));
         }
+        
+        public function attendanceFilter(Request $request, $id)
+        {
+            $query = WorkSession::where('employee_id', $id);
+
+            if ($request->from_date) {
+                $query->whereDate('work_date', '>=', $request->from_date);
+            }
+
+            if ($request->to_date) {
+                $query->whereDate('work_date', '<=', $request->to_date);
+            }
+
+            // DataTables parameters
+            $draw   = $request->get('draw');
+            $start  = $request->get('start');
+            $length = $request->get('length');
+
+            $recordsTotal = $query->count();
+
+            // Fetch paginated data
+            $rows = $query
+                ->orderBy('id', 'desc')
+                ->skip($start)
+                ->take($length)
+                ->get();
+
+            // Format data manually
+            $data = [];
+
+            foreach ($rows as $row) {
+
+                // Format dates
+                $workDate = $row->work_date
+                    ? \Carbon\Carbon::parse($row->work_date)->format('d-m-Y')
+                    : '-';
+
+                $online = $row->start_time
+                    ? \Carbon\Carbon::parse($row->start_time)->format('h:i A')
+                    : '-';
+
+                $offline = $row->end_time
+                    ? \Carbon\Carbon::parse($row->end_time)->format('h:i A')
+                    : '-';
+
+                // Calculate total hours
+                if ($row->start_time && $row->end_time) {
+                    $start = \Carbon\Carbon::parse($row->start_time);
+                    $end   = \Carbon\Carbon::parse($row->end_time);
+                    $total = gmdate('H:i:s', $end->diffInSeconds($start));
+                } else {
+                    $total = '-';
+                }
+
+                $data[] = [
+                    'id'           => $row->id,
+                    'work_date'    => $workDate,
+                    'online'       => $online,
+                    'offline'      => $offline,
+                    'total'        => $total,
+                    'project_name' => $row->project_name,
+                    'comment'      => $row->comment,
+                ];
+            }
+
+            // Return DataTables JSON format
+            return response()->json([
+                'draw'            => intval($draw),
+                'recordsTotal'    => $recordsTotal,
+                'recordsFiltered' => $recordsTotal,
+                'data'            => $data
+            ]);
+        }
+        
+        public function attendanceExportPdf(Request $request, $id)
+        {
+            $query = WorkSession::where('employee_id', $id);
+
+            if ($request->from_date)
+                $query->whereDate('work_date', '>=', $request->from_date);
+
+            if ($request->to_date)
+                $query->whereDate('work_date', '<=', $request->to_date);
+
+            $data = $query->orderBy('id', 'desc')->get();
+
+            $employee = Employee::find($id);
+
+            $pdf = \PDF::loadView('pdf.attendances', compact('data', 'employee'))
+                        ->setPaper('a4', 'portrait');
+
+            return $pdf->download('attendance-report-' . now()->format('Y-m-d') . '.pdf');
+        }
 }

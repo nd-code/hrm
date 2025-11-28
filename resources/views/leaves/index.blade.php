@@ -14,22 +14,36 @@
                 </div>
 				
 				<!-- Filters -->
-				<div class="mb-4 flex space-x-4">
+				<div class="mb-4 flex items-end gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium">Employees</label>
 					<select id="employee_filter" class="border p-2 rounded">
 						<option value="">All Employees</option>
 						@foreach($employees as $employee)
 							<option value="{{ $employee->id }}">{{ $employee->name }}</option>
 						@endforeach
 					</select>
+                                    </div>
 
+                                    <div>
+                                        <label class="block text-sm font-medium">From Date</label>
 					<input type="date" id="from_date" class="border p-2 rounded">
-					<input type="date" id="to_date" class="border p-2 rounded">
+                                    </div>
 
-					<button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
-					
-					<button type="button" id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded">
-						Reset
-					</button>
+                                    <div>
+                                        <label class="block text-sm font-medium">To Date</label>
+					<input type="date" id="to_date" class="border p-2 rounded">
+                                    </div>
+
+                                    <button id="filterBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+
+                                    <button type="button" id="resetBtn" class="bg-gray-600 text-white px-4 py-2 rounded">
+                                            Reset
+                                    </button>
+
+                                    <button id="exportPdfBtn" class="bg-green-600 text-white px-4 py-2 rounded">
+                                        Export PDF
+                                    </button>
 				</div>
 
                 <!-- Leaves Table -->
@@ -49,57 +63,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($leaves as $leave)
-                        <tr data-id="{{ $leave->id }}">
-                            <td style="display:none;">{{ $leave->id }}</td>
-                            <td>{{ $leave->employee->name }}</td>
-							<td>
-								@php
-									$ids = explode(',', $leave->apply_to ?? '');
-									$names = \App\Models\Employee::whereIn('id', $ids)->pluck('name')->toArray();
-								@endphp
-								{{ implode(', ', $names) }}
-							</td>
-							<td contenteditable="true" class="editable" data-field="leave_type">{{ $leave->leave_type }}</td>
-                            <td>
-								<input type="date" class="editable-date" data-field="from_date"
-									   value="{{ $leave->from_date }}">
-							</td>
-							<td>
-								<input type="date" class="editable-date" data-field="to_date"
-									   value="{{ $leave->to_date }}">
-							</td>
-							<td id="leave-days">
-								@php
-									if(isset($leave->leave_type) && $leave->leave_type == 'Half Day Leave')
-									{
-										$days = '0.5';
-									}
-									else
-									{
-										$fromDate = Carbon::parse($leave->from_date);
-										$toDate = Carbon::parse($leave->to_date);
-										$days = $fromDate->diffInDays($toDate) + 1; // +1 if both dates are inclusive
-									}
-								@endphp
-								{{ $days }} Day(s)
-							</td>
-							<td>{{ $leave->manager?->name ?? '-' }}</td>
-                            <td>{{ ucfirst($leave->status) }}@if($leave->status == 'Pending')  (<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="{{ $leave->id }}"><i class="fas fa-check-circle"></i></button><button class="reject-btn text-red-500 mr-2" title="Reject" data-id="{{ $leave->id }}"><i class="fas fa-times-circle"></i></button>)@endif</td>
-                            <td>
-								<a href="{{ route('leaves.show', $leave->id) }}" title="View">
-									<i class="fas fa-eye text-blue-500 mr-2"></i>
-								</a>
-								<form method="POST" action="{{ route('leaves.destroy', $leave->id) }}" style="display:inline">
-									@csrf
-									@method('DELETE')
-									<button type="submit" class="text-red-500 hover:text-red-700" title="Delete" onclick="return confirm('Delete this leave?')">
-										<i class="fas fa-trash-alt"></i>
-									</button>
-								</form>
-							</td>
-                        </tr>
-                        @endforeach
+                        
                     </tbody>
                 </table>
 
@@ -145,14 +109,13 @@
 	<!-- Manage By Modal -->
 	<div id="manageByModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
 		<div class="bg-white p-6 rounded shadow-lg w-96">
-			<h2 class="text-lg font-bold mb-4">Select Manager</h2>
 			<form id="manageByForm">
+                                <label>Select Manager:</label>
 				<select name="manage_by" id="manage_by" class="w-full border p-2 mb-2">
 					@foreach($employees as $employee)
 						<option value="{{ $employee->id }}">{{ $employee->name }}</option>
 					@endforeach
 				</select>
-                                <label>Comment:</label>
                                 <textarea name="comment" id="comment" placeholder="Comment..." class="w-full border p-2 mb-2"></textarea>
 				<input type="hidden" name="leave_id" id="leave_id">
 				<input type="hidden" name="status" id="leave_status">
@@ -161,6 +124,27 @@
 			</form>
 		</div>
 	</div>
+        
+        <!-- Reply Modal -->
+        <div id="replyModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded shadow-lg w-96">
+                <h2 class="text-lg font-semibold mb-3">Leave Discussion</h2>
+
+                <div id="repliesContainer" class="max-h-60 overflow-y-auto border p-2 mb-3 text-sm">
+                    <p class="text-gray-500 italic">Loading...</p>
+                </div>
+
+                <form id="replyForm">
+                    @csrf
+                    <textarea name="message" id="replyMessage" placeholder="Type your reply..." class="w-full border p-2 mb-3" required></textarea>
+                    <input type="hidden" name="leave_id" id="reply_leave_id">
+                    <div class="flex justify-end gap-2">
+                        <button type="button" id="closeReplyModal" class="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     <!-- Styles -->
     <style>
@@ -459,6 +443,71 @@
 					}
 				});
 			});
+        });
+        
+        // === Reply Thread Logic ===
+        $(document).on('click', '.reply-btn', function () {
+            const leaveId = $(this).data('id');
+            $('#reply_leave_id').val(leaveId);
+            $('#replyModal').removeClass('hidden');
+            $('#repliesContainer').html('<p class="text-gray-500 italic">Loading...</p>');
+
+            // Load existing replies
+            $.get(`/leaves/${leaveId}/replies`, function (replies) {
+                let html = '';
+                if (replies.length === 0) {
+                    html = '<p class="text-gray-500 italic">No replies yet.</p>';
+                } else {
+                    replies.forEach(r => {
+                        html += `
+                            <div class="mb-2 border-b pb-1">
+                                <strong>${r.employee.name}</strong>
+                                <span class="text-xs text-gray-400">${new Date(r.created_at).toLocaleString()}</span><br>
+                                ${r.message}
+                            </div>
+                        `;
+                    });
+                }
+                $('#repliesContainer').html(html);
+            });
+        });
+
+        $('#closeReplyModal').on('click', function () {
+            $('#replyModal').addClass('hidden');
+            $('#replyMessage').val('');
+        });
+
+        $('#replyForm').on('submit', function (e) {
+            e.preventDefault();
+            const leaveId = $('#reply_leave_id').val();
+            const message = $('#replyMessage').val();
+
+            $.post(`/leaves/${leaveId}/replies`, {
+                _token: '{{ csrf_token() }}',
+                message: message
+            }).done(function (resp) {
+                $('#replyMessage').val('');
+                const r = resp.reply;
+                $('#repliesContainer').append(`
+                    <div class="mb-2 border-b pb-1">
+                        <strong>${r.employee.name}</strong>
+                        <span class="text-xs text-gray-400">${new Date(r.created_at).toLocaleString()}</span><br>
+                        ${r.message}
+                    </div>
+                `);
+            }).fail(function (xhr) {
+                alert(xhr.responseJSON?.message || 'Failed to send reply.');
+            });
+        });
+        
+        $('#exportPdfBtn').on('click', function () {
+            let employee_id = $('#employee_filter').val();
+            let from_date   = $('#from_date').val();
+            let to_date     = $('#to_date').val();
+
+            const url = `/leaves/export/pdf?employee_id=${employee_id}&from_date=${from_date}&to_date=${to_date}`;
+
+            window.open(url, '_blank');
         });
     </script>
 

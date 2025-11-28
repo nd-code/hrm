@@ -4,7 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Leave;
 use App\Models\Employee;
+use App\Models\LeaveReply;
+use App\Models\User;
+use App\Notifications\LeaveReplyNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log;
+use PDF;
 
 class LeaveController extends Controller
 {
@@ -271,4 +277,89 @@ class LeaveController extends Controller
 			'days' => $days
 		]);
 	}
+        
+    public function getReplies($id)
+    {
+        $replies = LeaveReply::where('leave_id', $id)
+            ->with('employee:id,name')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($replies);
+    }
+
+    public function addReply(Request $request, $id)
+    {
+        $request->validate([
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $leave = Leave::findOrFail($id);
+
+        // Detect sender
+        $isEmployee = auth('employee')->check();
+        $employeeId = $isEmployee ? auth('employee')->id() : null; // employee sender
+        $adminUser  = !$isEmployee ? auth()->user() : null;        // admin sender
+
+        // Store the reply (admins do NOT store employee_id)
+        $reply = LeaveReply::create([
+            'leave_id'    => $leave->id,
+            'employee_id' => $employeeId, // Null for admin
+            'message'     => $request->message,
+        ]);
+
+        $reply->load('employee:id,name,email');
+
+        // Sender name
+        $senderName = $isEmployee
+            ? ($reply->employee->name ?? "Employee")
+            : ($adminUser->name ?? "Admin");
+
+        /**
+         * 🔥 SIMPLE LOGIC:
+         * Always send notification to the employee who applied for the leave
+         */
+        $recipient = $leave->employee; // leave owner
+
+        if ($recipient) {
+            //$recipient->notify(new LeaveReplyNotification($leave, $reply, $senderName));
+        }
+
+        return response()->json([
+            'success' => true,
+            'reply'   => $reply,
+            'message' => 'Reply added and notification sent to the leave owner.',
+        ]);
+    }
+    
+    public function exportPdf(Request $request)
+    {
+        $query = Leave::with(['employee', 'manager'])->orderBy('id', 'desc');
+
+        // Apply filters
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+        if ($request->filled('from_date')) {
+            $query->whereDate('from_date', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('to_date', '<=', $request->to_date);
+        }
+
+        $leaves = $query->get()->map(function ($leave) {
+            // Convert apply_to IDs → employee names
+            $applyToIds = explode(',', $leave->apply_to ?? '');
+            $applyToNames = \App\Models\Employee::whereIn('id', $applyToIds)
+                            ->pluck('name')->toArray();
+
+            $leave->apply_to_names = implode(', ', $applyToNames);
+
+            return $leave;
+        });
+
+        $pdf = \PDF::loadView('pdf.leaves', compact('leaves'));
+
+        return $pdf->download('leaves_report.pdf');
+    }
 }

@@ -10,6 +10,39 @@
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 
                 <h3 class="text-lg font-bold mb-4">My Work</h3>
+                
+                <!-- Attendance Filters -->
+                <div class="mb-4 flex items-end gap-4">
+
+                    <form method="GET" action="{{ route('employee.work.index') }}" class="mb-4 flex items-end gap-4">
+
+                        <div>
+                            <label class="block text-sm font-medium">From Date</label>
+                            <input type="date" name="from_date" value="{{ request('from_date') }}" class="border p-2 rounded w-40">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium">To Date</label>
+                            <input type="date" name="to_date" value="{{ request('to_date') }}" class="border p-2 rounded w-40">
+                        </div>
+
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                            Filter
+                        </button>
+
+                        <a href="{{ route('employee.work.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded">
+                            Reset
+                        </a>
+
+                        <a id="att_export_pdf_btn"
+                            href="{{ route('employee.work.export.pdf', ['from_date' => request('from_date'), 'to_date' => request('to_date')]) }}"
+                            class="bg-green-600 text-white px-4 py-2 rounded">
+                            Export PDF
+                        </a>
+
+                    </form>
+
+                </div>
 
                 <!-- My Work Table -->
                 <table id="workTable" class="w-full">
@@ -109,5 +142,13 @@
                 }
             });
         }
+        
+        $('#att_export_pdf_btn').click(function () {
+            let from = $('#att_from').val();
+            let to = $('#att_to').val();
+
+            //let url = `/employee/work/export-pdf?from_date=${from}&to_date=${to}`;
+            //window.open(url, "_blank");
+        });
     </script>
 </x-app-layout>
