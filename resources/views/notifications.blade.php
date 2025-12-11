@@ -42,6 +42,12 @@
                     @else
                         <p class="text-gray-600">No notification 🎉</p>
                     @endif
+                    
+                    <br>
+                    <a href="{{ route('setting') }}" 
+                       class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
+                       ← Back
+                    </a>
                 </div>
             </div>
         </div>

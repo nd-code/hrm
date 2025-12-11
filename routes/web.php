@@ -14,6 +14,7 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\CandidateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/list', [NotificationController::class, 'index'])->name('notifications');
     Route::post('/admin/notifications/send', [NotificationController::class, 'sendNotification'])->name('admin.notifications.send');
     Route::post('/notifications/delete-by-data', [NotificationController::class, 'deleteByData'])->name('notifications.deleteByData');
+    
+    Route::resource('candidates', CandidateController::class);
+    Route::post('candidates/inline-update', [CandidateController::class, 'inlineUpdate'])->name('candidates.inline.update');
 });
 
 // Admin Auth (Breeze)

@@ -14,7 +14,7 @@
                     </div>
                 </a>
 
-                <a href="#">
+                <a href="{{ route('candidates.index') }}">
                     <div class="p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold">Candidate List</h3>
                     </div>
