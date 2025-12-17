@@ -24,7 +24,7 @@
                         <button id="filterBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
                         <button id="resetBtn" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded">Reset</button>
                     </div>
-                </div>-->
+                </div>->
 
                 <!-- Reviews Table -->
                 <table id="reviewsTable" class="w-full">
@@ -45,24 +45,22 @@
                         <tr data-id="{{ $review->id }}">
                             <td style="display:none;">{{ $review->id }}</td>
                             <td>{{ $review->employee->name }}</td>
-                            <td contenteditable="true" class="editable" data-field="project_name">{{ $review->project_name }}</td>
+                            <td>{{ $review->project_name }}</td>
                             <td>
-								<input type="date" class="editable-date" data-field="date_from" 
-									   value="{{ $review->date_from }}">
+								{{ \Carbon\Carbon::parse($review->date_from)->format('d/m/Y') }}
 							</td>
 							<td>
-								<input type="date" class="editable-date" data-field="date_to" 
-									   value="{{ $review->date_to }}">
+								{{ \Carbon\Carbon::parse($review->date_to)->format('d/m/Y') }}
 							</td>
-                            <td contenteditable="true" class="editable" data-field="review_given_by">
-                                {{ $review->review_given_by }}
-                            </td>
-                            <td contenteditable="true" class="editable" data-field="review">{{ $review->review }}</td>
+                                                        <td>
+                                                            {{ $review->review_given_by }}
+                                                        </td>
+                            <td>{{ $review->review }}</td>
                             <td>
-                                <a href="{{ route('reviews.show', $review->id) }}">
+                                <a href="/employee/reviews-list/{{ $review->id }}">
                                     <i class="fas fa-eye text-blue-500 mr-2"></i>
                                 </a>
-                                <form method="POST" action="{{ route('reviews.destroy', $review->id) }}" style="display:inline">
+                                <form method="POST" action="{{ route('employee.review.destroy', $review->id) }}" style="display:inline">
                                     @csrf
                                     @method('DELETE')
                                     <button onclick="return confirm('Delete this feedback?')">
@@ -173,7 +171,7 @@
             $('#reviewForm').submit(function(e){
                 e.preventDefault();
                 $.ajax({
-                    url: '{{ route("reviews.store") }}',
+                    url: '{{ route("employee.review.store") }}',
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(data){
@@ -187,10 +185,10 @@
                             data.review_given_by,
                             data.review,
                             `
-                            <a href="/reviews/${data.id}">
+                            <a href="/employee/reviews-list/${data.id}">
                                 <i class="fas fa-eye text-blue-500 mr-2"></i>
                             </a>
-                            <form method="POST" action="/reviews/${data.id}" style="display:inline">
+                            <form method="POST" action="/employee/reviews-list/${data.id}" style="display:inline">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button onclick="return confirm('Delete this feedback?')">
@@ -202,8 +200,8 @@
 
                         $(newRow).attr('data-id', data.id);
                         $('#reviewForm')[0].reset();*/
-                                        
-                                        location.reload();
+                        
+                        location.reload();
                     }
                 });
             });
@@ -215,7 +213,7 @@
                 let value = $(this).text();
 
                 $.ajax({
-                    url: `/reviews/${id}`,
+                    url: `/employee/reviews-list/${id}`,
                     method: 'PUT',
                     data: {
                         _token: '{{ csrf_token() }}',
@@ -237,7 +235,7 @@
 				let value = $(this).val();
 
 				$.ajax({
-					url: `/reviews/${id}`,
+					url: `/employee/reviews-list/${id}`,
 					method: 'PUT',
 					data: {
 						_token: '{{ csrf_token() }}',

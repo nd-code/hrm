@@ -76,6 +76,11 @@ Route::post('/employee/logout', [EmployeeLoginController::class, 'logout'])->nam
 // Employee Dashboard
 Route::middleware(['auth:employee'])->group(function () {
     Route::get('/employee/dashboard', fn() => view('employee.dashboard'))->name('employee.dashboard');
+    
+    Route::resource('/employee/reviews-list', ReviewController::class);
+    Route::post('/employee/reviews-list/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('reviews.inline-update');
+    Route::post('/employee/reviews-list/store', [ReviewController::class, 'store'])->name('employee.review.store');
+    Route::delete('/employee/reviews-list/delete/{id}', [ReviewController::class, 'destroy'])->name('employee.review.destroy');
 
     // Employee Leave Routes
     Route::get('/employee/leaves', [LeaveController::class, 'employeeIndex'])->name('employee.leaves.index');

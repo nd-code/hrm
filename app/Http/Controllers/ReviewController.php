@@ -5,14 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Models\Team;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
     public function index()
     {
-        $reviews = Review::with('employee')->orderBy('id', 'desc')->get();
-        $employees = Employee::orderBy('id', 'desc')->get();
-        return view('reviews.index', compact('reviews', 'employees'));
+        if (auth()->id() == 101) {
+            $reviews = Review::with('employee')->orderBy('id', 'desc')->get();
+            $employees = Employee::orderBy('id', 'desc')->get();
+            return view('reviews.index', compact('reviews', 'employees'));
+        } elseif (auth('employee')->check()) {
+            $name = Auth::guard('employee')->user()->name;
+            $reviews = Review::with('employee')->where('review_given_by', $name)->orderBy('id', 'desc')->get();
+            $teamEmployees = Team::with('employee')
+                ->where('parent_employee_id', auth('employee')->id())
+                ->get();
+
+            $existingIds = $teamEmployees->pluck('employee_id')->toArray();
+
+            $employees = Employee::whereIn('id', $existingIds)
+                ->where('id', '!=', auth('employee')->id())
+                ->get();
+            return view('reviews.indexlist', compact('reviews', 'employees'));
+        }
     }
 
     public function store(Request $request)
@@ -25,6 +43,23 @@ class ReviewController extends Controller
 			'review_given_by' => 'required|string|max:255',
 			'review' => 'required',
 		]);
+                
+                if (Auth::guard('web')->check() && Auth::id() == 101) {
+
+                    $request->merge([
+                        'review_given_by' => 'Super Admin'
+                    ]);
+
+                } elseif (Auth::guard('employee')->check()) {
+
+                    $request->merge([
+                        'review_given_by' => Auth::guard('employee')->user()->name
+                    ]);
+                }
+                
+                //echo '<pre>';
+                //print_r($_POST);
+                //exit;
 
 		$review = Review::create($request->all());
 
@@ -42,7 +77,12 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
-        $review->delete();
+        if (auth()->id() == 101) {
+            $review->delete();
+        }else{
+            $id = request()->segment(count(request()->segments()));
+            Review::where('id', $id)->delete();
+        }
         return back()->with('success', 'Review deleted.');
     }
 	

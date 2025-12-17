@@ -130,6 +130,12 @@
                                         <i class="fa-solid fa-user-group me-2 text-green-400"></i> My Team
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="reviews-list"
+                                       class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reviews-list.*') ? 'bg-gray-700' : '' }}">
+                                        <i class="fa-regular fa-comments me-2 text-yellow-400"></i> Feedback
+                                    </a>
+                                </li>
                             @endif
 
                             <li>

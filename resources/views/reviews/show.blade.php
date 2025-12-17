@@ -73,7 +73,7 @@
 				</table>
 
                 <div class="mt-4">
-                    <a href="{{ route('reviews.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded">Back</a>
+                    <a href="@if(Auth::user()->id === 101){{ route('reviews.index') }}@else /employee/reviews-list @endif" class="bg-gray-600 text-white px-4 py-2 rounded">Back</a>
                 </div>
 
             </div>
