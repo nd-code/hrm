@@ -12,19 +12,22 @@
     <input type="text" name="city" class="border p-2" placeholder="City"
            value="{{ $candidate->city ?? old('city') }}">
 
-    <input type="text" name="salary" class="border p-2" placeholder="Salary"
+    <input type="text" name="salary" class="border p-2" placeholder="Salary (Per Annum)"
            value="{{ $candidate->salary ?? old('salary') }}">
 
-    <input type="text" name="work_experience" class="border p-2" placeholder="Work Experience"
+    <input type="text" name="work_experience" class="border p-2" placeholder="Experience (Yrs.)"
            value="{{ $candidate->work_experience ?? old('work_experience') }}">
 
     <input type="text" name="designation" class="border p-2" placeholder="Designation"
            value="{{ $candidate->designation ?? old('designation') }}">
 
-    <input type="date" name="interview_date" class="border p-2"
+    <div>
+        <label class="text-sm text-gray-600">Interview Taken Date:</label>
+        <input type="date" name="interview_date" class="border p-2"
            value="{{ $candidate->interview_date ?? old('interview_date') }}">
+    </div>
 
-    <textarea name="feedback" class="border p-2 col-span-2" placeholder="Feedback">{{ $candidate->feedback ?? old('feedback') }}</textarea>
+    <textarea name="comment" class="border p-2 col-span-2" placeholder="Comment">{{ $candidate->comment ?? old('comment') }}</textarea>
 
     <div class="col-span-2">
         <label>Upload CV (PDF/DOC)</label>

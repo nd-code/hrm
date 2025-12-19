@@ -25,13 +25,14 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>City</th>
-                                <th>Salary</th>
-                                <th>Exp.</th>
+                                <th>Salary (Per Annum)</th>
+                                <th>Exp. (Yrs.)</th>
                                 <th>Designation</th>
                                 <th>Interview Taken Date</th>
-                                <th>Feedback</th>
-                                <th>Status</th>
+                                <th>Comment</th>
+                                <th>Conclusion</th>
                                 <th>CV</th>
+                                <th>Created On</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -40,8 +41,10 @@
                             @foreach($candidates as $c)
                             <tr>
                                 <td style="display:none;">{{ $c->id }}</td>
-                                <td contenteditable="true" onBlur="updateField(this, '{{ $c->id }}', 'name')">
-                                    {{ $c->name }}
+                                <td>
+                                    <a href="{{ route('candidates.edit', $c->id) }}" class="hover:underline">
+                                        {{ $c->name }}
+                                    </a>
                                 </td>
 
                                 <td contenteditable="true" onBlur="updateField(this, '{{ $c->id }}', 'email')">
@@ -75,14 +78,15 @@
                                            onBlur="updateField(this, '{{ $c->id }}', 'interview_date')" />
                                 </td>
 
-                                <td contenteditable="true" onBlur="updateField(this, '{{ $c->id }}', 'feedback')">
-                                    {{ $c->feedback }}
+                                <td contenteditable="true" onBlur="updateField(this, '{{ $c->id }}', 'comment')">
+                                    {{ $c->comment }}
                                 </td>
 
                                 <td>
                                     <select onchange="updateFieldSelect(this, '{{ $c->id }}', 'status')"
                                             class="border p-1 rounded" style="width: 100px;">
                                         <option value="pending" {{ $c->status=='pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="on_hold"  {{ $c->status == 'on_hold'  ? 'selected' : '' }}>On Hold</option>
                                         <option value="selected" {{ $c->status=='selected' ? 'selected' : '' }}>Selected</option>
                                         <option value="rejected" {{ $c->status=='rejected' ? 'selected' : '' }}>Rejected</option>
                                     </select>
@@ -96,6 +100,8 @@
                                         -
                                     @endif
                                 </td>
+
+                                <td>{{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d-m-Y') : '' }}</td>
 
                                 <td>
                                     <a href="{{ route('candidates.edit', $c->id) }}" class="text-blue-600 mr-2"><i class="fas fa-pencil-alt"></i></a>

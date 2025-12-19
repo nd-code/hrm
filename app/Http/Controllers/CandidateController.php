@@ -30,7 +30,7 @@ class CandidateController extends Controller
             'work_experience' => 'nullable',
             'designation' => 'nullable',
             'interview_date' => 'nullable|date',
-            'feedback' => 'nullable',
+            'comment' => 'nullable|string',
             'cv' => 'nullable|mimes:pdf,doc,docx|max:2048',
         ]);
 
@@ -63,7 +63,7 @@ class CandidateController extends Controller
             'work_experience' => 'nullable',
             'designation' => 'nullable',
             'interview_date' => 'nullable|date',
-            'feedback' => 'nullable',
+            'comment' => 'nullable|string',
             'cv' => 'nullable|mimes:pdf,doc,docx|max:2048',
         ]);
 

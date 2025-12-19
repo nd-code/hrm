@@ -19,6 +19,11 @@
                         <button class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
                     </form>
 
+                    <br><br>
+                    <a href="{{ route('candidates.index') }}" 
+                       class="inline-block bg-gray-600 text-white px-4 py-2 rounded">
+                       ← Back
+                    </a>
                 </div>
             </div>
         </div>

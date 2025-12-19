@@ -18,7 +18,7 @@ class Candidate extends Model
         'work_experience',
         'designation',
         'interview_date',
-        'feedback',
+        'comment',
         'cv'
     ];
 }
