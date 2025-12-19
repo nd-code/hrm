@@ -95,7 +95,20 @@ class EmployeeController extends Controller
         foreach ($approvedLeaves as $leave) {
             $from = Carbon::parse($leave->from_date);
             $to   = Carbon::parse($leave->to_date);
-            $days = $from->diffInDays($to); // inclusive
+
+            // If leave is in current month & year
+            if ($from->isSameMonth(now()) && $from->year === now()->year) {
+
+                // If leave end date is in future, count till today
+                $endDate = $to->greaterThan(now()) ? now() : $to;
+
+                // NO +1 for current month
+                $days = $from->diffInDays($endDate);
+
+            } else {
+                // Past or future months → inclusive
+                $days = $from->diffInDays($to) + 1;
+            }
 
             $leave->days = $days;
             $totalLeaves += $days;
@@ -222,7 +235,20 @@ class EmployeeController extends Controller
             foreach ($approvedLeaves as $leave) {
                 $from = Carbon::parse($leave->from_date);
                 $to   = Carbon::parse($leave->to_date);
-                $days = $from->diffInDays($to);
+
+                // If leave is in current month & year
+                if ($from->isSameMonth(now()) && $from->year === now()->year) {
+
+                    // If leave end date is in future, count till today
+                    $endDate = $to->greaterThan(now()) ? now() : $to;
+
+                    // NO +1 for current month
+                    $days = $from->diffInDays($endDate);
+
+                } else {
+                    // Past or future months → inclusive
+                    $days = $from->diffInDays($to) + 1;
+                }
 
                 $leave->days = $days;
                 $totalLeaves += $days;
