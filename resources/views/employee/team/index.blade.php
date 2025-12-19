@@ -168,6 +168,9 @@
                                                 </button>
                                             @else
                                                 <span>{{ ucfirst($leave->status) }}</span>
+                                                (<button class="view-btn text-blue-500 ml-2 mr-2" title="Reply" data-id="{{ $leave->id }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>)
                                             @endif
                                         </td>
                                     </tr>
@@ -190,7 +193,7 @@
                                         <input type="hidden" name="leave_id" id="reply_leave_id">
                                         <div class="flex justify-end gap-2">
                                             <button type="button" id="closeReplyModal" class="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
-                                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
+                                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hideSend">Send</button>
                                         </div>
                                     </form>
                                 </div>
@@ -298,6 +301,36 @@
     
     // === Reply Thread Logic ===
     $(document).on('click', '.reply-btn', function () {
+        $('#replyMessage').show();
+        $('.hideSend').show();
+        const leaveId = $(this).data('id');
+        $('#reply_leave_id').val(leaveId);
+        $('#replyModal').removeClass('hidden');
+        $('#repliesContainer').html('<p class="text-gray-500 italic">Loading...</p>');
+
+        // Load existing replies
+        $.get(`/leaves/${leaveId}/replies`, function (replies) {
+            let html = '';
+            if (replies.length === 0) {
+                html = '<p class="text-gray-500 italic">No replies yet.</p>';
+            } else {
+                replies.forEach(r => {
+                    html += `
+                        <div class="mb-2 border-b pb-1">
+                            <strong>${r.employee.name}</strong>
+                            <span class="text-xs text-gray-400">${new Date(r.created_at).toLocaleString()}</span><br>
+                            ${r.message}
+                        </div>
+                    `;
+                });
+            }
+            $('#repliesContainer').html(html);
+        });
+    });
+    
+    $(document).on('click', '.view-btn', function () {
+        $('#replyMessage').hide();
+        $('.hideSend').hide();
         const leaveId = $(this).data('id');
         $('#reply_leave_id').val(leaveId);
         $('#replyModal').removeClass('hidden');

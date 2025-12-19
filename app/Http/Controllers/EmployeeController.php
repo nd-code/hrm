@@ -69,35 +69,60 @@ class EmployeeController extends Controller
 		return back()->with('success', 'Employee added and email sent.');
 	}
 
-    public function show(Employee $employee)
+    public function show(Request $request, Employee $employee)
     {
         $sessions = WorkSession::where('employee_id', $employee->id)
             ->orderBy('id', 'desc')
             ->get();
 
-        // Fetch employee leaves
-        $leaves = Leave::where('employee_id', $employee->id)->orderBy('id', 'desc')->get();
+        // Selected year (default = current year)
+        $year = $request->year ?? now()->year;
 
-        // Total leaves (sum of days)
+        // All leaves (for table)
+        $leaves = Leave::where('employee_id', $employee->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Only APPROVED leaves for selected year
+        $approvedLeaves = $leaves->filter(function ($leave) use ($year) {
+            return strtolower($leave->status) === 'approved'
+                && Carbon::parse($leave->from_date)->year == $year;
+        });
+
+        // Total approved leaves
         $totalLeaves = 0;
-        foreach ($leaves as $leave) {
+
+        foreach ($approvedLeaves as $leave) {
             $from = Carbon::parse($leave->from_date);
-            $to = Carbon::parse($leave->to_date);
+            $to   = Carbon::parse($leave->to_date);
             $days = $from->diffInDays($to) + 1; // inclusive
+
+            $leave->days = $days;
             $totalLeaves += $days;
-            $leave->days = $days; // store for blade
         }
 
-        // Month-wise leaves
-        $monthWise = $leaves->groupBy(function ($leave) {
-            return Carbon::parse($leave->from_date)->format('Y-m');
-        })->map(function ($group) {
-            return $group->sum('days');
-        });
-        
+        // Month-wise approved leaves (year-safe)
+        $monthWise = $approvedLeaves
+            ->groupBy(fn ($leave) =>
+                Carbon::parse($leave->from_date)->format('Y-m')
+            )
+            ->map(fn ($group) => $group->sum('days'));
+
+        // Year dropdown options (last 5 years)
+        $years = range(now()->year, now()->year - 5);
+
         $positions = Position::orderBy('id')->get();
 
-        return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise', 'positions'));
+        return view('employees.show', compact(
+            'employee',
+            'sessions',
+            'leaves',
+            'totalLeaves',
+            'monthWise',
+            'positions',
+            'year',
+            'years'
+        ));
     }
 
     public function destroy(Employee $employee)
@@ -169,7 +194,7 @@ class EmployeeController extends Controller
 		return view('employee.profile', compact('employee'));
 	}
         
-        public function details($id)
+        public function details(Request $request, $id)
         {
             $employee = Employee::findOrFail($id);
 
@@ -177,29 +202,52 @@ class EmployeeController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
 
-            // Fetch employee leaves
-            $leaves = Leave::where('employee_id', $id)->orderBy('id', 'desc')->get();
+            // Selected year (default = current year)
+            $year = $request->year ?? now()->year;
 
-            // Total leaves (sum of days)
+            // All leaves (for table)
+            $leaves = Leave::where('employee_id', $id)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            // Approved leaves for selected year
+            $approvedLeaves = $leaves->filter(function ($leave) use ($year) {
+                return strtolower($leave->status) === 'approved'
+                    && Carbon::parse($leave->from_date)->year == $year;
+            });
+
+            // Total approved leaves
             $totalLeaves = 0;
-            foreach ($leaves as $leave) {
+
+            foreach ($approvedLeaves as $leave) {
                 $from = Carbon::parse($leave->from_date);
-                $to = Carbon::parse($leave->to_date);
-                $days = $from->diffInDays($to) + 1; // inclusive
+                $to   = Carbon::parse($leave->to_date);
+                $days = $from->diffInDays($to) + 1;
+
+                $leave->days = $days;
                 $totalLeaves += $days;
-                $leave->days = $days; // store for blade
             }
 
-            // Month-wise leaves
-            $monthWise = $leaves->groupBy(function ($leave) {
-                return Carbon::parse($leave->from_date)->format('Y-m');
-            })->map(function ($group) {
-                return $group->sum('days');
-            });
+            // Month-wise approved leaves
+            $monthWise = $approvedLeaves
+                ->groupBy(fn ($leave) => Carbon::parse($leave->from_date)->format('Y-m'))
+                ->map(fn ($group) => $group->sum('days'));
+
+            // Years for dropdown (last 5 years)
+            $years = range(now()->year, now()->year - 5);
 
             $positions = Position::orderBy('id')->get();
 
-            return view('employees.show', compact('employee', 'sessions', 'leaves', 'totalLeaves', 'monthWise', 'positions'));
+            return view('employees.show', compact(
+                'employee',
+                'sessions',
+                'leaves',
+                'totalLeaves',
+                'monthWise',
+                'positions',
+                'years',
+                'year'
+            ));
         }
         
         public function attendanceFilter(Request $request, $id)

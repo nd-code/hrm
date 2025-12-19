@@ -198,10 +198,26 @@
                 <div id="tab-leaves" class="tab-content hidden p-4">
 
                     <h3 class="text-lg font-bold mb-4">Leaves</h3>
+                    
+                    <form method="GET" class="mb-4">
+                        <label class="font-semibold mr-2">Select Year:</label>
+                        <select name="year" onchange="this.form.submit()"
+                                class="border p-2 rounded" style="width: 100px;">
+                            @foreach($years as $y)
+                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>
+                                    {{ $y }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
 
-                    <p class="mb-4"><strong>Total Leaves:</strong> {{ $totalLeaves }}</p>
+                    <p class="mb-4">
+                        <strong>Total Leaves (Approved - {{ $year }}):</strong> {{ $totalLeaves }}
+                    </p>
 
-                    <h4 class="text-md font-semibold mb-2">Month Wise Leaves</h4>
+                    <h4 class="text-md font-semibold mb-2">
+                        Month Wise Leaves (Approved - {{ $year }})
+                    </h4>
                     <table class="w-full border-collapse border border-gray-300 mb-4">
                         <thead>
                             <tr>
@@ -210,12 +226,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($monthWise as $month => $count)
+                            @forelse($monthWise as $month => $count)
                                 <tr>
-                                    <td class="border p-2">{{ \Carbon\Carbon::parse($month . '-01')->format('F Y') }}</td>
+                                    <td class="border p-2">
+                                        {{ \Carbon\Carbon::parse($month . '-01')->format('F Y') }}
+                                    </td>
                                     <td class="border p-2">{{ $count }}</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="border p-2 text-center text-gray-500">
+                                        No approved leaves
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
 
@@ -223,7 +247,7 @@
                     <table id="leaveTable" class="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr>
-                                <th style="display:none;">ID</th> <!-- Added ID Column -->
+                                <th style="display:none;">ID</th>
                                 <th class="border p-2">From</th>
                                 <th class="border p-2">To</th>
                                 <th class="border p-2">Days</th>
@@ -235,13 +259,23 @@
                         <tbody>
                             @foreach($leaves as $leave)
                                 <tr>
-                                    <td style="display:none;">{{ $leave->id }}</td> <!-- ID Cell -->
+                                    <td style="display:none;">{{ $leave->id }}</td>
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
-                                    <td class="border p-2">{{ $leave->days }}</td>
+                                    <td class="border p-2">
+                                        {{ \Carbon\Carbon::parse($leave->from_date)->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1 }}
+                                    </td>
                                     <td class="border p-2">{{ ucfirst($leave->leave_type) }}</td>
                                     <td class="border p-2">{{ $leave->reason }}</td>
-                                    <td class="border p-2">{{ ucfirst($leave->status) }}</td>
+                                    <td class="border p-2">
+                                        <span class="
+                                            {{ $leave->status === 'approved' ? 'text-green-600' : '' }}
+                                            {{ $leave->status === 'pending' ? 'text-yellow-600' : '' }}
+                                            {{ $leave->status === 'rejected' ? 'text-red-600' : '' }}
+                                        ">
+                                            {{ ucfirst($leave->status) }}
+                                        </span>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
