@@ -95,7 +95,7 @@ class EmployeeController extends Controller
         foreach ($approvedLeaves as $leave) {
             $from = Carbon::parse($leave->from_date);
             $to   = Carbon::parse($leave->to_date);
-            $days = $from->diffInDays($to) + 1; // inclusive
+            $days = $from->diffInDays($to); // inclusive
 
             $leave->days = $days;
             $totalLeaves += $days;
@@ -222,7 +222,7 @@ class EmployeeController extends Controller
             foreach ($approvedLeaves as $leave) {
                 $from = Carbon::parse($leave->from_date);
                 $to   = Carbon::parse($leave->to_date);
-                $days = $from->diffInDays($to) + 1;
+                $days = $from->diffInDays($to);
 
                 $leave->days = $days;
                 $totalLeaves += $days;
