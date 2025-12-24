@@ -248,7 +248,10 @@
 									</button>
 									<button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${row.id}">
 										<i class="fas fa-times-circle"></i>
-									</button>)`;
+									</button>
+                                                                        <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="${row.id}">
+                                                                                <i class="fas fa-reply"></i>
+                                                                        </button>)`;
 							}
 							return status;
 						}
@@ -321,6 +324,9 @@
 							 </button>
 							 <button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${data.id}">
 								<i class="fas fa-times-circle"></i>
+							 </button>
+                                                         <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="${data.id}">
+								<i class="fas fa-reply"></i>
 							 </button>)`,
 							`
 							<a href="/leaves/${data.id}" title="View">

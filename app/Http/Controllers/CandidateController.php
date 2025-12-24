@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\RecycleBinService;
 
 class CandidateController extends Controller
 {
@@ -80,6 +81,8 @@ class CandidateController extends Controller
 
     public function destroy(Candidate $candidate)
     {
+        RecycleBinService::delete($candidate, 'candidate');
+        
         if ($candidate->cv && file_exists(storage_path("app/public/{$candidate->cv}"))) {
             unlink(storage_path("app/public/{$candidate->cv}"));
         }

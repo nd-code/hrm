@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use App\Services\RecycleBinService;
 
 class VendorController extends Controller
 {
@@ -55,6 +56,8 @@ class VendorController extends Controller
 
     public function destroy(Vendor $vendor)
     {
+        RecycleBinService::delete($vendor, 'vendor');
+
         $vendor->delete();
         return back()->with('success', 'Vendor deleted successfully.');
     }

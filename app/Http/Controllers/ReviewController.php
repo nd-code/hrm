@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\RecycleBinService;
 
 class ReviewController extends Controller
 {
@@ -77,6 +78,8 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        RecycleBinService::delete($review, 'feedback');
+
         if (auth()->id() == 101) {
             $review->delete();
         }else{

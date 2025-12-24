@@ -12,6 +12,7 @@ use App\Models\WorkSession;
 use App\Models\Leave;
 use Carbon\Carbon;
 use App\Models\Position;
+use App\Services\RecycleBinService;
 
 class EmployeeController extends Controller
 {
@@ -140,6 +141,8 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        RecycleBinService::delete($employee, 'employee');
+        
         $employee->delete();
         return back()->with('success', 'Deleted.');
     }

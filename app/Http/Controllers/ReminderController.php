@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\RecycleBinService;
 
 class ReminderController extends Controller
 {
@@ -47,6 +48,8 @@ class ReminderController extends Controller
 
     public function destroy(Reminder $reminder)
     {
+        RecycleBinService::delete($reminder, 'reminder');
+        
         $reminder->delete();
         return back()->with('success', 'Reminder deleted successfully.');
     }

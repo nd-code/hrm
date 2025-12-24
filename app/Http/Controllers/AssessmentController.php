@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assessment;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Services\RecycleBinService;
 
 class AssessmentController extends Controller
 {
@@ -66,6 +67,8 @@ class AssessmentController extends Controller
 
     public function destroy(Assessment $assessment)
     {
+        RecycleBinService::delete($assessment, 'assessment');
+
         $assessment->delete();
         return redirect()->route('assessments.index')->with('success','Assessment deleted.');
     }

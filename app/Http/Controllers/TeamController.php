@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Employee;
 use App\Models\Leave;
+use App\Services\RecycleBinService;
 
 class TeamController extends Controller
 {
@@ -50,6 +51,9 @@ class TeamController extends Controller
     public function destroy($id)
     {
         $team = Team::findOrFail($id);
+        
+        RecycleBinService::delete($team, 'team');
+        
         $team->delete();
         return back()->with('success', 'Deleted.');
     }

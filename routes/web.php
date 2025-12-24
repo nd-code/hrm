@@ -15,6 +15,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\RecycleBinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,12 @@ Route::middleware(['auth'])->group(function () {
     
     Route::resource('candidates', CandidateController::class);
     Route::post('candidates/inline-update', [CandidateController::class, 'inlineUpdate'])->name('candidates.inline.update');
+    
+    Route::get('/recycle-bin', [RecycleBinController::class, 'index']);
+    Route::post('/recycle-bin/{id}/restore', [RecycleBinController::class, 'restore'])
+        ->name('recycle.restore');
+    Route::delete('/recycle-bin/{id}', [RecycleBinController::class, 'destroy'])
+        ->name('recycle.delete');
 });
 
 // Admin Auth (Breeze)

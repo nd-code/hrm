@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 use PDF;
+use App\Services\RecycleBinService;
 
 class LeaveController extends Controller
 {
@@ -119,6 +120,9 @@ class LeaveController extends Controller
     public function destroy($id)
     {
         $leave = Leave::findOrFail($id);
+        
+        RecycleBinService::delete($leave, 'leave');
+        
 		$leave->delete();
         return back()->with('success', 'Leave deleted.');
     }
@@ -322,7 +326,7 @@ class LeaveController extends Controller
         $recipient = $leave->employee; // leave owner
 
         if ($recipient) {
-            //$recipient->notify(new LeaveReplyNotification($leave, $reply, $senderName));
+            $recipient->notify(new LeaveReplyNotification($leave, $reply, $senderName));
         }
 
         return response()->json([
