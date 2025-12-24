@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Setting') }}
+            {{ __('Recycle Bin') }}
         </h2>
     </x-slot>
 
@@ -9,6 +9,7 @@
         <div class="mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-4">Recycle Bin</h3>
                     <table class="display w-full mt-4">
                         <thead>
                             <tr>
@@ -32,12 +33,12 @@
                                 <td>
                                     <form method="POST" action="{{ route('recycle.restore', $item->id) }}">
                                         @csrf
-                                        <i class="fas fa-undo text-green-500 mr-2"></i>
+                                        <button class="btn btn-success">Restore</button>
                                     </form>
 
                                     <form method="POST" action="{{ route('recycle.delete', $item->id) }}">
                                         @csrf @method('DELETE')
-                                        <i class="fas fa-trash-alt text-red-500"></i>
+                                        <button class="btn btn-danger">Delete</button>
                                     </form>
                                 </td>
                             </tr>

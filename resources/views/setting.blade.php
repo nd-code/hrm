@@ -28,7 +28,7 @@
                 
                 <a href="{{ url('/recycle-bin') }}">
                     <div class="p-6 rounded-lg shadow-md">
-                        <h3 class="text-lg font-semibold">Recycle</h3>
+                        <h3 class="text-lg font-semibold">Recycle Bin</h3>
                     </div>
                 </a>
             </div>
