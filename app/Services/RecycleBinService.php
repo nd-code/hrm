@@ -55,8 +55,15 @@ class RecycleBinService
     protected static function resolveModel(string $module): string
     {
         return match ($module) {
-            'employees' => \App\Models\Employee::class,
-            'users'     => \App\Models\User::class,
+            'employee' => \App\Models\Employee::class,
+            'user'     => \App\Models\User::class,
+            'assessment'     => \App\Models\Assessment::class,
+            'candidate'     => \App\Models\Candidate::class,
+            'leave'     => \App\Models\Leave::class,
+            'reminder'     => \App\Models\Reminder::class,
+            'feedback'     => \App\Models\Review::class,
+            'team'     => \App\Models\Team::class,
+            'vendor'     => \App\Models\Vendor::class,
             default     => abort(404, 'Invalid module'),
         };
     }

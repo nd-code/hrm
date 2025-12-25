@@ -22,27 +22,33 @@
                         </thead>
 
                         <tbody>
-                            @foreach($items as $item)
-                            <tr>
-                                <td>{{ ucfirst($item->module) }}</td>
-                                <td>{{ $item->record_id }}</td>
-                                <td>
-                                    <pre class="text-xs">{{ json_encode($item->data, JSON_PRETTY_PRINT) }}</pre>
-                                </td>
-                                <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                                <td>
-                                    <form method="POST" action="{{ route('recycle.restore', $item->id) }}">
-                                        @csrf
-                                        <button class="btn btn-success">Restore</button>
-                                    </form>
+                            @forelse($items as $item)
+                                <tr>
+                                    <td>{{ ucfirst($item->module) }}</td>
+                                    <td>{{ $item->record_id }}</td>
+                                    <td>
+                                        <pre class="text-xs">{{ json_encode($item->data, JSON_PRETTY_PRINT) }}</pre>
+                                    </td>
+                                    <td>{{ $item->created_at->format('d/m/Y') }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ route('recycle.restore', $item->id) }}">
+                                            @csrf
+                                            <button class="btn btn-success">Restore</button>
+                                        </form>
 
-                                    <form method="POST" action="{{ route('recycle.delete', $item->id) }}">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
+                                        <form method="POST" action="{{ route('recycle.delete', $item->id) }}">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-gray-500">
+                                        No deleted records found
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
 
