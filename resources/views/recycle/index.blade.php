@@ -30,15 +30,27 @@
                                         <pre class="text-xs">{{ json_encode($item->data, JSON_PRETTY_PRINT) }}</pre>
                                     </td>
                                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                                    <td>
+                                    <td class="flex items-center gap-3" style="padding-top: 50px;">
+                                        {{-- Restore --}}
                                         <form method="POST" action="{{ route('recycle.restore', $item->id) }}">
                                             @csrf
-                                            <button class="btn btn-success">Restore</button>
+                                            <button type="submit" title="Restore" class="text-green-600 hover:text-green-800">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
                                         </form>
 
+                                        {{-- Delete --}}
                                         <form method="POST" action="{{ route('recycle.delete', $item->id) }}">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-danger">Delete</button>
+                                            @csrf
+                                            @method('DELETE')
+                                            <button
+                                                type="submit"
+                                                title="Delete Permanently"
+                                                class="text-red-600 hover:text-red-800"
+                                                onclick="return confirm('Are you sure you want to permanently delete this record?')"
+                                            >
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
