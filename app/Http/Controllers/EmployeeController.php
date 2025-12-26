@@ -81,14 +81,14 @@ class EmployeeController extends Controller
 
         // All leaves (for table)
         $leaves = Leave::where('employee_id', $employee->id)
+            ->whereYear('from_date', $year)
             ->orderBy('id', 'desc')
             ->get();
 
-        // Only APPROVED leaves for selected year
-        $approvedLeaves = $leaves->filter(function ($leave) use ($year) {
-            return strtolower($leave->status) === 'approved'
-                && Carbon::parse($leave->from_date)->year == $year;
-        });
+        // Approved leaves
+        $approvedLeaves = $leaves->filter(fn ($leave) =>
+            strtolower($leave->status) === 'approved'
+        );
 
         // Total approved leaves
         $totalLeaves = 0;
@@ -97,19 +97,8 @@ class EmployeeController extends Controller
             $from = Carbon::parse($leave->from_date);
             $to   = Carbon::parse($leave->to_date);
 
-            // If leave is in current month & year
-            if ($from->isSameMonth(now()) && $from->year === now()->year) {
-
-                // If leave end date is in future, count till today
-                $endDate = $to->greaterThan(now()) ? now() : $to;
-
-                // NO +1 for current month
-                $days = $from->diffInDays($endDate);
-
-            } else {
-                // Past or future months → inclusive
-                $days = $from->diffInDays($to) + 1;
-            }
+            // Always count full inclusive days
+            $days = $from->diffInDays($to) + 1;
 
             $leave->days = $days;
             $totalLeaves += $days;
@@ -223,14 +212,14 @@ class EmployeeController extends Controller
 
             // All leaves (for table)
             $leaves = Leave::where('employee_id', $id)
+                ->whereYear('from_date', $year)
                 ->orderBy('id', 'desc')
                 ->get();
 
-            // Approved leaves for selected year
-            $approvedLeaves = $leaves->filter(function ($leave) use ($year) {
-                return strtolower($leave->status) === 'approved'
-                    && Carbon::parse($leave->from_date)->year == $year;
-            });
+            // Approved leaves
+            $approvedLeaves = $leaves->filter(fn ($leave) =>
+                strtolower($leave->status) === 'approved'
+            );
 
             // Total approved leaves
             $totalLeaves = 0;
@@ -239,19 +228,8 @@ class EmployeeController extends Controller
                 $from = Carbon::parse($leave->from_date);
                 $to   = Carbon::parse($leave->to_date);
 
-                // If leave is in current month & year
-                if ($from->isSameMonth(now()) && $from->year === now()->year) {
-
-                    // If leave end date is in future, count till today
-                    $endDate = $to->greaterThan(now()) ? now() : $to;
-
-                    // NO +1 for current month
-                    $days = $from->diffInDays($endDate);
-
-                } else {
-                    // Past or future months → inclusive
-                    $days = $from->diffInDays($to) + 1;
-                }
+                // Always count full inclusive days
+                $days = $from->diffInDays($to) + 1;
 
                 $leave->days = $days;
                 $totalLeaves += $days;

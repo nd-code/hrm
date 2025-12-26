@@ -222,7 +222,7 @@
                         <thead>
                             <tr>
                                 <th class="border p-2">Month</th>
-                                <th class="border p-2">Total Leaves</th>
+                                <th class="border p-2">Leaves</th>
                             </tr>
                         </thead>
                         <tbody>
