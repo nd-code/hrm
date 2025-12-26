@@ -97,8 +97,13 @@ class EmployeeController extends Controller
             $from = Carbon::parse($leave->from_date);
             $to   = Carbon::parse($leave->to_date);
 
-            // Always count full inclusive days
+            // Full inclusive days
             $days = $from->diffInDays($to) + 1;
+
+            // Half day handling
+            if (strtolower($leave->leave_type) === 'half day leave') {
+                $days = 0.5;
+            }
 
             $leave->days = $days;
             $totalLeaves += $days;
@@ -228,8 +233,13 @@ class EmployeeController extends Controller
                 $from = Carbon::parse($leave->from_date);
                 $to   = Carbon::parse($leave->to_date);
 
-                // Always count full inclusive days
+                // Full inclusive days
                 $days = $from->diffInDays($to) + 1;
+
+                // Half day handling
+                if (strtolower($leave->leave_type) === 'half day leave') {
+                    $days = 0.5;
+                }
 
                 $leave->days = $days;
                 $totalLeaves += $days;

@@ -263,7 +263,12 @@
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->from_date)->format('d-m-Y') }}</td>
                                     <td class="border p-2">{{ \Carbon\Carbon::parse($leave->to_date)->format('d-m-Y') }}</td>
                                     <td class="border p-2">
-                                        {{ \Carbon\Carbon::parse($leave->from_date)->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1 }}
+                                        @if(strtolower($leave->leave_type) === 'half day leave')
+                                            0.5
+                                        @else
+                                            {{ \Carbon\Carbon::parse($leave->from_date)
+                                                ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1 }}
+                                        @endif
                                     </td>
                                     <td class="border p-2">{{ ucfirst($leave->leave_type) }}</td>
                                     <td class="border p-2">{{ $leave->reason }}</td>
