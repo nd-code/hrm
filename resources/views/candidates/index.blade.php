@@ -29,9 +29,7 @@
                                 <th>Exp. (Yrs.)</th>
                                 <th>Designation</th>
                                 <th>Interview Taken Date</th>
-                                <th>Comment</th>
                                 <th>Conclusion</th>
-                                <th>CV</th>
                                 <th>Created On</th>
                                 <th>Actions</th>
                             </tr>
@@ -78,10 +76,6 @@
                                            onBlur="updateField(this, '{{ $c->id }}', 'interview_date')" />
                                 </td>
 
-                                <td contenteditable="true" onBlur="updateField(this, '{{ $c->id }}', 'comment')">
-                                    {{ $c->comment }}
-                                </td>
-
                                 <td>
                                     <select onchange="updateFieldSelect(this, '{{ $c->id }}', 'status')"
                                             class="border p-1 rounded" style="width: 100px;">
@@ -90,15 +84,6 @@
                                         <option value="selected" {{ $c->status=='selected' ? 'selected' : '' }}>Selected</option>
                                         <option value="rejected" {{ $c->status=='rejected' ? 'selected' : '' }}>Rejected</option>
                                     </select>
-                                </td>
-
-                                <td>
-                                    @if($c->cv)
-                                        <a href="{{ asset('storage/'.$c->cv) }}" target="_blank"
-                                           class="text-blue-600 underline"><i class="fas fa-file-alt"></i></a>
-                                    @else
-                                        -
-                                    @endif
                                 </td>
 
                                 <td>{{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d-m-Y') : '' }}</td>
