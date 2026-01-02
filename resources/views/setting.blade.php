@@ -31,6 +31,12 @@
                         <h3 class="text-lg font-semibold">Recycle Bin</h3>
                     </div>
                 </a>
+                
+                <a href="{{ url('/activity-logs') }}">
+                    <div class="p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold">Activity Logs</h3>
+                    </div>
+                </a>
             </div>
         </div>
     </div>

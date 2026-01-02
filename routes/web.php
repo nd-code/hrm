@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\RecycleBinController;
+use App\Http\Controllers\ActivityLogsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('recycle.restore');
     Route::delete('/recycle-bin/{id}', [RecycleBinController::class, 'destroy'])
         ->name('recycle.delete');
+    
+    Route::get('/activity-logs', [ActivityLogsController::class, 'index']);
 });
 
 // Admin Auth (Breeze)

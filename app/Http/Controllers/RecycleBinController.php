@@ -19,7 +19,7 @@ class RecycleBinController extends Controller
 {
     public function index()
     {
-        $items = RecycleBin::latest()->paginate(20);
+        $items = RecycleBin::latest()->get();
 
         return view('recycle.index', compact('items'));
     }

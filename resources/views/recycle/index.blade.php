@@ -15,12 +15,13 @@
                     {{-- Empty state OUTSIDE table (DataTables safe) --}}
                     @if($items->isEmpty())
                         <div class="text-center py-6 text-gray-500">
-                            No deleted records found
+                            No deleted records found.
                         </div>
                     @else
                         <table id="recycleTable" class="display w-full mt-4">
                             <thead>
                                 <tr>
+                                    <th style="display: none;">ID</th>
                                     <th>Module</th>
                                     <th>Record ID</th>
                                     <th>Deleted Data</th>
@@ -32,6 +33,7 @@
                             <tbody>
                                 @foreach($items as $item)
                                     <tr>
+                                        <td style="display: none;">{{ $item->id }}</td>
                                         <td>{{ ucfirst($item->module) }}</td>
                                         <td>{{ $item->record_id }}</td>
                                         <td data-search="{{ implode(' ', $item->data) }}">
@@ -98,11 +100,11 @@
     $(document).ready(function () {
         $('#recycleTable').DataTable({
             pageLength: 10,
-            order: [[3, 'desc']],
+            order: [[0, 'desc']],
             searching: true, // 🔍 ENABLED
             orderClasses: false, // 🔥 disables sorting_1 class
             columnDefs: [
-                { orderable: false, targets: [4] } // Disable sort on Action
+                { orderable: false, targets: [5] } // Disable sort on Action
             ]
         });
     });
