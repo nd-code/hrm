@@ -128,71 +128,95 @@ class LeaveController extends Controller
     }
 	
 	public function updateStatus(Request $request, Leave $leave)
-	{
-		$request->validate([
-			'status' => 'required|string',
-			'manage_by' => 'required|integer|exists:employees,id',
-		]);
+        {
+            $request->validate([
+                'status'    => 'required|string',
+                'manage_by' => 'required|integer|exists:employees,id',
+            ]);
 
-		$normalized = ucfirst(strtolower($request->status));
+            // Normalize status
+            $normalized = strtoupper($request->status) === 'LWP'
+                ? 'LWP'
+                : ucfirst(strtolower($request->status));
 
-		if (!in_array($normalized, ['Pending', 'Approved', 'Rejected'], true)) {
-			return response()->json(['message' => 'Invalid status value.'], 422);
-		}
+            // ✅ Allow LWP also
+            if (!in_array($normalized, ['Pending', 'Approved', 'Rejected', 'LWP'], true)) {
+                return response()->json(['message' => 'Invalid status value.'], 422);
+            }
 
-		$leave->update([
-			'status'    => $normalized,
-			'manage_by' => $request->manage_by,
-		]);
-		
-		// Notify the employee who applied for leave
-		if ($leave->employee) {
-                    $userId = auth()->id();
-                    if ($userId !== null && $userId == 101) {
-                        $name = 'Super Admin';
-                    } else {
-                        $employeeId = auth('employee')->id();
-                        $employee = Employee::find($employeeId);
-                        $name = $employee ? $employee->name : 'Unknown';
-                    }
+            $leave->update([
+                'status'    => $normalized,
+                'manage_by' => $request->manage_by,
+            ]);
 
-                    $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
-                    $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
+            // ======================
+            // EMAIL NOTIFICATIONS
+            // ======================
 
-                    $message = "Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been {$normalized} by {$name}.";
-                    if (!empty($request->comment)) {
-                        $message .= "\n\nNote: {$request->comment}";
-                    }
-
-                    \Mail::raw($message, function ($msg) use ($leave) {
-                        $msg->to($leave->employee->email)
-                            ->subject('Leave Status Updated');
-                    });
+            if ($leave->employee) {
+                $userId = auth()->id();
+                if ($userId !== null && $userId == 101) {
+                    $name = 'Super Admin';
+                } else {
+                    $employeeId = auth('employee')->id();
+                    $employee   = Employee::find($employeeId);
+                    $name       = $employee ? $employee->name : 'Unknown';
                 }
 
-		// Notify all selected employees in 'apply_to'
-		if (!empty($leave->apply_to)) {
-                    $employeeIds = explode(',', $leave->apply_to);
-                    $employees = Employee::whereIn('id', $employeeIds)->get();
+                $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
+                $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
 
-                    $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
-                    $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
+                // ✅ Custom message for LWP
+                if ($normalized === 'LWP') {
+                    $message = "Hello {$leave->employee->name},\n\nYour leave from {$fromDate} to {$toDate} has been marked as LWP (Leave Without Pay) by {$name}.";
+                } else {
+                    $message = "Hello {$leave->employee->name},\n\nYour leave request from {$fromDate} to {$toDate} has been {$normalized} by {$name}.";
+                }
 
-                    foreach ($employees as $emp) {
-                        \Mail::raw("Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} has been {$normalized} by {$name}.", function ($msg) use ($emp) {
+                if (!empty($request->comment)) {
+                    $message .= "\n\nNote: {$request->comment}";
+                }
+
+                \Mail::raw($message, function ($msg) use ($leave) {
+                    $msg->to($leave->employee->email)
+                        ->subject('Leave Status Updated');
+                });
+            }
+
+            // ======================
+            // APPLY TO EMPLOYEES
+            // ======================
+
+            if (!empty($leave->apply_to)) {
+                $employeeIds = explode(',', $leave->apply_to);
+                $employees   = Employee::whereIn('id', $employeeIds)->get();
+
+                $fromDate = \Carbon\Carbon::parse($leave->from_date)->format('d M Y');
+                $toDate   = \Carbon\Carbon::parse($leave->to_date)->format('d M Y');
+
+                foreach ($employees as $emp) {
+
+                    $text = $normalized === 'LWP'
+                        ? "has been marked as LWP (Leave Without Pay)"
+                        : "has been {$normalized}";
+
+                    \Mail::raw(
+                        "Hello {$emp->name},\n\nThe leave request of {$leave->employee->name} from {$fromDate} to {$toDate} {$text} by {$name}.",
+                        function ($msg) use ($emp) {
                             $msg->to($emp->email)
                                 ->subject('Leave Status Updated');
-                        });
-                    }
+                        }
+                    );
                 }
+            }
 
-		return response()->json([
-			'success' => true,
-			'status'  => $normalized,
-			'manager' => $leave->manager?->name ?? '',
-			'id'      => $leave->id,
-		]);
-	}
+            return response()->json([
+                'success' => true,
+                'status'  => $normalized,
+                'manager' => $leave->manager?->name ?? '',
+                'id'      => $leave->id,
+            ]);
+        }
 	
 	public function employeeIndex()
 	{

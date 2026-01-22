@@ -90,27 +90,36 @@ class EmployeeController extends Controller
             strtolower($leave->status) === 'approved'
         );
 
+        // LWP leaves
+        $lwpLeaves = $leaves->filter(fn ($leave) =>
+            strtolower($leave->status) === 'lwp'
+        );
+
         // Total approved leaves
         $totalLeaves = 0;
+        $totalLwp = 0;
 
         foreach ($approvedLeaves as $leave) {
-            $from = Carbon::parse($leave->from_date);
-            $to   = Carbon::parse($leave->to_date);
-
-            // Full inclusive days
-            $days = $from->diffInDays($to) + 1;
-
-            // Half day handling
-            if (strtolower($leave->leave_type) === 'half day leave') {
-                $days = 0.5;
-            }
-
+            $days = $this->calculateLeaveDays($leave);
             $leave->days = $days;
             $totalLeaves += $days;
         }
 
+        foreach ($lwpLeaves as $leave) {
+            $days = $this->calculateLeaveDays($leave);
+            $leave->days = $days;
+            $totalLwp += $days;
+        }
+
         // Month-wise approved leaves (year-safe)
-        $monthWise = $approvedLeaves
+        $monthWiseApproved = $approvedLeaves
+            ->groupBy(fn ($leave) =>
+                Carbon::parse($leave->from_date)->format('Y-m')
+            )
+            ->map(fn ($group) => $group->sum('days'));
+        
+        // Month-wise LWP leaves (year-safe)
+        $monthWiseLwp = $lwpLeaves
             ->groupBy(fn ($leave) =>
                 Carbon::parse($leave->from_date)->format('Y-m')
             )
@@ -126,7 +135,9 @@ class EmployeeController extends Controller
             'sessions',
             'leaves',
             'totalLeaves',
-            'monthWise',
+            'totalLwp',
+            'monthWiseApproved',
+            'monthWiseLwp',
             'positions',
             'year',
             'years'
@@ -226,28 +237,39 @@ class EmployeeController extends Controller
                 strtolower($leave->status) === 'approved'
             );
 
+            // LWP leaves
+            $lwpLeaves = $leaves->filter(fn ($leave) =>
+                strtolower($leave->status) === 'lwp'
+            );
+
             // Total approved leaves
             $totalLeaves = 0;
+            $totalLwp = 0;
 
             foreach ($approvedLeaves as $leave) {
-                $from = Carbon::parse($leave->from_date);
-                $to   = Carbon::parse($leave->to_date);
-
-                // Full inclusive days
-                $days = $from->diffInDays($to) + 1;
-
-                // Half day handling
-                if (strtolower($leave->leave_type) === 'half day leave') {
-                    $days = 0.5;
-                }
-
+                $days = $this->calculateLeaveDays($leave);
                 $leave->days = $days;
                 $totalLeaves += $days;
             }
 
+            foreach ($lwpLeaves as $leave) {
+                $days = $this->calculateLeaveDays($leave);
+                $leave->days = $days;
+                $totalLwp += $days;
+            }
+
             // Month-wise approved leaves
-            $monthWise = $approvedLeaves
-                ->groupBy(fn ($leave) => Carbon::parse($leave->from_date)->format('Y-m'))
+            $monthWiseApproved = $approvedLeaves
+                ->groupBy(fn ($leave) =>
+                    Carbon::parse($leave->from_date)->format('Y-m')
+                )
+                ->map(fn ($group) => $group->sum('days'));
+            
+            // Month-wise LWP leaves
+            $monthWiseLwp = $lwpLeaves
+                ->groupBy(fn ($leave) =>
+                    Carbon::parse($leave->from_date)->format('Y-m')
+                )
                 ->map(fn ($group) => $group->sum('days'));
 
             // Years for dropdown (last 5 years)
@@ -260,10 +282,12 @@ class EmployeeController extends Controller
                 'sessions',
                 'leaves',
                 'totalLeaves',
-                'monthWise',
+                'totalLwp',
+                'monthWiseApproved',
+                'monthWiseLwp',
                 'positions',
-                'years',
-                'year'
+                'year',
+                'years'
             ));
         }
         
@@ -358,5 +382,15 @@ class EmployeeController extends Controller
                         ->setPaper('a4', 'portrait');
 
             return $pdf->download('attendance-report-' . now()->format('Y-m-d') . '.pdf');
+        }
+        
+        private function calculateLeaveDays($leave)
+        {
+            if (strtolower($leave->leave_type) === 'half day leave') {
+                return 0.5;
+            }
+
+            return \Carbon\Carbon::parse($leave->from_date)
+                ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
         }
 }

@@ -242,17 +242,25 @@
 						render: function (data, type, row) {
 							let status = data ? data.charAt(0).toUpperCase() + data.slice(1) : '';
 							if (data === 'Pending') {
-								return `${status} 
-									(<button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${row.id}">
-										<i class="fas fa-check-circle"></i>
-									</button>
-									<button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${row.id}">
-										<i class="fas fa-times-circle"></i>
-									</button>
-                                                                        <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="${row.id}">
-                                                                                <i class="fas fa-reply"></i>
-                                                                        </button>)`;
-							}
+                                                            return `Pending
+                                                                (
+                                                                <button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${row.id}">
+                                                                    <i class="fas fa-check-circle"></i>
+                                                                </button>
+
+                                                                <button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${row.id}">
+                                                                    <i class="fas fa-times-circle"></i>
+                                                                </button>
+
+                                                                <button class="lwp-btn text-yellow-500 mr-2" title="LWP" data-id="${row.id}">
+                                                                    <i class="fas fa-ban"></i>
+                                                                </button>
+
+                                                                <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="${row.id}">
+                                                                    <i class="fas fa-reply"></i>
+                                                                </button>
+                                                                )`;
+                                                        }
 							return status;
 						}
 					},
@@ -379,13 +387,22 @@
 			let selectedLeaveId = null;
 			let selectedStatus = null;
 
-			$(document).on('click', '.approve-btn, .reject-btn', function () {
-				selectedLeaveId = $(this).data('id');
-				selectedStatus = $(this).hasClass('approve-btn') ? 'approved' : 'rejected';
-				$('#leave_id').val(selectedLeaveId);
-				$('#leave_status').val(selectedStatus);
-				$('#manageByModal').removeClass('hidden');
-			});
+			$(document).on('click', '.approve-btn, .reject-btn, .lwp-btn', function () {
+                            selectedLeaveId = $(this).data('id');
+
+                            if ($(this).hasClass('approve-btn')) {
+                                selectedStatus = 'approved';
+                            } else if ($(this).hasClass('reject-btn')) {
+                                selectedStatus = 'rejected';
+                            } else {
+                                selectedStatus = 'lwp';
+                            }
+
+                            $('#leave_id').val(selectedLeaveId);
+                            $('#leave_status').val(selectedStatus);
+
+                            $('#manageByModal').removeClass('hidden');
+                        });
 
 			function closeManageByModal() {
 				$('#manageByModal').addClass('hidden');

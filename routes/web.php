@@ -17,6 +17,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\RecycleBinController;
 use App\Http\Controllers\ActivityLogsController;
+use App\Http\Controllers\AppointmentLetterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +73,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('recycle.delete');
     
     Route::get('/activity-logs', [ActivityLogsController::class, 'index']);
+    
+    Route::get('/employees/{id}/appointment-letter', [AppointmentLetterController::class, 'show'])->name('employees.appointment-letter');
+    Route::post('/employees/{id}/appointment-letter/save', [AppointmentLetterController::class, 'save'])->name('employees.appointment-letter.save');
 });
 
 // Admin Auth (Breeze)

@@ -106,6 +106,14 @@
                                     </a>
                                 </td>
                             </tr>
+                            <!--<tr>
+                                <th class="border p-2 text-left">Appointment Letter</th>
+                                <td class="border p-2">
+                                    <a target="_blank" href="{{ route('employees.appointment-letter', $employee->id) }}">
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
+                                    </a>
+                                </td>
+                            </tr>-->
                         </table>
 
                     </div>
@@ -216,29 +224,44 @@
                     </p>
 
                     <h4 class="text-md font-semibold mb-2">
-                        Month Wise Leaves (Approved - {{ $year }})
+                        Leave Details
                     </h4>
                     <table class="w-full border-collapse border border-gray-300 mb-4">
                         <thead>
                             <tr>
                                 <th class="border p-2">Month</th>
-                                <th class="border p-2">Leaves</th>
+                                <th class="border p-2">Approved</th>
+                                <th class="border p-2">LWP</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($monthWise as $month => $count)
-                                <tr>
-                                    <td class="border p-2">
-                                        {{ \Carbon\Carbon::parse($month . '-01')->format('F Y') }}
-                                    </td>
-                                    <td class="border p-2">{{ $count }}</td>
-                                </tr>
+                            @php
+                                $months = collect($monthWiseApproved->keys())
+                                    ->merge($monthWiseLwp->keys())
+                                    ->unique()
+                                    ->sort();
+                            @endphp
+
+                            @forelse($months as $month)
+                            <tr>
+                                <td class="border p-2">
+                                    {{ \Carbon\Carbon::parse($month . '-01')->format('F Y') }}
+                                </td>
+
+                                <td class="border p-2 text-green-600">
+                                    {{ $monthWiseApproved[$month] ?? 0 }}
+                                </td>
+
+                                <td class="border p-2 text-red-600">
+                                    {{ $monthWiseLwp[$month] ?? 0 }}
+                                </td>
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="2" class="border p-2 text-center text-gray-500">
-                                        No approved leaves
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td colspan="3" class="border p-2 text-center text-gray-500">
+                                    No leave data
+                                </td>
+                            </tr>
                             @endforelse
                         </tbody>
                     </table>
