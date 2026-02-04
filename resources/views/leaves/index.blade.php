@@ -236,19 +236,60 @@
 					// Managed By
 					{ data: 'manager.name', defaultContent: '-' },
 
-					// Status (Editable Dropdown)
+					// Status
                                         { 
                                             data: 'status',
                                             render: function (data, type, row) {
-                                                let current = (data || '').toLowerCase();
 
+                                                // Normalize
+                                                let statusRaw   = (data || '').toLowerCase();
+                                                let statusLabel = data ? data.charAt(0).toUpperCase() + data.slice(1) : '';
+
+                                                // 🔵 PENDING → show buttons
+                                                if (statusRaw === 'pending') {
+                                                    return `Pending
+                                                        (
+                                                        <button class="approve-btn text-green-500 ml-2 mr-2"
+                                                                title="Approve"
+                                                                data-id="${row.id}">
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+
+                                                        <button class="reject-btn text-red-500 mr-2"
+                                                                title="Reject"
+                                                                data-id="${row.id}">
+                                                            <i class="fas fa-times-circle"></i>
+                                                        </button>
+
+                                                        <button class="lwp-btn text-yellow-500 mr-2"
+                                                                title="LWP"
+                                                                data-id="${row.id}">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+
+                                                        <button class="reply-btn text-blue-500 mr-2"
+                                                                title="Reply"
+                                                                data-id="${row.id}">
+                                                            <i class="fas fa-reply"></i>
+                                                        </button>
+                                                        )`;
+                                                }
+
+                                                // 🟢 OTHER STATUSES → dropdown
                                                 return `
                                                     <select class="leave-status border p-1 rounded"
-                                                            data-id="${row.id}" style="width: 110px;">
+                                                            data-id="${row.id}"
+                                                            style="width:110px">
                                                         <option value="">Select</option>
-                                                        <option value="approved" ${current === 'approved' ? 'selected' : ''}>Accepted</option>
-                                                        <option value="rejected" ${current === 'rejected' ? 'selected' : ''}>Rejected</option>
-                                                        <option value="lwp" ${current === 'lwp' ? 'selected' : ''}>LWP</option>
+                                                        <option value="approved" ${statusRaw === 'approved' ? 'selected' : ''}>
+                                                            Accepted
+                                                        </option>
+                                                        <option value="rejected" ${statusRaw === 'rejected' ? 'selected' : ''}>
+                                                            Rejected
+                                                        </option>
+                                                        <option value="lwp" ${statusRaw === 'lwp' ? 'selected' : ''}>
+                                                            LWP
+                                                        </option>
                                                     </select>
                                                 `;
                                             }
@@ -530,17 +571,16 @@
 
             $.ajax({
                 url: `/leaves/${leaveId}/statusDD`,
-                type: 'PUT',
+                method: 'PUT',
                 data: {
                     _token: '{{ csrf_token() }}',
                     status: status
                 },
-                success: function (resp) {
-                    // Optional toast / feedback
-                    console.log('Status updated', resp);
+                success: function () {
+                    console.log('Status updated');
                 },
                 error: function (xhr) {
-                    alert(xhr.responseJSON?.message || 'Failed to update status');
+                    alert(xhr.responseJSON?.message || 'Status update failed');
                 }
             });
         });
