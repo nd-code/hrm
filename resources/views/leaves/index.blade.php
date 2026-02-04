@@ -236,34 +236,23 @@
 					// Managed By
 					{ data: 'manager.name', defaultContent: '-' },
 
-					// Status
-					{ 
-						data: 'status',
-						render: function (data, type, row) {
-							let status = data ? data.charAt(0).toUpperCase() + data.slice(1) : '';
-							if (data === 'Pending') {
-                                                            return `Pending
-                                                                (
-                                                                <button class="approve-btn text-green-500 ml-2 mr-2" title="Approve" data-id="${row.id}">
-                                                                    <i class="fas fa-check-circle"></i>
-                                                                </button>
+					// Status (Editable Dropdown)
+                                        { 
+                                            data: 'status',
+                                            render: function (data, type, row) {
+                                                let current = (data || '').toLowerCase();
 
-                                                                <button class="reject-btn text-red-500 mr-2" title="Reject" data-id="${row.id}">
-                                                                    <i class="fas fa-times-circle"></i>
-                                                                </button>
-
-                                                                <button class="lwp-btn text-yellow-500 mr-2" title="LWP" data-id="${row.id}">
-                                                                    <i class="fas fa-ban"></i>
-                                                                </button>
-
-                                                                <button class="reply-btn text-blue-500 mr-2" title="Reply" data-id="${row.id}">
-                                                                    <i class="fas fa-reply"></i>
-                                                                </button>
-                                                                )`;
-                                                        }
-							return status;
-						}
-					},
+                                                return `
+                                                    <select class="leave-status border p-1 rounded"
+                                                            data-id="${row.id}" style="width: 110px;">
+                                                        <option value="">Select</option>
+                                                        <option value="approved" ${current === 'approved' ? 'selected' : ''}>Accepted</option>
+                                                        <option value="rejected" ${current === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                                        <option value="lwp" ${current === 'lwp' ? 'selected' : ''}>LWP</option>
+                                                    </select>
+                                                `;
+                                            }
+                                        },
 
 					// Actions
 					{ 
@@ -531,6 +520,29 @@
             const url = `/leaves/export/pdf?employee_id=${employee_id}&from_date=${from_date}&to_date=${to_date}`;
 
             window.open(url, '_blank');
+        });
+        
+        $(document).on('change', '.leave-status', function () {
+            const leaveId = $(this).data('id');
+            const status  = $(this).val();
+
+            if (!status) return;
+
+            $.ajax({
+                url: `/leaves/${leaveId}/statusDD`,
+                type: 'PUT',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    status: status
+                },
+                success: function (resp) {
+                    // Optional toast / feedback
+                    console.log('Status updated', resp);
+                },
+                error: function (xhr) {
+                    alert(xhr.responseJSON?.message || 'Failed to update status');
+                }
+            });
         });
     </script>
 

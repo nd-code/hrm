@@ -390,4 +390,18 @@ class LeaveController extends Controller
 
         return $pdf->download('leaves_report.pdf');
     }
+    
+    public function statusDD(Request $request, $id)
+    {
+        $leave = Leave::findOrFail($id);
+
+        $leave->status = $request->status;
+        $leave->manage_by = auth()->id(); // optional
+        $leave->save();
+
+        return response()->json([
+            'success' => true,
+            'status'  => ucfirst($leave->status)
+        ]);
+    }
 }
