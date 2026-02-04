@@ -241,12 +241,23 @@
                                             data: 'status',
                                             render: function (data, type, row) {
 
-                                                // Normalize
-                                                let statusRaw   = (data || '').toLowerCase();
-                                                let statusLabel = data ? data.charAt(0).toUpperCase() + data.slice(1) : '';
+                                                let statusRaw = (data || '').toLowerCase();
 
-                                                // 🔵 PENDING → show buttons
                                                 if (statusRaw === 'pending') {
+
+                                                    let replyBtn = '';
+
+                                                    // ❌ Admin → no reply button
+                                                    @if(Auth::user()->id != 101)
+                                                        replyBtn = `
+                                                            <button class="reply-btn text-blue-500 mr-2"
+                                                                    title="Reply"
+                                                                    data-id="${row.id}">
+                                                                <i class="fas fa-reply"></i>
+                                                            </button>
+                                                        `;
+                                                    @endif
+
                                                     return `Pending
                                                         (
                                                         <button class="approve-btn text-green-500 ml-2 mr-2"
@@ -267,29 +278,18 @@
                                                             <i class="fas fa-ban"></i>
                                                         </button>
 
-                                                        <button class="reply-btn text-blue-500 mr-2"
-                                                                title="Reply"
-                                                                data-id="${row.id}">
-                                                            <i class="fas fa-reply"></i>
-                                                        </button>
+                                                        ${replyBtn}
                                                         )`;
                                                 }
 
-                                                // 🟢 OTHER STATUSES → dropdown
                                                 return `
                                                     <select class="leave-status border p-1 rounded"
                                                             data-id="${row.id}"
                                                             style="width:110px">
                                                         <option value="">Select</option>
-                                                        <option value="approved" ${statusRaw === 'approved' ? 'selected' : ''}>
-                                                            Accepted
-                                                        </option>
-                                                        <option value="rejected" ${statusRaw === 'rejected' ? 'selected' : ''}>
-                                                            Rejected
-                                                        </option>
-                                                        <option value="lwp" ${statusRaw === 'lwp' ? 'selected' : ''}>
-                                                            LWP
-                                                        </option>
+                                                        <option value="approved" ${statusRaw === 'approved' ? 'selected' : ''}>Accepted</option>
+                                                        <option value="rejected" ${statusRaw === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                                        <option value="lwp" ${statusRaw === 'lwp' ? 'selected' : ''}>LWP</option>
                                                     </select>
                                                 `;
                                             }
