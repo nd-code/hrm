@@ -62,6 +62,44 @@
             break-before: page;   /* modern browsers */
         }
     }
+    
+    @media print {
+
+        @page {
+            size: A4;
+            margin-top: 120px;   /* letterhead header height */
+            margin-bottom: 100px; /* letterhead footer height */
+        }
+
+        body {
+            margin: 0;
+        }
+
+        /* remove padding that breaks page flow */
+        .expiLetter {
+            padding: 0 !important;
+        }
+
+        /* page breaks */
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+
+        /* prevent ugly splits */
+        p, li {
+            page-break-inside: avoid;
+        }
+
+        h2, h3 {
+            page-break-after: avoid;
+        }
+
+        /* hide UI */
+        .alert, button {
+            display: none !important;
+        }
+    }
   </style>
 </head>
 <body>

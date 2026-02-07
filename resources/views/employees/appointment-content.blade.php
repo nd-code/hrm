@@ -28,7 +28,10 @@
             You will not (except in the normal course of the establishment’s business) publish any article or statement, deliver any lecture or broadcast or make any communication to the press, including magazine publication relating to the employer’s business or to any matter with which the establishment may be concerned, unless you have previously applied to and obtained the written permission from the establishment.
         </li>
 
+        <br>
         <p><b>Signature: ……………………</b></p>
+        
+        <div class="page-break"></div>
 
         <li>
             You will be required to maintain utmost secrecy in respect of Project documents, Commercial offer, Design documents, Project cost estimation, Technology, Software packages license, employer’s policies, patterns and Trademark and Human assets profile.
@@ -75,6 +78,8 @@
     </ol>
 
     <p><b>Signature: ……………………</b></p>
+    
+    <div class="page-break"></div>
 
     <p><b>13. OTHER TERMS AND CONDITIONS:</b></p>
 
