@@ -52,7 +52,7 @@
                                                 value="{{ $employee->$field }}"
                                                 onchange="updateField({{ $employee->id }}, '{{ $field }}', this.value)"
                                             />
-                                        @elseif ($field === 'bank_details')
+                                        @elseif ($field === 'bank_details' || $field === 'address')
                                             <span class="editable-textarea"
                                                 data-field="{{ $field }}"
                                                 data-id="{{ $employee->id }}">
