@@ -41,7 +41,7 @@
                         <h3 class="text-lg font-bold mb-4">{{ $employee->name }}'s Info</h3>
 
                         <table class="w-full border-collapse border border-gray-300 mb-4">
-                            @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details'] as $field)
+                            @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details', 'salary', 'tds', 'pt'] as $field)
                                 <tr>
                                     <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
                                     <td class="border p-2">
@@ -66,11 +66,17 @@
                                                     </option>
                                                 @endforeach
                                             </select>
+                                        @elseif (in_array($field, ['salary', 'tds', 'pt']))
+                                            <span class="editable"
+                                                  data-field="{{ $field }}"
+                                                  data-id="{{ $employee->id }}">
+                                                {{ $employee->$field ?? 'Add here....' }}
+                                            </span>
                                         @else
                                             <span class="editable"
                                                 data-field="{{ $field }}"
                                                 data-id="{{ $employee->id }}">
-                                                {{ $employee->$field }}
+                                                {{ $employee->$field ?? 'Add here....' }}
                                             </span>
                                         @endif
                                     </td>
@@ -110,6 +116,14 @@
                                 <th class="border p-2 text-left">Appointment Letter</th>
                                 <td class="border p-2">
                                     <a target="_blank" href="{{ route('employees.appointment-letter', $employee->id) }}">
+                                        <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="border p-2 text-left">Salary Slip</th>
+                                <td class="border p-2">
+                                    <a target="_blank" href="{{ route('employees.salary-slip', $employee->id) }}">
                                         <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
                                     </a>
                                 </td>

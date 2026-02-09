@@ -393,4 +393,17 @@ class EmployeeController extends Controller
             return \Carbon\Carbon::parse($leave->from_date)
                 ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
         }
+        
+        public function salarySlip($id)
+	{
+            /*$employee = Employee::findOrFail($id);
+
+            $position = Position::where('id', $employee->position)->first();
+
+            $letter = \App\Models\AppointmentLetter::where('employee_id', $employee->id)->first();
+
+            return view('employees.appointment', compact('employee', 'position', 'letter'));*/
+            
+            return view('employees.salaryslip');
+	}
 }
