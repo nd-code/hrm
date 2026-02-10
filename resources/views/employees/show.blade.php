@@ -372,21 +372,32 @@
 		});
 
 		function makeInlineEditable(element) {
-			element.addEventListener('click', () => {
-				const currentValue = element.textContent.trim();
-				const field = element.dataset.field;
-				const id = element.dataset.id;
-				const input = document.createElement('input');
+                    element.addEventListener('click', () => {
+                        let currentValue = element.textContent.trim();
 
-				input.type = 'text';
-				input.value = currentValue;
-				input.className = 'border p-1 w-full';
-				element.replaceWith(input);
-				input.focus();
+                        // ✅ Clear placeholder text
+                        if (currentValue === 'Add here....') {
+                            currentValue = '';
+                        }
 
-				input.addEventListener('blur', () => saveInlineEdit(input, element, id, field, currentValue));
-			});
-		}
+                        const field = element.dataset.field;
+                        const id = element.dataset.id;
+                        const input = document.createElement('input');
+
+                        // Optional: numeric fields
+                        input.type = ['salary', 'tds', 'pt'].includes(field) ? 'number' : 'text';
+                        input.step = '0.01';
+                        input.value = currentValue;
+                        input.className = 'border p-1 w-full';
+
+                        element.replaceWith(input);
+                        input.focus();
+
+                        input.addEventListener('blur', () =>
+                            saveInlineEdit(input, element, id, field, currentValue)
+                        );
+                    });
+                }
 
 		function makeInlineTextareaEditable(element) {
 			element.addEventListener('click', () => {
