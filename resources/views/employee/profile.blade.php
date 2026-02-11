@@ -32,32 +32,29 @@ use App\Models\Position;
                             </td>
                         </tr>
                     @endforeach
-					<!--<tr>
-						<th class="border p-2 text-left">Documents</th>
-						<td class="border p-2">
-							<div id="documents-loading" class="hidden mb-2">
-								<svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-								</svg>
-								Uploading...
-							</div>
-							
-							<div id="documents-list" class="mb-2 text-sm">
-								Loading...
-							</div>
 
-							<input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
-							<button type="button" onclick="document.getElementById('document-upload').click()"
-								class="bg-blue-500 text-white px-3 py-1 rounded">
-								Upload Document
-							</button>
-						</td>
-					</tr>
-					<tr>
-						<th class="border p-2 text-left">Relieving Letter</th>
-						<td class="border p-2"><a target="_blank" href="{{ route('employees.relieving-letter', $employee->id) }}"><button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button></a></td>
-					</tr>-->
+                    <tr>
+                            <th class="border p-2 text-left">Documents</th>
+                            <td class="border p-2">
+                                <div id="documents-loading" class="hidden mb-2 d-none">
+                                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                        </svg>
+                                        Uploading...
+                                </div>
+
+                                <div id="documents-list" class="mb-2 text-sm">
+                                        Loading...
+                                </div>
+
+                                <input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
+                                <button type="button" onclick="document.getElementById('document-upload').click()"
+                                        class="bg-blue-500 text-white px-3 py-1 rounded d-none">
+                                        Upload Document
+                                </button>
+                            </td>
+                    </tr>
                 </table>
 
                 <!--<a href="{{ route('employees.index') }}" 
@@ -150,44 +147,11 @@ use App\Models\Position;
 		document.addEventListener('DOMContentLoaded', () => {
 			loadEmployeeDocuments({{ $employee->id }});
 
-			const fileInput = document.getElementById('document-upload');
 			const loadingIndicator = document.getElementById('documents-loading');
-
-			fileInput.addEventListener('change', function () {
-				if (this.files.length === 0) return;
-
-				loadingIndicator.classList.remove('hidden'); // Show loading
-				const formData = new FormData();
-				for (const file of this.files) {
-					formData.append('documents[]', file);
-				}
-
-				fetch(`/employees/{{ $employee->id }}/upload-documents`, {
-					method: 'POST',
-					headers: {
-						'X-CSRF-TOKEN': '{{ csrf_token() }}'
-					},
-					body: formData
-				})
-				.then(response => response.json())
-				.then(data => {
-					loadingIndicator.classList.add('hidden'); // Hide loading
-					if (data.success) {
-						loadEmployeeDocuments({{ $employee->id }});
-					} else {
-						alert('Failed to upload files.');
-					}
-					fileInput.value = ''; // Reset input
-				})
-				.catch(() => {
-					loadingIndicator.classList.add('hidden'); // Hide on error
-					alert('An error occurred during upload.');
-				});
-			});
 		});
 
 		function loadEmployeeDocuments(employeeId) {
-			fetch(`/employees/${employeeId}/documents`)
+			fetch(`/employee/${employeeId}/documents`)
 				.then(response => response.json())
 				.then(data => {
 					const container = document.getElementById('documents-list');
@@ -214,39 +178,12 @@ use App\Models\Position;
 							downloadBtn.className = 'ml-2 text-green-600 hover:text-green-800';
 							downloadBtn.style.cursor = 'pointer';
 
-							// Delete button
-							const deleteBtn = document.createElement('button');
-							deleteBtn.textContent = '🗑️';
-							deleteBtn.className = 'ml-2 text-red-600 hover:text-red-800';
-							deleteBtn.style.cursor = 'pointer';
-							deleteBtn.addEventListener('click', () => deleteDocument(employeeId, doc.id));
-
 							wrapper.appendChild(link);
-							wrapper.appendChild(downloadBtn); // Added before delete
-							wrapper.appendChild(deleteBtn);
+							wrapper.appendChild(downloadBtn);
 							container.appendChild(wrapper);
 						});
 					}
 				});
-		}
-
-		function deleteDocument(employeeId, documentId) {
-			if (!confirm('Are you sure you want to delete this document?')) return;
-
-			fetch(`/employees/${employeeId}/documents/${documentId}`, {
-				method: 'DELETE',
-				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}'
-				}
-			})
-			.then(response => response.json())
-			.then(data => {
-				if (data.success) {
-					loadEmployeeDocuments(employeeId);
-				} else {
-					alert('Failed to delete document.');
-				}
-			});
 		}
     </script>
 	

@@ -134,6 +134,10 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/leaves/{id}/reply', [LeaveController::class, 'addReply'])->name('employee.leave.reply');
     
     Route::get('/employee/work/export-pdf', [EmployeeWorkController::class, 'exportPdf'])->name('employee.work.export.pdf');
+    
+    Route::post('/employee/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
+    Route::get('/employee/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
+    Route::delete('/employee/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
 });
 
 Route::middleware('auth')->group(function () {
