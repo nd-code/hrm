@@ -140,25 +140,36 @@
                                 </table>
                             </div>
 
-                            <!-- Employees on Leave -->
-                            <div>
-                                <h3 class="text-lg font-semibold mb-3">🕒 Team Members on Leave Today</h3>
-                                <table class="w-full border">
-                                    <thead>
-                                        <tr class="bg-gray-100">
-                                            <th class="px-4 py-2 border">Employee</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($teamLeaves as $leave)
-                                            <tr>
-                                                <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $session->employee->id) }}">{{ $leave->employee->name }}</a></td>
-                                            </tr>
-                                        @empty
-                                            <tr><td colspan="2" class="px-4 py-2 border">No team members on leave today.</td></tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                            {{-- ============================= --}}
+                            {{-- Notifications Section --}}
+                            {{-- ============================= --}}
+
+                            @php
+                                $latestNotifications = auth('employee')->user()
+                                    ->notifications()
+                                    ->latest()
+                                    ->take(5)
+                                    ->get();
+                            @endphp
+
+                            <div class="w-100 space-y-2 p-3 mb-0 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
+                                <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+                                @if($latestNotifications->count())
+                                    <ul class="">
+                                        @foreach ($latestNotifications as $note)
+                                            <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
+                                                <span class="text-gray-800 font-medium">
+                                                    {{ $note->data['message'] ?? '' }}
+                                                </span> <br>
+                                                <span class="text-xs text-gray-500 ml-auto timeNotification ">
+                                                    {{ $note->created_at->diffForHumans() }}
+                                                </span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="text-gray-600">No notification 🎉</p>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -167,7 +178,28 @@
                     {{-- Reminders + Notifications Section --}}
                     {{-- ============================= --}}
 
-                    <div class="flex items-start gap-6 mt-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <!-- Employees on Leave -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">🕒 Team Members on Leave Today</h3>
+                            <table class="w-full border">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="px-4 py-2 border">Employee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($teamLeaves as $leave)
+                                        <tr>
+                                            <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $session->employee->id) }}">{{ $leave->employee->name }}</a></td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="2" class="px-4 py-2 border">No team members on leave today.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
                         {{-- ============================= --}}
                         {{-- Reminders Section --}}
                         {{-- ============================= --}}
@@ -180,7 +212,7 @@
                                 ->get();
                         @endphp
 
-                        <div class="w-1/2 p-3 mb-0 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800">
+                        <div class="w-100 p-3 mb-0 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800">
                             <h3 class="text-lg font-semibold mb-3">📝 Reminders</h3>
 
                             @if($todayReminders->count())
@@ -213,38 +245,6 @@
                                 </table>
                             @else
                                 <p class="text-gray-600">No reminder 🎉</p>
-                            @endif
-                        </div>
-
-                        {{-- ============================= --}}
-                        {{-- Notifications Section --}}
-                        {{-- ============================= --}}
-
-                        @php
-                            $latestNotifications = auth('employee')->user()
-                                ->notifications()
-                                ->latest()
-                                ->take(5)
-                                ->get();
-                        @endphp
-
-                        <div class="w-1/2 space-y-2 p-3 mb-0 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
-                            <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
-                            @if($latestNotifications->count())
-                                <ul class="">
-                                    @foreach ($latestNotifications as $note)
-                                        <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
-                                            <span class="text-gray-800 font-medium">
-                                                {{ $note->data['message'] ?? '' }}
-                                            </span> <br>
-                                            <span class="text-xs text-gray-500 ml-auto timeNotification ">
-                                                {{ $note->created_at->diffForHumans() }}
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-gray-600">No notification 🎉</p>
                             @endif
                         </div>
                     </div>

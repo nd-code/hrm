@@ -135,9 +135,12 @@ Route::middleware(['auth:employee'])->group(function () {
     
     Route::get('/employee/work/export-pdf', [EmployeeWorkController::class, 'exportPdf'])->name('employee.work.export.pdf');
     
-    Route::post('/employee/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employees.upload-documents');
-    Route::get('/employee/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employees.documents');
-    Route::delete('/employee/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.delete');
+    Route::post('/employee/{id}/upload-documents', [EmployeeController::class, 'uploadDocuments'])->name('employee.upload-documents');
+    Route::get('/employee/{id}/documents', [EmployeeController::class, 'getDocuments'])->name('employee.documents');
+    Route::delete('/employee/{employeeId}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('employee.documents.delete');
+    
+    Route::post('/employee/{id}/upload-photo', [EmployeeController::class, 'uploadPhoto'])->name('employee.upload-photo');
+    Route::delete('/employee/{id}/delete-photo', [EmployeeController::class, 'deletePhoto'])->name('employee.delete-photo');
 });
 
 Route::middleware('auth')->group(function () {

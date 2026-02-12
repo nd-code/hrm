@@ -179,8 +179,17 @@
                         @else
                             <li>
                                 <a href="{{ route('employee.profile') }}"
-                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-regular fa-id-card me-2 text-indigo-400"></i> <span class="navText">My Details</span>
+                                   class="flex items-center px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.profile') ? 'bg-gray-700' : '' }}">
+
+                                    {{-- Profile Image or Default Icon --}}
+                                    @if(auth()->user()->profile_photo)
+                                        <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                                             class="w-6 h-6 rounded-full object-cover me-2 border">
+                                    @else
+                                        <i class="fa-regular fa-id-card me-2 text-indigo-400"></i>
+                                    @endif
+
+                                    <span class="navText">My Details</span>
                                 </a>
                             </li>
                         @endif

@@ -208,202 +208,239 @@ class EmployeeController extends Controller
         return view('employees.relieving', compact('employee'));
     }
 	
-	public function profile()
-	{
-		$employee = auth()->user(); // logged-in employee
+    public function profile()
+    {
+            $employee = auth()->user(); // logged-in employee
 
-		return view('employee.profile', compact('employee'));
-	}
-        
-        public function details(Request $request, $id)
-        {
-            $employee = Employee::findOrFail($id);
+            return view('employee.profile', compact('employee'));
+    }
 
-            $sessions = WorkSession::where('employee_id', $id)
-                ->orderBy('id', 'desc')
-                ->get();
+    public function details(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
 
-            // Selected year (default = current year)
-            $year = $request->year ?? now()->year;
+        $sessions = WorkSession::where('employee_id', $id)
+            ->orderBy('id', 'desc')
+            ->get();
 
-            // All leaves (for table)
-            $leaves = Leave::where('employee_id', $id)
-                ->whereYear('from_date', $year)
-                ->orderBy('id', 'desc')
-                ->get();
+        // Selected year (default = current year)
+        $year = $request->year ?? now()->year;
 
-            // Approved leaves
-            $approvedLeaves = $leaves->filter(fn ($leave) =>
-                strtolower($leave->status) === 'approved'
-            );
+        // All leaves (for table)
+        $leaves = Leave::where('employee_id', $id)
+            ->whereYear('from_date', $year)
+            ->orderBy('id', 'desc')
+            ->get();
 
-            // LWP leaves
-            $lwpLeaves = $leaves->filter(fn ($leave) =>
-                strtolower($leave->status) === 'lwp'
-            );
+        // Approved leaves
+        $approvedLeaves = $leaves->filter(fn ($leave) =>
+            strtolower($leave->status) === 'approved'
+        );
 
-            // Total approved leaves
-            $totalLeaves = 0;
-            $totalLwp = 0;
+        // LWP leaves
+        $lwpLeaves = $leaves->filter(fn ($leave) =>
+            strtolower($leave->status) === 'lwp'
+        );
 
-            foreach ($approvedLeaves as $leave) {
-                $days = $this->calculateLeaveDays($leave);
-                $leave->days = $days;
-                $totalLeaves += $days;
-            }
+        // Total approved leaves
+        $totalLeaves = 0;
+        $totalLwp = 0;
 
-            foreach ($lwpLeaves as $leave) {
-                $days = $this->calculateLeaveDays($leave);
-                $leave->days = $days;
-                $totalLwp += $days;
-            }
-
-            // Month-wise approved leaves
-            $monthWiseApproved = $approvedLeaves
-                ->groupBy(fn ($leave) =>
-                    Carbon::parse($leave->from_date)->format('Y-m')
-                )
-                ->map(fn ($group) => $group->sum('days'));
-            
-            // Month-wise LWP leaves
-            $monthWiseLwp = $lwpLeaves
-                ->groupBy(fn ($leave) =>
-                    Carbon::parse($leave->from_date)->format('Y-m')
-                )
-                ->map(fn ($group) => $group->sum('days'));
-
-            // Years for dropdown (last 5 years)
-            $years = range(now()->year, now()->year - 5);
-
-            $positions = Position::orderBy('id')->get();
-
-            return view('employees.show', compact(
-                'employee',
-                'sessions',
-                'leaves',
-                'totalLeaves',
-                'totalLwp',
-                'monthWiseApproved',
-                'monthWiseLwp',
-                'positions',
-                'year',
-                'years'
-            ));
+        foreach ($approvedLeaves as $leave) {
+            $days = $this->calculateLeaveDays($leave);
+            $leave->days = $days;
+            $totalLeaves += $days;
         }
-        
-        public function attendanceFilter(Request $request, $id)
-        {
-            $query = WorkSession::where('employee_id', $id);
 
-            if ($request->from_date) {
-                $query->whereDate('work_date', '>=', $request->from_date);
-            }
-
-            if ($request->to_date) {
-                $query->whereDate('work_date', '<=', $request->to_date);
-            }
-
-            // DataTables parameters
-            $draw   = $request->get('draw');
-            $start  = $request->get('start');
-            $length = $request->get('length');
-
-            $recordsTotal = $query->count();
-
-            // Fetch paginated data
-            $rows = $query
-                ->orderBy('id', 'desc')
-                ->skip($start)
-                ->take($length)
-                ->get();
-
-            // Format data manually
-            $data = [];
-
-            foreach ($rows as $row) {
-
-                // Format dates
-                $workDate = $row->work_date
-                    ? \Carbon\Carbon::parse($row->work_date)->format('d-m-Y')
-                    : '-';
-
-                $online = $row->start_time
-                    ? \Carbon\Carbon::parse($row->start_time)->format('h:i A')
-                    : '-';
-
-                $offline = $row->end_time
-                    ? \Carbon\Carbon::parse($row->end_time)->format('h:i A')
-                    : '-';
-
-                // Calculate total hours
-                if ($row->start_time && $row->end_time) {
-                    $start = \Carbon\Carbon::parse($row->start_time);
-                    $end   = \Carbon\Carbon::parse($row->end_time);
-                    $total = gmdate('H:i:s', $end->diffInSeconds($start));
-                } else {
-                    $total = '-';
-                }
-
-                $data[] = [
-                    'id'           => $row->id,
-                    'work_date'    => $workDate,
-                    'online'       => $online,
-                    'offline'      => $offline,
-                    'total'        => $total,
-                    'project_name' => $row->project_name,
-                    'comment'      => $row->comment,
-                ];
-            }
-
-            // Return DataTables JSON format
-            return response()->json([
-                'draw'            => intval($draw),
-                'recordsTotal'    => $recordsTotal,
-                'recordsFiltered' => $recordsTotal,
-                'data'            => $data
-            ]);
+        foreach ($lwpLeaves as $leave) {
+            $days = $this->calculateLeaveDays($leave);
+            $leave->days = $days;
+            $totalLwp += $days;
         }
-        
-        public function attendanceExportPdf(Request $request, $id)
-        {
-            $query = WorkSession::where('employee_id', $id);
 
-            if ($request->from_date)
-                $query->whereDate('work_date', '>=', $request->from_date);
+        // Month-wise approved leaves
+        $monthWiseApproved = $approvedLeaves
+            ->groupBy(fn ($leave) =>
+                Carbon::parse($leave->from_date)->format('Y-m')
+            )
+            ->map(fn ($group) => $group->sum('days'));
 
-            if ($request->to_date)
-                $query->whereDate('work_date', '<=', $request->to_date);
+        // Month-wise LWP leaves
+        $monthWiseLwp = $lwpLeaves
+            ->groupBy(fn ($leave) =>
+                Carbon::parse($leave->from_date)->format('Y-m')
+            )
+            ->map(fn ($group) => $group->sum('days'));
 
-            $data = $query->orderBy('id', 'desc')->get();
+        // Years for dropdown (last 5 years)
+        $years = range(now()->year, now()->year - 5);
 
-            $employee = Employee::find($id);
+        $positions = Position::orderBy('id')->get();
 
-            $pdf = \PDF::loadView('pdf.attendances', compact('data', 'employee'))
-                        ->setPaper('a4', 'portrait');
+        return view('employees.show', compact(
+            'employee',
+            'sessions',
+            'leaves',
+            'totalLeaves',
+            'totalLwp',
+            'monthWiseApproved',
+            'monthWiseLwp',
+            'positions',
+            'year',
+            'years'
+        ));
+    }
 
-            return $pdf->download('attendance-report-' . now()->format('Y-m-d') . '.pdf');
+    public function attendanceFilter(Request $request, $id)
+    {
+        $query = WorkSession::where('employee_id', $id);
+
+        if ($request->from_date) {
+            $query->whereDate('work_date', '>=', $request->from_date);
         }
-        
-        private function calculateLeaveDays($leave)
-        {
-            if (strtolower($leave->leave_type) === 'half day leave') {
-                return 0.5;
+
+        if ($request->to_date) {
+            $query->whereDate('work_date', '<=', $request->to_date);
+        }
+
+        // DataTables parameters
+        $draw   = $request->get('draw');
+        $start  = $request->get('start');
+        $length = $request->get('length');
+
+        $recordsTotal = $query->count();
+
+        // Fetch paginated data
+        $rows = $query
+            ->orderBy('id', 'desc')
+            ->skip($start)
+            ->take($length)
+            ->get();
+
+        // Format data manually
+        $data = [];
+
+        foreach ($rows as $row) {
+
+            // Format dates
+            $workDate = $row->work_date
+                ? \Carbon\Carbon::parse($row->work_date)->format('d-m-Y')
+                : '-';
+
+            $online = $row->start_time
+                ? \Carbon\Carbon::parse($row->start_time)->format('h:i A')
+                : '-';
+
+            $offline = $row->end_time
+                ? \Carbon\Carbon::parse($row->end_time)->format('h:i A')
+                : '-';
+
+            // Calculate total hours
+            if ($row->start_time && $row->end_time) {
+                $start = \Carbon\Carbon::parse($row->start_time);
+                $end   = \Carbon\Carbon::parse($row->end_time);
+                $total = gmdate('H:i:s', $end->diffInSeconds($start));
+            } else {
+                $total = '-';
             }
 
-            return \Carbon\Carbon::parse($leave->from_date)
-                ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+            $data[] = [
+                'id'           => $row->id,
+                'work_date'    => $workDate,
+                'online'       => $online,
+                'offline'      => $offline,
+                'total'        => $total,
+                'project_name' => $row->project_name,
+                'comment'      => $row->comment,
+            ];
         }
-        
-        public function salarySlip($id)
-	{
-            /*$employee = Employee::findOrFail($id);
 
-            $position = Position::where('id', $employee->position)->first();
+        // Return DataTables JSON format
+        return response()->json([
+            'draw'            => intval($draw),
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsTotal,
+            'data'            => $data
+        ]);
+    }
 
-            $letter = \App\Models\AppointmentLetter::where('employee_id', $employee->id)->first();
+    public function attendanceExportPdf(Request $request, $id)
+    {
+        $query = WorkSession::where('employee_id', $id);
 
-            return view('employees.appointment', compact('employee', 'position', 'letter'));*/
-            
-            return view('employees.salaryslip');
-	}
+        if ($request->from_date)
+            $query->whereDate('work_date', '>=', $request->from_date);
+
+        if ($request->to_date)
+            $query->whereDate('work_date', '<=', $request->to_date);
+
+        $data = $query->orderBy('id', 'desc')->get();
+
+        $employee = Employee::find($id);
+
+        $pdf = \PDF::loadView('pdf.attendances', compact('data', 'employee'))
+                    ->setPaper('a4', 'portrait');
+
+        return $pdf->download('attendance-report-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    private function calculateLeaveDays($leave)
+    {
+        if (strtolower($leave->leave_type) === 'half day leave') {
+            return 0.5;
+        }
+
+        return \Carbon\Carbon::parse($leave->from_date)
+            ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
+    }
+
+    public function salarySlip($id)
+    {
+        /*$employee = Employee::findOrFail($id);
+
+        $position = Position::where('id', $employee->position)->first();
+
+        $letter = \App\Models\AppointmentLetter::where('employee_id', $employee->id)->first();
+
+        return view('employees.appointment', compact('employee', 'position', 'letter'));*/
+
+        return view('employees.salaryslip');
+    }
+
+    public function uploadPhoto(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        // Delete old photo if exists
+        if ($employee->profile_photo && Storage::exists($employee->profile_photo)) {
+            Storage::delete($employee->profile_photo);
+        }
+
+        $path = $request->file('profile_photo')
+                        ->store('employee_photos', 'public');
+
+        $employee->profile_photo = $path;
+        $employee->save();
+
+        return back()->with('success', 'Profile photo updated.');
+    }
+    
+    public function deletePhoto($id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        if ($employee->profile_photo &&
+            Storage::disk('public')->exists($employee->profile_photo)) {
+            Storage::disk('public')->delete($employee->profile_photo);
+        }
+
+        $employee->profile_photo = null;
+        $employee->save();
+
+        return redirect()->back()->with('success', 'Profile photo deleted successfully.');
+    }
 }

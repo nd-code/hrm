@@ -13,6 +13,53 @@ use App\Models\Position;
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
 
                 <h3 class="text-lg font-bold mb-4">My Details</h3>
+                
+                <div class="flex flex-col items-center mb-6">
+
+                    <div class="relative group">
+                        <img id="profilePreview"
+                            src="{{ $employee->profile_photo 
+                                    ? asset('storage/'.$employee->profile_photo) 
+                                    : asset('images/default-avatar.png') }}"
+                            class="w-32 h-32 rounded-full object-cover border shadow">
+
+                        <!-- Change Button -->
+                        <button onclick="document.getElementById('photoInput').click()"
+                            class="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full text-xs">
+                            ✏️
+                        </button>
+                    </div>
+
+                    <!-- Upload Form -->
+                    <form id="photoForm"
+                          action="{{ route('employee.upload-photo', $employee->id) }}"
+                          method="POST"
+                          enctype="multipart/form-data"
+                          class="mt-3">
+                        @csrf
+                        <input type="file" name="profile_photo"
+                               id="photoInput"
+                               accept="image/*"
+                               class="hidden"
+                               onchange="previewAndSubmit(event)">
+                    </form>
+
+                    <!-- Delete Button (only if photo exists) -->
+                    @if($employee->profile_photo)
+                        <form action="{{ route('employee.delete-photo', $employee->id) }}"
+                              method="POST"
+                              class="mt-2"
+                              onsubmit="return confirm('Are you sure you want to delete profile picture?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="text-red-600 text-sm hover:underline">
+                                <i class="fa-solid fa-trash me-2 text-indigo-400"></i>
+                            </button>
+                        </form>
+                    @endif
+
+                </div>
 
                 <table class="w-full border-collapse border border-gray-300 mb-4">
                     @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details'] as $field)
@@ -113,7 +160,7 @@ use App\Models\Position;
 			const newValue = inputElement.value.trim();
 			const displayValue = newValue || 'Add here....'; // Show placeholder if empty
 			if (newValue !== oldValue) {
-				fetch(`/employees/${id}/inline-update`, {
+				fetch(`/employee/${id}/inline-update`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -138,7 +185,7 @@ use App\Models\Position;
 		
 		// Inline update
 		function updateField(id, field, value) {
-			$.post(`/employees/${id}/inline-update`, {
+			$.post(`/employee/${id}/inline-update`, {
 				_token: '{{ csrf_token() }}',
 				[field]: value
 			});
@@ -186,6 +233,18 @@ use App\Models\Position;
 				});
 		}
     </script>
+        
+        <script>
+        function previewAndSubmit(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                document.getElementById('profilePreview').src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+
+            document.getElementById('photoForm').submit();
+        }
+        </script>
 	
 	<style>
 		.joining-date-input {

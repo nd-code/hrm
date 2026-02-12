@@ -97,7 +97,7 @@
 		  .detail { border: none; }
 	  }
 	  /*.detail[contenteditable="true"] {
-		  border: 1px dashed #999; /* visible only on screen */
+		  border: 1px dashed #999;
 		  padding: 5px;
 	  }*/
 	</style>

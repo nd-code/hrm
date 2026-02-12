@@ -45,6 +45,7 @@
                         <thead>
                             <tr>
                                 <th style="display:none;">ID</th> <!-- Added ID Column -->
+                                <th>Profile</th>
                                 <th>Name</th>
                                 <th>Email</th>
 								<th>Employee ID</th>
@@ -59,6 +60,12 @@
                             @foreach($employees as $emp)
                             <tr data-id="{{ $emp->id }}">
                                 <td style="display:none;">{{ $emp->id }}</td> <!-- ID Cell -->
+                                <td>
+                                    <img src="{{ $emp->profile_photo 
+                                                ? asset('storage/'.$emp->profile_photo) 
+                                                : asset('images/default-avatar.png') }}"
+                                         class="w-10 h-10 rounded-full object-cover me-2 border">
+                                </td>
                                 <td contenteditable="true" onBlur="updateField({{ $emp->id }}, 'name', this.innerText)">
                                     {{ $emp->name }}
                                 </td>
