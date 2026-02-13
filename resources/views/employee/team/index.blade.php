@@ -70,7 +70,8 @@
                                 <thead>
                                     <tr>
                                         <th style="display:none;">ID</th>
-                                        <th>Employee Name</th>
+                                        <th>Profile</th>
+                                        <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>Action</th>
@@ -80,6 +81,12 @@
                                     @foreach($teamEmployees as $teamEmp)
                                     <tr data-id="{{ $teamEmp->id }}">
                                         <td style="display:none;">{{ $teamEmp->id }}</td>
+                                        <td>
+                                            <img src="{{ $emp->profile_photo 
+                                                        ? asset('storage/'.$emp->profile_photo) 
+                                                        : asset('images/default-avatar.png') }}"
+                                                 class="w-10 h-10 rounded-full object-cover me-2 border">
+                                        </td>
                                         <td><a style="text-decoration: underline;" href="{{ route('employee.details', $teamEmp->employee->id) }}">{{ $teamEmp->employee->name }}</a></td>
                                         <td>{{ $teamEmp->employee->email }}</td>
                                         <td>{{ $teamEmp->employee->phone }}</td>
