@@ -141,7 +141,7 @@
                                                 <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($session->start_time)->format('h:i A') }}</td>
                                             </tr>
                                         @empty
-                                            <tr><td colspan="2" class="px-4 py-2 border">No team members online.</td></tr>
+                                            <tr><td colspan="4" class="px-4 py-2 border">No team members online.</td></tr>
                                         @endforelse
                                     </tbody>
                                 </table>

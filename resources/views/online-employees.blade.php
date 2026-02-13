@@ -17,5 +17,5 @@
         </tr>
     @endforeach
 @else
-    <tr><td class="px-4 py-2 border" colspan="3">No employees are online.</td></tr>
+    <tr><td class="px-4 py-2 border" colspan="4">No employees are online.</td></tr>
 @endif

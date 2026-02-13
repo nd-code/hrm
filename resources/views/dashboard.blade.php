@@ -81,7 +81,7 @@
                         </thead>
                         <tbody>
                             @if($employeesOnLeave->isEmpty())
-                                <tr><td class="px-4 py-2 border">No employees are on leave today.</td></tr>
+                                <tr><td colspan="2" class="px-4 py-2 border">No employees are on leave today.</td></tr>
                             @else
                                 @foreach($employeesOnLeave as $leave)
                                     <tr>
