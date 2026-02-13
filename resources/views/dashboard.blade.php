@@ -54,7 +54,8 @@
                     <table class="w-full border">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-2 border">Employee</th>
+                                <th class="px-4 py-2 border">Profile</th>
+                                <th class="px-4 py-2 border">Name</th>
                                 <th class="px-4 py-2 border">Date</th>
                                 <th class="px-4 py-2 border">Start Time</th>
                             </tr>
@@ -74,7 +75,8 @@
                     <table class="w-full border">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-2 border">Employee Name</th>
+                                <th class="px-4 py-2 border" width="19%">Profile</th>
+                                <th class="px-4 py-2 border" width="81%">Name</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,6 +85,12 @@
                             @else
                                 @foreach($employeesOnLeave as $leave)
                                     <tr>
+                                        <td class="px-4 py-2 border">
+                                            <img src="{{ $leave->employee->profile_photo 
+                                                    ? asset('storage/'.$leave->employee->profile_photo) 
+                                                    : asset('images/default-avatar.png') }}"
+                                             class="w-10 h-10 rounded-full object-cover me-2 border">
+                                        </td>
                                         <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employees.show', $leave->employee->id) }}">{{ $leave->employee->name }}</a></td>
                                     </tr>
                                 @endforeach
