@@ -205,7 +205,7 @@
                                                         : asset('images/default-avatar.png') }}"
                                                  class="w-10 h-10 rounded-full object-cover me-2 border">
                                             </td>
-                                            <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $session->employee->id) }}">{{ $leave->employee->name }}</a></td>
+                                            <td class="px-4 py-2 border"><a style="text-decoration: underline;" href="{{ route('employee.details', $leave->employee->id) }}">{{ $leave->employee->name }}</a></td>
                                         </tr>
                                     @empty
                                         <tr><td colspan="2" class="px-4 py-2 border">No team members on leave today.</td></tr>
