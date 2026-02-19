@@ -43,7 +43,19 @@
                         <table class="w-full border-collapse border border-gray-300 mb-4">
                             @foreach (['name', 'email', 'employee_id', 'phone', 'position', 'pan_number', 'address', 'joining_date', 'bank_details', 'salary', 'tds', 'pt'] as $field)
                                 <tr>
-                                    <th class="border p-2 text-left capitalize">{{ str_replace('_', ' ', $field) }}</th>
+                                    <th class="border p-2 text-left capitalize">
+                                        @if ($field === 'tds')
+                                            Tax Deducted at Source
+                                        @elseif ($field === 'pt')
+                                            Professional Tax
+                                        @else
+                                            {{ str_replace('_', ' ', $field) }}
+                                        @endif
+
+                                        @if (in_array($field, ['salary', 'tds', 'pt']))
+                                            <span style="text-transform: capitalize; font-size: 12px;">(Per Month)</span>
+                                        @endif
+                                    </th>
                                     <td class="border p-2">
                                         @if ($field === 'joining_date')
                                             <input
@@ -67,11 +79,20 @@
                                                 @endforeach
                                             </select>
                                         @elseif (in_array($field, ['salary', 'tds', 'pt']))
-                                            <span class="editable"
-                                                  data-field="{{ $field }}"
-                                                  data-id="{{ $employee->id }}">
-                                                {{ $employee->$field ?? 'Add here....' }}
+                                            @php
+                                                $value = number_format($employee->$field, 2);
+                                                $parts = explode('.', $value);
+                                                $masked = str_repeat('X', strlen($parts[0])) . '.' . str_repeat('X', strlen($parts[1]));
+                                            @endphp
+
+                                            <span id="masked-{{ $field }}-{{ $employee->id }}">
+                                                {{ $masked }}
                                             </span>
+
+                                            <button type="button"
+                                                    onclick="verifyPassword('{{ $field }}', {{ $employee->id }})" id="viewButton-{{ $field }}-{{ $employee->id }}">
+                                                👁
+                                            </button>
                                         @else
                                             <span class="editable"
                                                 data-field="{{ $field }}"
@@ -338,6 +359,26 @@
                 @endif
             </div>
 
+        </div>
+    </div>
+    
+    <!-- Password Modal -->
+    <div id="passwordModal" style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.5);
+        justify-content:center;
+        align-items:center;
+    ">
+        <div style="background:#fff; padding:20px; border-radius:8px; width:300px;">
+            <input type="password" id="confirmPassword" class="form-control" placeholder="Enter Password">
+            <br>
+            <button onclick="submitPassword()" class="btn btn-primary btn-sm">Submit</button>
+            <button onclick="closeModal()" class="btn btn-secondary btn-sm">Cancel</button>
         </div>
     </div>
 
@@ -637,4 +678,50 @@
         #workTable tr.even { background-color: #ffffff; }
         #leaveTable{width: 100% !important;}
     </style>
+    
+    <script>
+        let currentField = null;
+        let currentId = null;
+
+        function verifyPassword(field, id) {
+            currentField = field;
+            currentId = id;
+
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function submitPassword() {
+            let password = document.getElementById('confirmPassword').value;
+
+            fetch("{{ route('employees.verify.salary.password') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    password: password,
+                    field: currentField,
+                    id: currentId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('masked-' + currentField + '-' + currentId)
+                        .innerText = data.value;
+
+                    closeModal();
+                    document.getElementById('viewButton-' + currentField + '-' + currentId).style.display = 'none';
+                } else {
+                    alert("Wrong password");
+                }
+            });
+        }
+    </script>
 </x-app-layout>

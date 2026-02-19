@@ -2,14 +2,14 @@
 
     <p>
         We are pleased to appoint you as
-        Part-time <b>Sr. Digital Marketing Manager</b>
+        Part-time <b>{{ $position->name }}</b>
         in our establishment with effect from
         <b>{{ now()->format('jS F Y') }}</b>.
     </p>
 
     <ol>
         <li>
-            You will be paid a fixed <b>Rs. 31,500/-</b> as CTC per Month. This may be changed from time to time as per establishment rules from time to time. TDS & Professional Tax will be deducted based on your investment details and Indian taxation system from your CTC.
+            You will be paid a fixed <b>Rs. {{ $employee->salary }}/-</b> as CTC per Month. This may be changed from time to time as per establishment rules from time to time. TDS & Professional Tax will be deducted based on your investment details and Indian taxation system from your CTC.
         </li>
 
         <li>

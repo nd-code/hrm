@@ -13,6 +13,8 @@ use App\Models\Leave;
 use Carbon\Carbon;
 use App\Models\Position;
 use App\Services\RecycleBinService;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -442,5 +444,19 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->back()->with('success', 'Profile photo deleted successfully.');
+    }
+    
+    public function verifyPassword(Request $request)
+    {
+        if (!Hash::check($request->password, Auth::user()->password)) {
+            return response()->json(['success' => false]);
+        }
+
+        $employee = Employee::findOrFail($request->id);
+
+        return response()->json([
+            'success' => true,
+            'value' => number_format($employee->{$request->field}, 2)
+        ]);
     }
 }

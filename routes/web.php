@@ -79,6 +79,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/employees/{id}/appointment-letter/save', [AppointmentLetterController::class, 'save'])->name('employees.appointment-letter.save');
     
     Route::get('/employees/{id}/salary-slip', [EmployeeController::class, 'salarySlip'])->name('employees.salary-slip');
+    
+    Route::post('/employees/verify-salary-password', [EmployeeController::class, 'verifyPassword'])->name('employees.verify.salary.password');
 });
 
 // Admin Auth (Breeze)
