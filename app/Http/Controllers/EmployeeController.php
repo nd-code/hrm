@@ -396,17 +396,14 @@ class EmployeeController extends Controller
             ->diffInDays(\Carbon\Carbon::parse($leave->to_date)) + 1;
     }
 
-    public function salarySlip($id)
+    public function salarySlip(Request $request, $id)
     {
-        /*$employee = Employee::findOrFail($id);
+        $employee = Employee::findOrFail($id);
 
-        $position = Position::where('id', $employee->position)->first();
+        $month = $request->month ?? date('m');
+        $year  = $request->year ?? date('Y');
 
-        $letter = \App\Models\AppointmentLetter::where('employee_id', $employee->id)->first();
-
-        return view('employees.appointment', compact('employee', 'position', 'letter'));*/
-
-        return view('employees.salaryslip');
+        return view('employees.salaryslip', compact('employee', 'month', 'year'));
     }
 
     public function uploadPhoto(Request $request, $id)

@@ -78,21 +78,41 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        @elseif (in_array($field, ['salary', 'tds', 'pt']))
+                                        @elseif (in_array($field, ['salary', 'tds']))
                                             @php
-                                                $value = number_format($employee->$field, 2);
-                                                $parts = explode('.', $value);
-                                                $masked = str_repeat('X', strlen($parts[0])) . '.' . str_repeat('X', strlen($parts[1]));
+                                                $rawValue = $employee->$field;
+
+                                                if ($rawValue !== null) {
+                                                    $formatted = number_format($rawValue, 2);
+                                                    $parts = explode('.', $formatted);
+                                                    $masked = str_repeat('X', strlen($parts[0])) . '.' . str_repeat('X', strlen($parts[1]));
+                                                } else {
+                                                    $masked = 'Add here....';
+                                                }
                                             @endphp
 
-                                            <span id="masked-{{ $field }}-{{ $employee->id }}">
+                                            <span class="editable"
+                                                  id="masked-{{ $field }}-{{ $employee->id }}"
+                                                  data-field="{{ $field }}"
+                                                  data-id="{{ $employee->id }}"
+                                                  data-original="{{ $rawValue }}">
                                                 {{ $masked }}
                                             </span>
 
-                                            <button type="button"
-                                                    onclick="verifyPassword('{{ $field }}', {{ $employee->id }})" id="viewButton-{{ $field }}-{{ $employee->id }}">
-                                                👁
-                                            </button>
+                                            <!-- View Button -->
+                                            @if($rawValue !== null)
+                                                <button type="button"
+                                                        onclick="verifyPassword('{{ $field }}', {{ $employee->id }})"
+                                                        id="viewButton-{{ $field }}-{{ $employee->id }}" title="View {{ $field }}">
+                                                    👁
+                                                </button>
+                                            @endif
+                                        @elseif (in_array($field, ['pt']))
+                                            <span class="editable"
+                                                  data-field="{{ $field }}"
+                                                  data-id="{{ $employee->id }}">
+                                                {{ $employee->$field ?? 'Add here....' }}
+                                            </span>
                                         @else
                                             <span class="editable"
                                                 data-field="{{ $field }}"
@@ -144,9 +164,10 @@
                             <tr>
                                 <th class="border p-2 text-left">Salary Slip</th>
                                 <td class="border p-2">
-                                    <a target="_blank" href="{{ route('employees.salary-slip', $employee->id) }}">
-                                        <button class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
-                                    </a>
+                                    <button onclick="openSalaryModal({{ $employee->id }})"
+                                        class="bg-blue-500 text-white px-4 py-2 rounded">
+                                        Print
+                                    </button>
                                 </td>
                             </tr>
                         </table>
@@ -381,6 +402,49 @@
             <button onclick="closeModal()" class="btn btn-secondary btn-sm">Cancel</button>
         </div>
     </div>
+    
+    <!-- Salary Month-Year Modal -->
+    <div id="salaryModal" style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.5);
+        justify-content:center;
+        align-items:center;
+    ">
+        <div style="background:#fff; padding:20px; border-radius:8px; width:300px;">
+
+            <h3 class="text-lg font-semibold mb-3">Select Month & Year</h3>
+
+            <label class="block mb-2">Month</label>
+            <select id="salaryMonth" class="border p-2 w-full mb-3">
+                @foreach(range(1,12) as $m)
+                    <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                @endforeach
+            </select>
+
+            <label class="block mb-2">Year</label>
+            <select id="salaryYear" class="border p-2 w-full mb-3">
+                @for($y = date('Y'); $y >= date('Y')-10; $y--)
+                    <option value="{{ $y }}">{{ $y }}</option>
+                @endfor
+            </select>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="printSalarySlip()"
+                    class="bg-blue-600 text-white px-3 py-1 rounded">
+                    Print
+                </button>
+                <button onclick="closeSalaryModal()"
+                    class="bg-gray-500 text-white px-3 py-1 rounded">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Common Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -414,18 +478,21 @@
 
 		function makeInlineEditable(element) {
                     element.addEventListener('click', () => {
-                        let currentValue = element.textContent.trim();
 
-                        // ✅ Clear placeholder text
+                        const field = element.dataset.field;
+                        const id = element.dataset.id;
+
+                        // ✅ FIX: Use real value if exists (for salary/tds)
+                        let currentValue = element.dataset.original !== undefined
+                            ? element.dataset.original
+                            : element.textContent.trim();
+
                         if (currentValue === 'Add here....') {
                             currentValue = '';
                         }
 
-                        const field = element.dataset.field;
-                        const id = element.dataset.id;
                         const input = document.createElement('input');
 
-                        // Optional: numeric fields
                         input.type = ['salary', 'tds', 'pt'].includes(field) ? 'number' : 'text';
                         input.step = '0.01';
                         input.value = currentValue;
@@ -722,6 +789,27 @@
                     alert("Wrong password");
                 }
             });
+        }
+        
+        let salaryEmployeeId = null;
+
+        function openSalaryModal(id) {
+            salaryEmployeeId = id;
+            document.getElementById('salaryModal').style.display = 'flex';
+        }
+
+        function closeSalaryModal() {
+            document.getElementById('salaryModal').style.display = 'none';
+        }
+
+        function printSalarySlip() {
+            let month = document.getElementById('salaryMonth').value;
+            let year = document.getElementById('salaryYear').value;
+
+            let url = `/employees/${salaryEmployeeId}/salary-slip?month=${month}&year=${year}`;
+
+            window.open(url, '_blank');
+            closeSalaryModal();
         }
     </script>
 </x-app-layout>
