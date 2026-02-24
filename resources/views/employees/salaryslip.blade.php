@@ -24,32 +24,26 @@
                <p class="c24"><span class="c15">Salary Slip for the Month of {{ \Carbon\Carbon::createFromDate($year, $month, 1)->format('F Y') }}.</span></p>
             </td>
          </tr>
-         <tr>
-            <td colspan="5" style="background:#e9e9e9; padding:10px;">
-                <table width="100%">
-                    <tr>
-                        <!-- Left Side -->
-                        <td width="40%" style="vertical-align:top;">
-                            <strong>Name:</strong> {{ $employee->name }}
-                        </td>
-
-                        <!-- Right Side -->
-                        <td width="60%" align="right">
-                            <div>
-                                <strong>Total Days = 31</strong>
-                            </div>
-                            <div>
-                                <strong>
-                                    Working days = 22,
-                                    Week off days = 09,
-                                    PL = 0,
-                                    CL = 0,
-                                    SL = 0
-                                </strong>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+         <tr class="c66">
+            <td class="c56" colspan="1" rowspan="2" style="width: 160px;">
+               <p class="c35"><span class="c15">Name</span><span class="c4">: {{ $employee->name }}</span></p>
+            </td>
+            <td class="c57" colspan="1" rowspan="1">
+               <p class="c12"><span class="c14"></span></p>
+            </td>
+            <td class="c93" colspan="1" rowspan="1">
+               <p class="c12"><span class="c14"></span></p>
+            </td>
+            <td class="c21" colspan="2" rowspan="1">
+               <p class="c46"><span class="c15">Total Days = 31</span></p>
+            </td>
+         </tr>
+         <tr class="c64">
+            <td class="c20" colspan="1" rowspan="1">
+               <p class="c12"><span class="c14"></span></p>
+            </td>
+            <td class="c31" colspan="3" rowspan="1">
+               <p class="c68"><span class="c15">Working days= 22, Week off days = 09, PL = 0, CL = 0, SL = 0</span></p>
             </td>
          </tr>
          <tr class="c52">
