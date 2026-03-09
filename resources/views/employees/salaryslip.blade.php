@@ -25,25 +25,12 @@
             </td>
          </tr>
          <tr class="c66">
-            <td class="c56" colspan="1" rowspan="2" style="width: 160px;">
-               <p class="c35"><span class="c15">Name</span><span class="c4">: {{ $employee->name }}</span></p>
+            <td class="c56" colspan="2" valign="middle" style="vertical-align: middle; text-align: left;">
+              <span class="c4" style="padding-left: 10px;"><b>Name</b>: {{ $employee->name }}</span>
             </td>
-            <td class="c57" colspan="1" rowspan="1">
-               <p class="c12"><span class="c14"></span></p>
-            </td>
-            <td class="c93" colspan="1" rowspan="1">
-               <p class="c12"><span class="c14"></span></p>
-            </td>
-            <td class="c21" colspan="2" rowspan="1">
-               <p class="c46"><span class="c15">Total Days = 31</span></p>
-            </td>
-         </tr>
-         <tr class="c64">
-            <td class="c20" colspan="1" rowspan="1">
-               <p class="c12"><span class="c14"></span></p>
-            </td>
-            <td class="c31" colspan="3" rowspan="1">
-               <p class="c68"><span class="c15">Working days= 22, Week off days = 09, PL = 0, CL = 0, SL = 0</span></p>
+            <td class="c21" colspan="3" style="text-align: center; padding:15px 0 15px 0;">
+                <span class="c15">Total Days = {{ $totalDays }}</span><br>
+                <span class="c15">Working days= {{ $workingDays }}, Week off days = {{ $weekOffDays }}, LWP = {{ $lwp }}</span>
             </td>
          </tr>
          <tr class="c52">
@@ -51,7 +38,7 @@
                <p class="c43"><span class="c15">Total Salary = Rs. {{ number_format($employee->salary, 0, '.', ',') }}/- pm</span></p>
             </td>
             <td class="c61" colspan="3" rowspan="1">
-               <p class="c74"><span class="c15">Paid Salary = Rs. {{ number_format(($employee->salary ?? 0) - (($employee->tds ?? 0) + ($employee->pt ?? 0)), 0, '.', ',') }}/-</span></p>
+               <p class="c74"><span class="c15">Paid Salary = Rs. {{ number_format($netSalary, 0, '.', ',') }}/-</span></p>
             </td>
          </tr>
          <tr class="c1">
@@ -158,10 +145,14 @@
                <p class="c91"><span class="c4">{{ number_format($employee->salary * 0.10, 0) }}</span></p>
             </td>
             <td class="c8" colspan="1" rowspan="1">
-               <p class="c12"><span class="c6"></span></p>
+               <p class="c44"><span class="c4">LWP</span></p>
             </td>
             <td class="c2" colspan="1" rowspan="1">
-               <p class="c12"><span class="c6"></span></p>
+               <p class="c88">
+                    <span class="c4">
+                        {{ $lwp > 0 ? number_format($lwpDeduction, 0, '.', ',') : '' }}
+                    </span>
+                </p>
             </td>
          </tr>
          <tr class="c81">
@@ -219,11 +210,7 @@
             <td class="c2" colspan="1" rowspan="1">
                 <p class="c29">
                     <span class="c15">
-                        @php
-                            $totalDeduction = ($employee->tds ?? 0) + ($employee->pt ?? 0);
-                        @endphp
-
-                        {{ $totalDeduction != 0 ? number_format($totalDeduction, 0, '.', ',') : '' }}/-
+                        {{ number_format($totalDeduction, 0, '.', ',') }}/-
                     </span>
                 </p>
             </td>
@@ -236,7 +223,7 @@
                <p class="c51"><span class="c4">Salary Credited to Your Account#</span></p>
             </td>
             <td class="c16" colspan="1" rowspan="1">
-               <p class="c90"><span class="c15">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ number_format(($employee->salary ?? 0) - (($employee->tds ?? 0) + ($employee->pt ?? 0)), 0, '.', ',') }}/-</span></p>
+               <p class="c90"><span class="c15">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ number_format($netSalary, 0, '.', ',') }}/-</span></p>
             </td>
          </tr>
          <tr class="c23">

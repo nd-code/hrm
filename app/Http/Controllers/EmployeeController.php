@@ -403,7 +403,65 @@ class EmployeeController extends Controller
         $month = $request->month ?? date('m');
         $year  = $request->year ?? date('Y');
 
-        return view('employees.salaryslip', compact('employee', 'month', 'year'));
+        $startDate = Carbon::createFromDate($year, $month, 1);
+        $endDate   = $startDate->copy()->endOfMonth();
+
+        // ✅ Total Days in month
+        $totalDays = $startDate->daysInMonth;
+
+        // ✅ Count Sundays (Week Off)
+        $weekOffDays = 0;
+        $current = $startDate->copy();
+
+        while ($current <= $endDate) {
+            if ($current->isWeekend()) { // Saturday + Sunday
+                $weekOffDays++;
+            }
+            $current->addDay();
+        }
+
+        // ✅ Working Days
+        $workingDays = $totalDays - $weekOffDays;
+
+        // ✅ Get LWP from leaves table
+        // assuming leaves table has: employee_id, from_date, to_date, status
+        $lwpLeaves = Leave::where('employee_id', $employee->id)
+            ->where('status', 'LWP')
+            ->whereBetween('from_date', [$startDate, $endDate])
+            ->get();
+
+        $lwp = 0;
+        foreach ($lwpLeaves as $leave) {
+            $lwp += Carbon::parse($leave->from_date)
+                ->diffInDays(Carbon::parse($leave->to_date)) + 1;
+        }
+
+        // ✅ Per day salary
+        $perDaySalary = $employee->salary / $totalDays;
+
+        // ✅ LWP Deduction
+        $lwpDeduction = $perDaySalary * $lwp;
+
+        // ✅ Total Deduction
+        $totalDeduction = ($employee->tds ?? 0) 
+                        + ($employee->pt ?? 0) 
+                        + $lwpDeduction;
+
+        // ✅ Net Salary
+        $netSalary = $employee->salary - $totalDeduction;
+
+        return view('employees.salaryslip', compact(
+            'employee',
+            'month',
+            'year',
+            'totalDays',
+            'weekOffDays',
+            'workingDays',
+            'lwp',
+            'lwpDeduction',
+            'totalDeduction',
+            'netSalary'
+        ));
     }
 
     public function uploadPhoto(Request $request, $id)
