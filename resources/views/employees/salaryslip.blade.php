@@ -16,7 +16,7 @@
          <tr class="c41">
             <td class="c60" colspan="5" rowspan="1">
                <p class="c26"><span class="c15">Aarav Info Solutions Private Limited.</span></p>
-               <p class="c65"><span class="c4">A-1208, Siddhi Vinayak Tower, Bh. D.C.P. Office, Makarba, Ahmedabad-380051 Email: </span><span class="c4"><a class="c32" href="mailto:contact@ainfosolutions.com">contact@ainfosolutions.com,</a></span><span class="c4">&nbsp;</span><span class="c4"><a class="c32" href="https://www.google.com/url?q=http://www.ainfosolutions.com/&amp;sa=D&amp;source=editors&amp;ust=1770676057783020&amp;usg=AOvVaw0JpeV3XVL3BxTw398ASgi4">www.ainfosolutions.com</a></span></p>
+               <p class="c65"><span class="c4">A-1208, Siddhi Vinayak Tower, Bh. D.C.P. Office, Makarba, Ahmedabad-380051 Email: </span><span class="c4"><a class="c32" href="mailto:contact@ainfosolutions.com">contact@ainfosolutions.com,</a></span><span class="c4">&nbsp;</span><span class="c4"><a class="c32" href="http://www.ainfosolutions.com" target="_blank">www.ainfosolutions.com</a></span></p>
             </td>
          </tr>
          <tr class="c99">
@@ -28,9 +28,9 @@
             <td class="c56" colspan="2" valign="middle" style="vertical-align: middle; text-align: left;">
               <span class="c4" style="padding-left: 10px;"><b>Name</b>: {{ $employee->name }}</span>
             </td>
-            <td class="c21" colspan="3" style="text-align: center; padding:15px 0 15px 0;">
-                <span class="c15">Total Days = {{ $totalDays }}</span><br>
-                <span class="c15">Working days= {{ $workingDays }}, Week off days = {{ $weekOffDays }}, LWP = {{ $lwp }}</span>
+            <td class="c21" colspan="3" style="text-align: right; padding:15px 0 15px 0;">
+                <span class="c15" style="padding-right: 75px;">Total Days = {{ $totalDays }}</span><br>
+                <span class="c15" style="padding-right: 10px;">Working days= {{ $workingDays }}, Week off days = {{ $weekOffDays }}</span>
             </td>
          </tr>
          <tr class="c52">
@@ -92,7 +92,7 @@
                <p class="c0"><span class="c4">Other DED 2</span></p>
             </td>
             <td class="c2" colspan="1" rowspan="1">
-               <p class="c12"><span class="c6"></span></p>
+               <p class="c88"><span class="c4">{{ $lwp > 0 ? number_format($lwpDeduction, 0, '.', ',') : '' }}</span></p>
             </td>
          </tr>
          <tr class="c81">
@@ -145,14 +145,10 @@
                <p class="c91"><span class="c4">{{ number_format($employee->salary * 0.10, 0) }}</span></p>
             </td>
             <td class="c8" colspan="1" rowspan="1">
-               <p class="c44"><span class="c4">LWP</span></p>
+               <p class="c44"><span class="c4"></span></p>
             </td>
             <td class="c2" colspan="1" rowspan="1">
-               <p class="c88">
-                    <span class="c4">
-                        {{ $lwp > 0 ? number_format($lwpDeduction, 0, '.', ',') : '' }}
-                    </span>
-                </p>
+               <p class="c88"><span class="c4"></span></p>
             </td>
          </tr>
          <tr class="c81">

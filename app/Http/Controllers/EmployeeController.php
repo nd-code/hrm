@@ -514,4 +514,16 @@ class EmployeeController extends Controller
             'value' => number_format($employee->{$request->field}, 2)
         ]);
     }
+    
+    public function toggleStatus(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        $employee->status = $request->status;
+        $employee->save();
+
+        return response()->json([
+            'message' => 'Status updated successfully'
+        ]);
+    }
 }

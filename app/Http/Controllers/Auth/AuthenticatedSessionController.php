@@ -39,6 +39,18 @@ class AuthenticatedSessionController extends Controller
 
         // Try Employee login
         if (Auth::guard('employee')->attempt($credentials, $request->boolean('remember'))) {
+
+            $employee = Auth::guard('employee')->user();
+
+            // 🚫 Block inactive employee
+            if (!$employee->status) {
+                Auth::guard('employee')->logout();
+
+                throw ValidationException::withMessages([
+                    'email' => 'Your account is inactive. Please contact admin.',
+                ]);
+            }
+
             $request->session()->regenerate();
             return redirect()->intended('/employee/dashboard');
         }

@@ -53,6 +53,7 @@
                                 <th>Position</th>
                                 <th>PAN Number</th>
                                 <th>Joining Date</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -97,6 +98,14 @@
 										value="{{ $emp->joining_date }}"
 										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
 									/>
+                                </td>
+                                <td>
+                                    <label class="switch">
+                                        <input type="checkbox" 
+                                            {{ $emp->status ? 'checked' : '' }}
+                                            onchange="toggleStatus({{ $emp->id }}, this.checked)">
+                                        <span class="slider round"></span>
+                                    </label>
                                 </td>
                                 <td class="space-x-2">
                                     <!-- View Icon -->
@@ -168,6 +177,7 @@
                 var table = $('#employeesTable').DataTable();
 				table.row.add([
 					`${response.id}`, // ID is hidden by DataTables configuration
+                                        `<td><img src="images/default-avatar.png" class="w-10 h-10 rounded-full object-cover me-2 border"></td>`,
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'name', this.innerText)">${response.name}</td>`,
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'email', this.innerText)">${response.email}</td>`,
 					`<td contenteditable="true" onBlur="updateField(${response.id}, 'employee_id', this.innerText)">${response.employee_id}</td>`,
@@ -192,6 +202,8 @@
 				]).order([0, 'desc']).draw(false); // Force reorder by ID DESC
 
                 $('#addEmployeeForm')[0].reset();
+                
+                location.reload();
             }
         });
     });
@@ -202,6 +214,22 @@
             _token: '{{ csrf_token() }}',
             [field]: value
         });
+    }
+    
+    function toggleStatus(id, status) {
+
+        $.ajax({
+            url: `/employees/${id}/toggle-status`,
+            type: "POST",
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: status ? 1 : 0
+            },
+            success: function(res) {
+                console.log(res.message);
+            }
+        });
+
     }
     </script>
 	
@@ -216,5 +244,56 @@
 		.joining-date-input {
 			outline: none;
 		}
+                
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 45px;
+                    height: 22px;
+                  }
+
+                  .switch input { 
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                  }
+
+                  .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    background-color: #ccc;
+                    transition: .4s;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                  }
+
+                  .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 3px;
+                    bottom: 3px;
+                    background-color: white;
+                    transition: .4s;
+                  }
+
+                  input:checked + .slider {
+                    background-color: #22c55e;
+                  }
+
+                  input:checked + .slider:before {
+                    transform: translateX(22px);
+                  }
+
+                  .slider.round {
+                    border-radius: 34px;
+                  }
+
+                  .slider.round:before {
+                    border-radius: 50%;
+                  }
 	</style>
 </x-app-layout>
