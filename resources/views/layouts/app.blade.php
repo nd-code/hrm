@@ -114,6 +114,13 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('holidays.index') }}"
+                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('holidays.*') ? 'bg-gray-700' : '' }}">
+                                    <i class="fa-solid fa-calendar-days me-2 text-indigo-400"></i>
+                                    <span class="navText">Holidays</span>
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('assessments.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('assessments.*') ? 'bg-gray-700' : '' }}">
                                     <i class="fa-solid fa-chart-line me-2 text-red-400"></i> <span class="navText">KPA</span>
@@ -131,6 +138,13 @@
                                 <a href="{{ route('employee.leaves.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.leaves.index') ? 'bg-gray-700' : '' }}">
                                     <i class="fa-regular fa-calendar-check me-2 text-pink-400"></i> <span class="navText">Leaves</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('employee.holidays.index') }}"
+                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.holidays.*') ? 'bg-gray-700' : '' }}">
+                                    <i class="fa-solid fa-calendar-check me-2 text-purple-400"></i>
+                                    <span class="navText">Holidays</span>
                                 </a>
                             </li>
                             <li>

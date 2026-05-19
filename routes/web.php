@@ -18,6 +18,7 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\RecycleBinController;
 use App\Http\Controllers\ActivityLogsController;
 use App\Http\Controllers\AppointmentLetterController;
+use App\Http\Controllers\HolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +84,30 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/employees/verify-salary-password', [EmployeeController::class, 'verifyPassword'])->name('employees.verify.salary.password');
     
     Route::post('/employees/{id}/toggle-status', [EmployeeController::class, 'toggleStatus']);
+    
+        /*
+    |--------------------------------------------------------------------------
+    | Holiday Routes (Admin)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/holidays', [HolidayController::class, 'adminIndex'])
+        ->name('holidays.index');
+
+    Route::get('/holidays/create', [HolidayController::class, 'create'])
+        ->name('holidays.create');
+
+    Route::post('/holidays/store', [HolidayController::class, 'store'])
+        ->name('holidays.store');
+
+    Route::get('/holidays/edit/{id}', [HolidayController::class, 'edit'])
+        ->name('holidays.edit');
+
+    Route::post('/holidays/update/{id}', [HolidayController::class, 'update'])
+        ->name('holidays.update');
+
+    Route::delete('/holidays/delete/{id}', [HolidayController::class, 'destroy'])
+        ->name('holidays.delete');
 });
 
 // Admin Auth (Breeze)
@@ -102,6 +127,15 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/reviews-list/{id}/inline-update', [ReviewController::class, 'inlineUpdate'])->name('employee.reviews.inline-update');
     Route::post('/employee/reviews-list/store', [ReviewController::class, 'store'])->name('employee.review.store');
     Route::delete('/employee/reviews-list/delete/{id}', [ReviewController::class, 'destroy'])->name('employee.review.destroy');
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Holiday Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/employee/holidays', [HolidayController::class, 'employeeHolidayIndex'])
+        ->name('employee.holidays.index');
 
     // Employee Leave Routes
     Route::get('/employee/leaves', [LeaveController::class, 'employeeIndex'])->name('employee.leaves.index');
