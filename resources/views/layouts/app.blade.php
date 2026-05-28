@@ -141,13 +141,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('employee.holidays.index') }}"
-                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.holidays.*') ? 'bg-gray-700' : '' }}">
-                                    <i class="fa-solid fa-calendar-check me-2 text-purple-400"></i>
-                                    <span class="navText">Holidays</span>
-                                </a>
-                            </li>
-                            <li>
                                 <a href="{{ route('employee.work.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.work.index') ? 'bg-gray-700' : '' }}">
                                     <i class="fa-solid fa-briefcase me-2 text-orange-400"></i> <span class="navText">My Work</span>
@@ -173,6 +166,13 @@
                                 <a href="{{ route('reminders.index') }}"
                                    class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('reminders.index') ? 'bg-gray-700' : '' }}">
                                     <i class="fa-solid fa-bell me-2 text-yellow-400"></i> <span class="navText">Reminders</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('employee.holidays.index') }}"
+                                   class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('employee.holidays.*') ? 'bg-gray-700' : '' }}">
+                                    <i class="fa-solid fa-calendar-check me-2 text-purple-400"></i>
+                                    <span class="navText">Holidays</span>
                                 </a>
                             </li>
                         @endif

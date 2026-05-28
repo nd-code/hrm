@@ -190,6 +190,7 @@
 										value="${response.joining_date ?? ''}"
 										onchange="updateField({{ $emp->id }}, 'joining_date', this.value)"
 									/></td>`,
+                                        `<td><label class="switch"><input type="checkbox" checked="" onchange="toggleStatus(${response.id}, this.checked)"><span class="slider round"></span></label></td>`,
 					`<td class="space-x-2">
 						<a href="/employees/${response.id}" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i></a>
 						<form method="POST" action="/employees/${response.id}" style="display:inline">

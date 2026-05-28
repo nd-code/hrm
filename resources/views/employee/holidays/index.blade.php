@@ -33,6 +33,10 @@
                                 <th class="border px-4 py-3 text-left">
                                     Date
                                 </th>
+                                
+                                <th class="border px-4 py-3 text-left">
+                                    Optional
+                                </th>
 
                                 <th class="border px-4 py-3 text-left">
                                     Description
@@ -58,6 +62,10 @@
 
                                     <td class="border px-4 py-3">
                                         {{ \Carbon\Carbon::parse($holiday->holiday_date)->format('d M Y') }}
+                                    </td>
+                                    
+                                    <td class="border px-4 py-3">
+                                        {{ $holiday->is_optional ? 'Yes' : 'No' }}
                                     </td>
 
                                     <td class="border px-4 py-3">

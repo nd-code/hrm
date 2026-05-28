@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Holiday;
+use App\Services\RecycleBinService;
 
 class HolidayController extends Controller
 {
@@ -77,6 +78,8 @@ class HolidayController extends Controller
     public function destroy($id)
     {
         $holiday = Holiday::findOrFail($id);
+        
+        RecycleBinService::delete($holiday, 'holiday');
 
         $holiday->delete();
 
