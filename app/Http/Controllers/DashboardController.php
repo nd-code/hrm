@@ -9,6 +9,7 @@ use App\Models\Assessment;
 use Carbon\Carbon;
 use App\Models\WorkSession;
 use Illuminate\Support\Facades\DB;
+use App\Models\Holiday;
 
 class DashboardController extends Controller
 {
@@ -20,22 +21,18 @@ class DashboardController extends Controller
         $assessmentCount = Assessment::count();
 
         $now = Carbon::now();
-        $today = Carbon::today();
 
         // Define your 24-hour window (9 PM → next day 9 PM)
-        $displayStart = Carbon::today()->setTime(21, 0); // 9 PM today
-        $displayEnd = (clone $displayStart)->addDay();   // 9 PM next day
+        $displayStart = Carbon::today()->setTime(21, 0);
 
         // Determine which date's leaves to show
         if ($now->lt($displayStart)) {
-            // Before 9 PM today → show leaves from yesterday
             $leaveDate = Carbon::yesterday()->toDateString();
         } else {
-            // After 9 PM today → show today's leaves
             $leaveDate = Carbon::today()->toDateString();
         }
 
-        // Employees on leave (based on 9 PM → next day 9 PM logic)
+        // Employees on leave
         $employeesOnLeave = Leave::with('employee')
             ->where('from_date', '<=', $leaveDate)
             ->where('to_date', '>=', $leaveDate)
@@ -45,7 +42,7 @@ class DashboardController extends Controller
 
         // Online employees
         $onlineEmployees = WorkSession::with('employee')
-            ->whereNull('end_time')   // means timer still running
+            ->whereNull('end_time')
             ->latest()
             ->get();
 
@@ -57,6 +54,17 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Upcoming Holidays (Today + Next 2 Days)
+        $upcomingHolidays = Holiday::whereBetween(
+                'holiday_date',
+                [
+                    Carbon::today()->toDateString(),
+                    Carbon::today()->addDays(2)->toDateString()
+                ]
+            )
+            ->orderBy('holiday_date')
+            ->get();
+
         return view('dashboard', compact(
             'employeeCount',
             'reviewCount',
@@ -64,7 +72,8 @@ class DashboardController extends Controller
             'assessmentCount',
             'onlineEmployees',
             'notifications',
-            'employeesOnLeave'
+            'employeesOnLeave',
+            'upcomingHolidays'
         ));
     }
 	

@@ -98,28 +98,93 @@
                         </tbody>
                     </table>
 
-                    <div class="p-3 mb-0 mt-4 text-sm text-red-800 border border-red-300  bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
+                    <div class="p-3 mb-0 mt-4 text-sm text-red-800 border border-red-300 bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
 
                         <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+
+                        {{-- Upcoming Holidays --}}
+                        @if(isset($upcomingHolidays) && $upcomingHolidays->count())
+
+                            @foreach($upcomingHolidays as $holiday)
+
+                                @php
+                                    $daysLeft = now()->startOfDay()->diffInDays(
+                                        \Carbon\Carbon::parse($holiday->holiday_date)->startOfDay(),
+                                        false
+                                    );
+                                @endphp
+
+                                <div class="p-3 mb-0 text-sm text-black border border-yellow-300 bg-yellow-50 notificationBox">
+
+                                    <span class="text-gray-800 font-medium">
+
+                                        🎉 Upcoming Holiday:
+                                        <strong>{{ $holiday->title }}</strong>
+
+                                        @if($daysLeft == 0)
+                                            (Today)
+                                        @elseif($daysLeft == 1)
+                                            (Tomorrow)
+                                        @else
+                                            (In {{ $daysLeft }} Days)
+                                        @endif
+
+                                    </span>
+
+                                    <br>
+
+                                    @if(!empty($holiday->description))
+                                        <span class="text-sm text-gray-600">
+                                            {{ $holiday->description }}
+                                        </span>
+                                        <br>
+                                    @endif
+
+                                    <span class="text-xs text-gray-500 ml-auto timeNotification">
+                                        {{ \Carbon\Carbon::parse($holiday->holiday_date)->format('d M Y') }}
+                                    </span>
+
+                                </div>
+
+                            @endforeach
+
+                        @endif
+
+                        {{-- Existing Notifications --}}
                         @if($notifications->count())
-                            <ul class="">
+
+                            <ul>
+
                                 @foreach ($notifications as $note)
+
                                     @php
                                         $data = json_decode($note->data, true);
                                     @endphp
-                                    <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
+
+                                    <li class="p-3 mb-0 text-sm text-black border border-red-300 bg-white dark:text-blue-400 notificationBox">
+
                                         <span class="text-gray-800 font-medium">
                                             {{ $data['message'] ?? '' }}
-                                        </span> <br>
-                                        <span class="text-xs text-gray-500 ml-auto timeNotification">
-                                            {{ \Carbon\Carbon::parse($note->latest_created_at ?? $note->created_at)->diffForHumans() }}
                                         </span>
+
+                                        <br>
+
+                                        <span class="text-xs text-gray-500 ml-auto timeNotification">
+                                            {{ \Carbon\Carbon::parse($note->created_at)->diffForHumans() }}
+                                        </span>
+
                                     </li>
+
                                 @endforeach
+
                             </ul>
-                        @else
+
+                        @elseif(!isset($upcomingHolidays) || $upcomingHolidays->count() == 0)
+
                             <p class="text-gray-600">No notification 🎉</p>
+
                         @endif
+
                     </div>
                 </div>
             </div>
@@ -148,12 +213,13 @@
 <style>
     .notificationBox {
         position: relative;
-        border:0 !important;
-        border:1px solid #f1d6d6 !important;
+        border: 1px solid #f1d6d6 !important;
     }
+
     .notificationBox:first-child {
-        border-bottom:0 !important;
+        border-bottom: 0 !important;
     }
+
     .timeNotification {
         background: #f5d2d2;
         padding: 1px 8px;
@@ -163,7 +229,7 @@
         display: inline-block;
         font-size: 11px !important;
         color: #9c2f2f;
-        font-weight:500;
+        font-weight: 500;
     }
 </style>
 
