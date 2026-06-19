@@ -173,7 +173,7 @@
                             <div class="w-100 space-y-2 p-3 mb-0 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
 
                                 <h3 class="text-lg font-semibold mb-3">
-                                    📌 Notifications & Upcoming Holidays
+                                    📌 Notifications
                                 </h3>
 
                                 {{-- Upcoming Holidays --}}
