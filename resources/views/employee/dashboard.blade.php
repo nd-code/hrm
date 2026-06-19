@@ -4,6 +4,7 @@
     use App\Models\Reminder;
     use App\Models\Leave;
     use App\Models\Team;
+    use App\Models\Holiday;
 
     $teamEmployees = Team::with('employee')
         ->where('parent_employee_id', auth('employee')->id())
@@ -42,6 +43,16 @@
         ->whereNull('end_time')
         ->latest()
         ->get();
+        
+    $upcomingHolidays = Holiday::whereBetween(
+        'holiday_date',
+        [
+            Carbon::today()->toDateString(),
+            Carbon::today()->addDays(2)->toDateString()
+        ]
+    )
+    ->orderBy('holiday_date')
+    ->get();
 @endphp
 
 <x-app-layout>
@@ -160,23 +171,90 @@
                             @endphp
 
                             <div class="w-100 space-y-2 p-3 mb-0 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800">
-                                <h3 class="text-lg font-semibold mb-3">📌 Notifications</h3>
+
+                                <h3 class="text-lg font-semibold mb-3">
+                                    📌 Notifications & Upcoming Holidays
+                                </h3>
+
+                                {{-- Upcoming Holidays --}}
+                                @if($upcomingHolidays->count())
+
+                                    @foreach($upcomingHolidays as $holiday)
+
+                                        @php
+                                            $daysLeft = now()->startOfDay()->diffInDays(
+                                                \Carbon\Carbon::parse($holiday->holiday_date)->startOfDay(),
+                                                false
+                                            );
+                                        @endphp
+
+                                        <div class="p-3 mb-0 text-sm text-black border border-yellow-300 bg-yellow-50 notificationBox">
+
+                                            <span class="text-gray-800 font-medium">
+
+                                                🎉 Upcoming Holiday:
+                                                <strong>{{ $holiday->title }}</strong>
+
+                                                @if($daysLeft == 0)
+                                                    (Today)
+                                                @elseif($daysLeft == 1)
+                                                    (Tomorrow)
+                                                @else
+                                                    (In {{ $daysLeft }} Days)
+                                                @endif
+
+                                            </span>
+
+                                            <br>
+
+                                            @if(!empty($holiday->description))
+                                                <span class="text-sm text-gray-600">
+                                                    {{ $holiday->description }}
+                                                </span>
+                                                <br>
+                                            @endif
+
+                                            <span class="text-xs text-gray-500 ml-auto timeNotification">
+                                                {{ \Carbon\Carbon::parse($holiday->holiday_date)->format('d M Y') }}
+                                            </span>
+
+                                        </div>
+
+                                    @endforeach
+
+                                @endif
+
+                                {{-- Existing Notifications --}}
                                 @if($latestNotifications->count())
-                                    <ul class="">
+
+                                    <ul>
+
                                         @foreach ($latestNotifications as $note)
-                                            <li class="p-3 mb-0 text-sm text-black border border-red-300  bg-white dark:text-blue-400 notificationBox">
+
+                                            <li class="p-3 mb-0 text-sm text-black border border-red-300 bg-white dark:text-blue-400 notificationBox">
+
                                                 <span class="text-gray-800 font-medium">
                                                     {{ $note->data['message'] ?? '' }}
-                                                </span> <br>
-                                                <span class="text-xs text-gray-500 ml-auto timeNotification ">
+                                                </span>
+
+                                                <br>
+
+                                                <span class="text-xs text-gray-500 ml-auto timeNotification">
                                                     {{ $note->created_at->diffForHumans() }}
                                                 </span>
+
                                             </li>
+
                                         @endforeach
+
                                     </ul>
-                                @else
+
+                                @elseif(!$upcomingHolidays->count())
+
                                     <p class="text-gray-600">No notification 🎉</p>
+
                                 @endif
+
                             </div>
                         </div>
                     @endif
