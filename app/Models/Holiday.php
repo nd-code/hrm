@@ -13,7 +13,7 @@ class Holiday extends Model
         'title',
         'holiday_date',
         'description',
-        'is_optional',
+        'day',
         'status'
     ];
 }

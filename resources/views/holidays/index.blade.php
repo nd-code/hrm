@@ -48,7 +48,7 @@
                                 </th>
 
                                 <th class="border px-4 py-3 text-left">
-                                    Optional
+                                    Day
                                 </th>
 
                                 <th class="border px-4 py-3 text-left">
@@ -78,7 +78,7 @@
                                     </td>
 
                                     <td class="border px-4 py-3">
-                                        {{ $holiday->is_optional ? 'Yes' : 'No' }}
+                                        {{ $holiday->day }}
                                     </td>
 
                                     <td class="border px-4 py-3">

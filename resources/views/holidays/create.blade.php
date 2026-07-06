@@ -72,24 +72,18 @@
                         </div>
 
                         <div class="col-lg-4">
+                            <label class="mb-2">Day</label>
 
-                            <label class="mb-2">
-                                Holiday Type
-                            </label>
+                            <select name="day" class="form-control" required>
+                                <option value="">Select Day</option>
 
-                            <select name="is_optional"
-                                    class="form-control">
-
-                                <option value="0">
-                                    Mandatory
-                                </option>
-
-                                <option value="1">
-                                    Optional
-                                </option>
-
+                                @foreach (['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day)
+                                    <option value="{{ $day }}"
+                                        {{ old('day', $holiday->day ?? '') == $day ? 'selected' : '' }}>
+                                        {{ $day }}
+                                    </option>
+                                @endforeach
                             </select>
-
                         </div>
 
                     </div>

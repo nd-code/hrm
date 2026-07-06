@@ -32,13 +32,14 @@ class HolidayController extends Controller
         $request->validate([
             'title' => 'required|max:255',
             'holiday_date' => 'required|date',
+            'day' => 'required|string'
         ]);
 
         Holiday::create([
             'title'         => $request->title,
             'holiday_date'  => $request->holiday_date,
             'description'   => $request->description,
-            'is_optional'   => $request->is_optional ? 1 : 0,
+            'day'           => $request->day,
             'status'        => 1,
         ]);
 
@@ -59,6 +60,7 @@ class HolidayController extends Controller
         $request->validate([
             'title' => 'required|max:255',
             'holiday_date' => 'required|date',
+            'day' => 'required|string'
         ]);
 
         $holiday = Holiday::findOrFail($id);
@@ -67,7 +69,7 @@ class HolidayController extends Controller
             'title'         => $request->title,
             'holiday_date'  => $request->holiday_date,
             'description'   => $request->description,
-            'is_optional'   => $request->is_optional ? 1 : 0,
+            'day'           => $request->day,
         ]);
 
         return redirect()

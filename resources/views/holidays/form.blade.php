@@ -53,20 +53,21 @@
 </div>
 
 <div class="mt-6">
-
-    <label class="inline-flex items-center">
-
-        <input type="checkbox"
-               name="is_optional"
-               value="1"
-               class="rounded border-gray-300 text-blue-600 shadow-sm"
-               {{ old('is_optional', $holiday->is_optional ?? false) ? 'checked' : '' }}>
-
-        <span class="ml-2 text-sm text-gray-700">
-            Optional Holiday
-        </span>
-
+    
+    <label class="block mb-2 text-sm font-medium text-gray-700">
+        Day
     </label>
+
+    <select name="day" class="form-control" required>
+        <option value="">Select Day</option>
+
+        @foreach (['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day)
+            <option value="{{ $day }}"
+                {{ old('day', $holiday->day ?? '') == $day ? 'selected' : '' }}>
+                {{ $day }}
+            </option>
+        @endforeach
+    </select>
 
 </div>
 
