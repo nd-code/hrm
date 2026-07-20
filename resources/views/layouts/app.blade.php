@@ -316,6 +316,12 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="relative float-right" style="margin-right: 100px;margin-top: 10px;">
+                            <a href="{{ route('employee.documentsList') }}">
+                                <i class="fa-solid fa-folder-open me-1 text-yellow-400"></i>
+                                <span class="navText">My Documents</span>
+                            </a>
+                        </div>
                     </header>
                 @endif
             @endauth

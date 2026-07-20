@@ -526,4 +526,15 @@ class EmployeeController extends Controller
             'message' => 'Status updated successfully'
         ]);
     }
+    
+    public function documents()
+    {
+        $employeeId = auth('employee')->id();
+
+        $documents = EmployeeDocument::where('employee_id', $employeeId)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('employee.documents.index', compact('documents'));
+    }
 }

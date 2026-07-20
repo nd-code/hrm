@@ -148,6 +148,8 @@ Route::middleware(['auth:employee'])->group(function () {
     Route::post('/employee/{id}/inline-update', [EmployeeWorkController::class, 'inlineUpdate'])->name('employee.work.inline-update');
 
     Route::get('/employee/profile', [EmployeeController::class, 'profile'])->name('employee.profile');
+    
+    Route::get('/employee/documents', [EmployeeController::class, 'documents'])->name('employee.documentsList');
 
     Route::resource('/employee/reminders', ReminderController::class);
     Route::post('/employee/reminders/{reminder}/inline-update', [ReminderController::class, 'inlineUpdate'])->name('employee.reminders.inlineUpdate');
