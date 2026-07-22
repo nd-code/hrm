@@ -30,6 +30,12 @@
                        Leaves
                     </a>
                 </li>
+                <li class="mr-1">
+                    <a href="#tab-documents"
+                       class="tab-link bg-white inline-block py-2 px-4 text-gray-500 hover:text-blue-600">
+                       Documents
+                    </a>
+                </li>
             </ul>
 
             <!-- Tab Contents -->
@@ -123,28 +129,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            <tr>
-                                <th class="border p-2 text-left">Documents</th>
-                                <td class="border p-2">
-                                    <div id="documents-loading" class="hidden mb-2">
-                                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                                        </svg>
-                                        Uploading...
-                                    </div>
-
-                                    <div id="documents-list" class="mb-2 text-sm">
-                                        Loading...
-                                    </div>
-
-                                    <input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
-                                    <button type="button" onclick="document.getElementById('document-upload').click()"
-                                        class="bg-blue-500 text-white px-3 py-1 rounded">
-                                        Upload Document
-                                    </button>
-                                </td>
-                            </tr>
                             <tr>
                                 <th class="border p-2 text-left">Relieving Letter</th>
                                 <td class="border p-2">
@@ -364,6 +348,57 @@
                             @endforeach
                         </tbody>
                     </table>
+
+                </div>
+                
+                <!-- Documents Tab -->
+                <div id="tab-documents" class="tab-content hidden p-4">
+
+                    <div class="flex justify-between items-center mb-5">
+
+                        <h3 class="text-lg font-bold">Documents</h3>
+
+                        <div class="flex items-center gap-3">
+
+                            <!-- Search -->
+                            <input
+                                type="text"
+                                id="document-search"
+                                placeholder="Search document..."
+                                class="border rounded-lg px-4 py-2 w-64 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                            <!-- Upload -->
+                            <input
+                                type="file"
+                                id="document-upload"
+                                name="documents[]"
+                                multiple
+                                class="hidden">
+
+                            <button
+                                type="button"
+                                onclick="document.getElementById('document-upload').click()"
+                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                + Upload Document
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div id="documents-loading" class="hidden mb-4 text-blue-600">
+                        Uploading...
+                    </div>
+
+                    <div id="documents-list"
+                         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                    </div>
+
+                    <!-- No Result -->
+                    <div id="no-documents"
+                         class="hidden text-center text-gray-500 mt-6">
+                        No documents found.
+                    </div>
 
                 </div>
 		
@@ -610,36 +645,57 @@
 						container.textContent = 'No documents uploaded.';
 					} else {
 						data.documents.forEach(doc => {
-							const wrapper = document.createElement('div');
-							wrapper.className = 'flex items-center justify-between mb-1';
 
-							// File name (click to view in browser)
-							const link = document.createElement('a');
-							link.href = `/storage/${doc.file_path}`;
-							link.textContent = doc.file_name;
-							link.target = '_blank';
-							link.className = 'text-blue-600 hover:underline flex-1';
+                                                    let ext = doc.file_name.split('.').pop().toLowerCase();
 
-							// Download button
-							const downloadBtn = document.createElement('a');
-							downloadBtn.href = `/storage/${doc.file_path}`;
-							downloadBtn.download = doc.file_name;
-							downloadBtn.textContent = '⬇️';
-							downloadBtn.className = 'ml-2 text-green-600 hover:text-green-800';
-							downloadBtn.style.cursor = 'pointer';
+                                                    let icon = "fa-file";
 
-							// Delete button
-							const deleteBtn = document.createElement('button');
-							deleteBtn.textContent = '🗑️';
-							deleteBtn.className = 'ml-2 text-red-600 hover:text-red-800';
-							deleteBtn.style.cursor = 'pointer';
-							deleteBtn.addEventListener('click', () => deleteDocument(employeeId, doc.id));
+                                                    if (['pdf'].includes(ext))
+                                                        icon = "fa-file-pdf";
+                                                    else if (['doc','docx'].includes(ext))
+                                                        icon = "fa-file-word";
+                                                    else if (['xls','xlsx'].includes(ext))
+                                                        icon = "fa-file-excel";
+                                                    else if (['jpg','jpeg','png','gif','webp'].includes(ext))
+                                                        icon = "fa-file-image";
 
-							wrapper.appendChild(link);
-							wrapper.appendChild(downloadBtn); // Added before delete
-							wrapper.appendChild(deleteBtn);
-							container.appendChild(wrapper);
-						});
+                                                    container.innerHTML += `
+                                                        <div class="document-card bg-white border rounded-xl shadow hover:shadow-lg transition p-4" data-name="${doc.file_name.toLowerCase()}">
+
+                                                            <div class="text-center">
+
+                                                                <i class="fa-solid ${icon} text-6xl text-blue-500 mb-4"></i>
+
+                                                                <div class="font-semibold break-words text-sm mb-4">
+                                                                    ${doc.file_name}
+                                                                </div>
+
+                                                                <div class="flex justify-center gap-3">
+
+                                                                    <a href="/storage/${doc.file_path}"
+                                                                       target="_blank"
+                                                                       class="text-blue-600">
+                                                                        <i class="fa-solid fa-eye"></i>
+                                                                    </a>
+
+                                                                    <a href="/storage/${doc.file_path}"
+                                                                       download
+                                                                       class="text-green-600">
+                                                                        <i class="fa-solid fa-download"></i>
+                                                                    </a>
+
+                                                                    <button onclick="deleteDocument(${doc.employee_id},${doc.id})"
+                                                                            class="text-red-600">
+                                                                        <i class="fa-solid fa-trash"></i>
+                                                                    </button>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    `;
+                                                });
 					}
 				});
 		}
@@ -662,6 +718,32 @@
 				}
 			});
 		}
+                
+                $('#document-search').on('keyup', function () {
+
+                    let keyword = $(this).val().toLowerCase();
+                    let count = 0;
+
+                    $('#documents-list .document-card').each(function () {
+
+                        let fileName = $(this).data('name');
+
+                        if (fileName.includes(keyword)) {
+                            $(this).show();
+                            count++;
+                        } else {
+                            $(this).hide();
+                        }
+
+                    });
+
+                    if (count === 0) {
+                        $('#no-documents').removeClass('hidden');
+                    } else {
+                        $('#no-documents').addClass('hidden');
+                    }
+
+                });
     </script>
 	
 	<style>

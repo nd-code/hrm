@@ -79,29 +79,6 @@ use App\Models\Position;
                             </td>
                         </tr>
                     @endforeach
-
-                    <tr>
-                            <th class="border p-2 text-left">Documents</th>
-                            <td class="border p-2">
-                                <div id="documents-loading" class="hidden mb-2 d-none">
-                                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                                        </svg>
-                                        Uploading...
-                                </div>
-
-                                <div id="documents-list" class="mb-2 text-sm">
-                                        Loading...
-                                </div>
-
-                                <input type="file" id="document-upload" name="documents[]" multiple style="display: none;" />
-                                <button type="button" onclick="document.getElementById('document-upload').click()"
-                                        class="bg-blue-500 text-white px-3 py-1 rounded d-none">
-                                        Upload Document
-                                </button>
-                            </td>
-                    </tr>
                 </table>
 
                 <!--<a href="{{ route('employees.index') }}" 
@@ -189,48 +166,6 @@ use App\Models\Position;
 				_token: '{{ csrf_token() }}',
 				[field]: value
 			});
-		}
-		
-		document.addEventListener('DOMContentLoaded', () => {
-			loadEmployeeDocuments({{ $employee->id }});
-
-			const loadingIndicator = document.getElementById('documents-loading');
-		});
-
-		function loadEmployeeDocuments(employeeId) {
-			fetch(`/employee/${employeeId}/documents`)
-				.then(response => response.json())
-				.then(data => {
-					const container = document.getElementById('documents-list');
-					container.innerHTML = '';
-					if (data.documents.length === 0) {
-						container.textContent = 'No documents uploaded.';
-					} else {
-						data.documents.forEach(doc => {
-							const wrapper = document.createElement('div');
-							wrapper.className = 'flex items-center justify-between mb-1';
-
-							// File name (click to view in browser)
-							const link = document.createElement('a');
-							link.href = `/storage/${doc.file_path}`;
-							link.textContent = doc.file_name;
-							link.target = '_blank';
-							link.className = 'text-blue-600 hover:underline flex-1';
-
-							// Download button
-							const downloadBtn = document.createElement('a');
-							downloadBtn.href = `/storage/${doc.file_path}`;
-							downloadBtn.download = doc.file_name;
-							downloadBtn.textContent = '⬇️';
-							downloadBtn.className = 'ml-2 text-green-600 hover:text-green-800';
-							downloadBtn.style.cursor = 'pointer';
-
-							wrapper.appendChild(link);
-							wrapper.appendChild(downloadBtn);
-							container.appendChild(wrapper);
-						});
-					}
-				});
 		}
     </script>
         

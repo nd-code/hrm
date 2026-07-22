@@ -184,7 +184,7 @@ class EmployeeController extends Controller
 
 	public function getDocuments($id)
 	{
-		$documents = EmployeeDocument::where('employee_id', $id)->get();
+		$documents = EmployeeDocument::where('employee_id', $id)->orderBy('id', 'desc')->get();
 		return response()->json(['success' => true, 'documents' => $documents]);
 	}
 	
