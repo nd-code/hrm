@@ -48,7 +48,7 @@
         'holiday_date',
         [
             Carbon::today()->toDateString(),
-            Carbon::today()->addDays(2)->toDateString()
+            Carbon::today()->addDays(16)->toDateString()
         ]
     )
     ->orderBy('holiday_date')

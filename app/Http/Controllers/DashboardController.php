@@ -59,7 +59,7 @@ class DashboardController extends Controller
                 'holiday_date',
                 [
                     Carbon::today()->toDateString(),
-                    Carbon::today()->addDays(15)->toDateString()
+                    Carbon::today()->addDays(16)->toDateString()
                 ]
             )
             ->orderBy('holiday_date')
