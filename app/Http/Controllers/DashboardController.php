@@ -54,12 +54,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Upcoming Holidays (Today + Next 2 Days)
+        // Upcoming Holidays (Today + Next 15 Days)
         $upcomingHolidays = Holiday::whereBetween(
                 'holiday_date',
                 [
                     Carbon::today()->toDateString(),
-                    Carbon::today()->addDays(2)->toDateString()
+                    Carbon::today()->addDays(15)->toDateString()
                 ]
             )
             ->orderBy('holiday_date')
