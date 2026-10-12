@@ -118,6 +118,7 @@ require __DIR__.'/auth.php';
 Route::get('/employee/login', [EmployeeLoginController::class, 'showLoginForm'])->name('employee.login');
 Route::post('/employee/login', [EmployeeLoginController::class, 'login']);
 Route::post('/employee/logout', [EmployeeLoginController::class, 'logout'])->name('employee.logout');
+Route::get('/employee/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])->name('employee.password.request');
 
 // Employee Dashboard
 Route::middleware(['auth:employee'])->group(function () {

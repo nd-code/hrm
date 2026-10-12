@@ -26,5 +26,5 @@ class Employee extends Authenticatable
         'tds',
         'pt'
     ];
-    protected $hidden = ['password'];
+    protected $hidden = ['password', 'remember_token'];
 }
