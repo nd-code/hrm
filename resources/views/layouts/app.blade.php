@@ -66,6 +66,11 @@
     #sidebar.active .p-active {
         padding: 14px !important;
     }
+
+    @keyframes pulse-doc-badge {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+        50% { transform: scale(1.15); box-shadow: 0 0 0 4px rgba(239,68,68,0); }
+    }
     </style>
 
 </head>
@@ -317,9 +322,35 @@
                             </div>
                         </div>
                         <div class="relative float-right" style="margin-right: 100px;margin-top: 10px;">
-                            <a href="{{ route('employee.documentsList') }}">
+                            @php
+                                $unseenDocCount = \App\Models\EmployeeDocument::where('employee_id', auth('employee')->id())
+                                    ->where('seen_by_employee', false)
+                                    ->count();
+                            @endphp
+                            <a href="{{ route('employee.documentsList') }}" class="position-relative" style="text-decoration: none;">
                                 <i class="fa-solid fa-folder-open me-1 text-yellow-400"></i>
                                 <span class="navText">My Documents</span>
+                                @if($unseenDocCount > 0)
+                                    <span style="
+                                        position: absolute;
+                                        top: -8px;
+                                        right: -10px;
+                                        background: #ef4444;
+                                        color: white;
+                                        font-size: 11px;
+                                        font-weight: 700;
+                                        min-width: 18px;
+                                        height: 18px;
+                                        border-radius: 50%;
+                                        display: inline-flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        padding: 0 4px;
+                                        line-height: 1;
+                                        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+                                        animation: pulse-doc-badge 1.5s infinite;
+                                    ">{{ $unseenDocCount }}</span>
+                                @endif
                             </a>
                         </div>
                     </header>

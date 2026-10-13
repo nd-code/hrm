@@ -535,6 +535,11 @@ class EmployeeController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
+        // Mark all unseen documents as seen now that the employee is viewing them
+        EmployeeDocument::where('employee_id', $employeeId)
+            ->where('seen_by_employee', false)
+            ->update(['seen_by_employee' => true]);
+
         return view('employee.documents.index', compact('documents'));
     }
 }

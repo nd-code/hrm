@@ -14,6 +14,7 @@ class EmployeeDocument extends Model
         'employee_id',
         'file_name',
         'file_path',
+        'seen_by_employee',
     ];
 
     public function employee()
